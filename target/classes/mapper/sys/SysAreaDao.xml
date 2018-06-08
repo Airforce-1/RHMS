@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.sys.dao.SysAreaDao">
+
+	<select id="queryObject" resultType="com.khidi.manager.sys.entity.SysAreaEntity">
+		select * from sys_area where area_id = '${_parameter}' and del_flag = 0
+	</select>
+
+
+
+	<select id="queryParentIdIsCorrent" parameterType="com.khidi.manager.sys.entity.SysAreaEntity" resultType="String">
+		select area_id from (select area_id from sys_area START WITH area_id= #{areaId} CONNECT BY prior area_id = parent_id) b
+		where b.area_id = #{parentId}
+	</select>
+
+
+
+	<select id="queryList" resultType="com.khidi.manager.sys.entity.SysAreaEntity">
+		select d.*,(select p.name from sys_area p where p.area_id = d.parent_id) as parentName
+		from sys_area d where d.del_flag = 0
+		<!--<if test="areaFilter != null">-->
+			<!--and '${areaFilter}' like  '%'|| d.area_id  ||'%'-->
+		<!--</if>-->
+		<if test="roleId != null">
+			and (SELECT XMLAGG(XMLELEMENT(E,areaids
+			||',')).EXTRACT('//text()').getclobval() AS areaids
+			FROM sys_role_resource
+			WHERE roleid IN (${roleId})) LIKE '%'||d.area_id||'%'
+		</if>
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by d.${sidx} ${order}
+            </when>
+			<otherwise>
+                order by d.order_num asc
+			</otherwise>
+        </choose>
+	</select>
+
+
+	<insert id="save" parameterType="com.khidi.manager.sys.entity.SysAreaEntity" useGeneratedKeys="true" keyProperty="areaId">
+		insert into sys_area
+		(
+			AREA_ID ,
+			ID,
+			PARENT_ID ,
+			NAME ,
+			ORDER_NUM ,
+			DEL_FLAG ,
+			LAND_AREA ,
+			CULTIVATED_AREA ,
+			SUM_PEOPLE ,
+			SUM_FAMILY ,
+			SUM_HOUSE ,
+			AREA_X ,
+			AREA_Y ,
+			SUM_VILLAGE ,
+			WEIGHT ,
+			AREA_AREA ,
+			REMARK,
+			OPEN
+		)
+		values
+		(
+			#{areaId},
+			#{id},
+			#{parentId},
+			#{name},
+			#{orderNum},
+			#{delFlag},
+			#{landArea,jdbcType=VARCHAR},
+			#{cultivatedArea,jdbcType=VARCHAR},
+			#{sumPeople,jdbcType=VARCHAR},
+			#{sumFamily,jdbcType=VARCHAR},
+			#{sumHouse,jdbcType=VARCHAR},
+			#{areaX,jdbcType=VARCHAR},
+			#{areaY,jdbcType=VARCHAR},
+			#{sumVillage,jdbcType=VARCHAR},
+			#{weight,jdbcType=VARCHAR},
+			#{areaArea,jdbcType=VARCHAR},
+			#{remark,jdbcType=VARCHAR},
+			#{open,jdbcType=VARCHAR}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.khidi.manager.sys.entity.SysAreaEntity">
+		update sys_area
+		<set>
+			<if test="areaId != null">
+				AREA_ID = #{areaId}  , </if>
+			<if test="id != null">
+				ID = #{id}  , </if>
+			<if test="parentId != null">
+				PARENT_ID = #{parentId}  , </if>
+			<if test="name != null">
+				NAME = #{name}  , </if>
+			<if test="orderNum != null">
+				ORDER_NUM = #{orderNum}  , </if>
+			<if test="landArea != null">
+				LAND_AREA = #{landArea}  , </if>
+			<if test="cultivatedArea != null">
+				CULTIVATED_AREA = #{cultivatedArea}  , </if>
+			<if test="sumPeople != null">
+				SUM_PEOPLE = #{sumPeople}  , </if>
+			<if test="sumFamily != null">
+				SUM_FAMILY = #{sumFamily}  , </if>
+			<if test="sumHouse != null">
+				SUM_HOUSE = #{sumHouse}  , </if>
+			<if test="areaX != null">
+				AREA_X = #{areaX}  , </if>
+			<if test="areaY != null">
+				AREA_Y = #{areaY}  , </if>
+			<if test="sumVillage != null">
+				SUM_VILLAGE = #{sumVillage}  , </if>
+			<if test="weight != null">
+				WEIGHT = #{weight}  , </if>
+			<if test="areaArea != null">
+				AREA_AREA = #{areaArea}  , </if>
+			<if test="remark != null">
+				REMARK = #{remark}  </if>
+			<if test="open != null">
+				OPEN = #{open}  </if>
+		</set>
+		where area_id = #{areaId}
+	</update>
+	
+	<update id="delete">
+		delete from sys_area where area_id = #{value}
+	</update>
+
+	<select id="queryListByParentId" resultType="com.khidi.manager.sys.entity.SysAreaEntity">
+		select * from sys_area where parent_id = #{value} and del_flag = 0
+	</select>
+
+
+
+	<select id="queryExistsByParentId" resultType="com.khidi.manager.sys.entity.SysAreaEntity">
+		select 1 from sys_area where parent_id = #{value} and del_flag = 0
+	</select>
+	
+	<select id="queryAreaIdList" resultType="String">
+		select area_id from sys_area where parent_id = #{value} and del_flag = 0
+	</select>
+
+	<select id="getSubAreaIdList" resultType="String">
+		select area_id from sys_area START WITH area_id= #{value} CONNECT BY prior area_id = parent_id
+	</select>
+
+
+	<select id="getList4Open" resultType="com.khidi.manager.sys.entity.SysAreaEntity">
+		select area.area_id,area.id,area.name,area.parent_id, (case when exists(select 1 from sys_area  where parent_id = area.area_Id) then 1 else 0 end ) open from sys_area area
+	</select>
+</mapper>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.socialparticipation.dao.AppnewsviewimgDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap
+		type="com.khidi.manager.socialparticipation.entity.AppnewsviewimgEntity"
+		id="appnewsviewimgMap">
+		<result property="appNewsId" column="APPNEWSID" />
+		<result property="filePath" column="FILEPATH" />
+		<result property="id" column="ATTACHID" />
+	</resultMap>
+
+	<select id="queryObject"
+		resultType="com.khidi.manager.socialparticipation.entity.AppnewsviewimgEntity">
+		select * from APPNEWSVIEWIMG where ID = #{id}
+	</select>
+
+
+	<select id="queryList"
+		resultType="com.khidi.manager.socialparticipation.entity.AppnewsviewimgEntity">
+		<choose>
+			<when test="limit != null and offset !=null and page!=null">
+				select * FROM (
+				SELECT * FROM
+				(
+				SELECT a.*, ROWNUM RN
+				FROM (select * from APPNEWSVIEWIMG
+				<where>
+					<if test="appNewsId != null and appNewsId''">AND APPNEWSID like '%'||to_char(#{appNewsId})||'%'
+					</if>
+					<if test="filePath != null and filePath!=''">AND FILEPATH like '%'||to_char(#{filePath})||'%'
+					</if>
+					<if test="id != null and id!=''">AND ATTACHID like '%'||to_char(#{id})||'%'
+					</if>
+				</where>
+				<choose>
+					<when test="sidx != null and sidx.trim() != ''">
+						order by ${sidx} ${order}
+					</when>
+					<otherwise>
+						order by createtime desc
+					</otherwise>
+				</choose>
+				)a
+				WHERE ROWNUM &lt;= #{limit} * #{page}
+				)
+				WHERE RN > #{offset}
+				)
+			</when>
+			<otherwise>
+				select * from APPNEWSVIEWIMG
+			</otherwise>
+		</choose>
+	</select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<select id="queryTotal" resultType="int">
+		select count(*) from APPNEWSVIEWIMG
+		<where>
+			<if test="appNewsId != null and appNewsId''">AND APPNEWSID like '%'||to_char(#{appNewsId})||'%'
+			</if>
+			<if test="filePath != null and filePath''">AND FILEPATH like '%'||to_char(#{filePath})||'%'
+			</if>
+			<if test="id != null and id!=''">AND ATTACHID like '%'||to_char(#{id})||'%'
+			</if>
+		</where>
+	</select>
+
+
+	<select id="getAttachByNewsId"
+		resultMap="appnewsviewimgMap">
+		SELECT * FROM APPNEWSVIEWIMG WHERE APPNEWSID = #{newsId}
+	</select>
+
+	<insert id="save"
+		parameterType="com.khidi.manager.socialparticipation.entity.AppnewsviewimgEntity">
+		insert into APPNEWSVIEWIMG
+		(
+		APPNEWSID ,
+		FILEPATH ,
+		ATTACHID
+		)
+		values
+		(
+		#{appNewsId,jdbcType = VARCHAR},
+		#{filePath,jdbcType = VARCHAR},
+		#{id,jdbcType = VARCHAR}
+		)
+	</insert>
+
+	<update id="update"
+		parameterType="com.khidi.manager.socialparticipation.entity.AppnewsviewimgEntity">
+		update APPNEWSVIEWIMG
+		<set>
+			<if test="filepath != null">
+				FILEPATH = #{filePath} ,
+			</if>
+			<if test="attachid != null">
+				ATTACHID = #{id}
+			</if>
+		</set>
+		where APPNEWSID = #{appNewsId}
+	</update>
+
+	<delete id="delete">
+		delete from APPNEWSVIEWIMG where APPNEWSID = #{newsId,jdbcType = VARCHAR}
+	</delete>
+</mapper>

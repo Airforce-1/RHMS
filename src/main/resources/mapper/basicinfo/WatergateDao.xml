@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.basicinfo.dao.WatergateDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap type="com.khidi.manager.basicinfo.entity.WatergateEntity"
+		id="WatergateMap">
+		<result property="id" column="ID" />
+		<result property="name" column="NAME" />
+	</resultMap>
+
+	<select id="queryObject" resultType="com.khidi.manager.basicinfo.entity.WatergateEntity">
+		select * from watergate
+		where ID = #{id}
+	</select>
+
+
+	<select id="queryList" resultType="com.khidi.manager.basicinfo.entity.WatergateEntity">
+		<choose>
+			<when test="limit != null and offset !=null and page!=null">
+				select d.* FROM (
+				SELECT c.* FROM
+				(
+				SELECT a.*, ROWNUM RN
+				FROM (select *
+				from watergate
+				<where>
+					<if test="code != null and code !='' ">AND code like '%'||to_char(#{code})||'%'
+					</if>
+					<if test="x != null and x !='' ">AND x like '%'||to_char(#{x})||'%'
+					</if>
+					<if test="y != null and y !='' ">AND y like '%'||to_char(#{y})||'%'
+					</if>
+					<if test="type != null and type !='' ">AND type like '%'||to_char(#{type})||'%'
+					</if>
+					<if test="buildSituation != null and buildSituation !='' ">AND build_Situation like
+						'%'||to_char(#{buildSituation})||'%'
+					</if>
+					<if test="buildTime != null and buildTime !='' ">AND build_Time like '%'||to_char(#{buildTime})||'%'
+					</if>
+					<if test="irrigatedId != null and irrigatedId !='' ">AND irrigated_Id like '%'||to_char(#{irrigatedId})||'%'
+					</if>
+					<if test="islockstation != null and islockstation !='' ">AND islockstation LIKE
+						'%'||to_char(#{islockstation})||'%'
+					</if>
+					<if test="iswaterlock != null and iswaterlock !='' ">AND iswaterlock LIKE '%'||to_char(#{iswaterlock})||'%'
+					</if>
+					<if test="managerName != null and managerName !='' ">AND manager_Name LIKE '%'||to_char(#{managerName})||'%'
+					</if>
+					<if test="areaId != null and areaId !='' ">AND area_Id in (select area_id FROM sys_area START WITH
+						area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+					</if>
+					<if test="createTime != null and createTime !='' ">AND create_Time like '%'||to_char(#{createTime})||'%'
+					</if>
+					<if test="managerCode != null and managerCode !='' ">AND manager_Code like '%'||to_char(#{managerCode})||'%'
+					</if>
+					<if test="underManager != null and underManager !='' ">AND under_Manager like
+						'%'||to_char(#{underManager})||'%'
+					</if>
+					<if test="id != null and id !='' ">AND ID like '%'||to_char(#{id})||'%'
+					</if>
+					<if test="name != null and name !='' ">AND name like '%'||to_char(#{name})||'%'
+					</if>
+					<if test="resourceType != null and resourceType!=''">AND resource_Type like
+						'%'||to_char(#{resourceType})||'%'
+					</if>
+					<if test="resourceId != null and resourceId!=''">AND resource_Id like '%'||to_char(#{resourceId})||'%'
+					</if>
+					<if test="grade != null and grade !=''">AND GRADE like '%'||to_char(#{GRADE})||'%'
+					</if>
+					<if test="resourceName != null and resourceName!=''">AND resource_Id in (select id from river where name
+						like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_river where name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from lake where name
+						like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_lake where name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from canal where name
+						like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_canal where name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from reservoir where
+						name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_reservoir where name like
+						'%'||to_char(#{resourceName})||'%')
+					</if>
+				</where>
+				<choose>
+					<when test="sidx != null and sidx.trim() != ''">
+						order by ${sidx} ${order}
+					</when>
+					<otherwise>
+						order by create_time desc
+					</otherwise>
+				</choose>
+				) a
+				WHERE ROWNUM &lt;= #{limit} * #{page}
+				) c
+				WHERE RN > #{offset}
+				) d
+			</when>
+			<otherwise>
+				select * from watergate
+				<where>
+					<if test="code != null and code !='' ">AND code like '%'||to_char(#{code})||'%'
+					</if>
+					<if test="x != null and x !='' ">AND x like '%'||to_char(#{x})||'%'
+					</if>
+					<if test="y != null and y !='' ">AND y like '%'||to_char(#{y})||'%'
+					</if>
+					<if test="type != null and type !='' ">AND type like '%'||to_char(#{type})||'%'
+					</if>
+					<if test="buildSituation != null and buildSituation !='' ">AND build_Situation like
+						'%'||to_char(#{buildSituation})||'%'
+					</if>
+					<if test="buildTime != null and buildTime !='' ">AND build_Time like '%'||to_char(#{buildTime})||'%'
+					</if>
+					<if test="irrigatedId != null and irrigatedId !='' ">AND irrigated_Id like '%'||to_char(#{irrigatedId})||'%'
+					</if>
+					<if test="islockstation != null and islockstation !='' ">AND islockstation LIKE
+						'%'||to_char(#{islockstation})||'%'
+					</if>
+					<if test="iswaterlock != null and iswaterlock !='' ">AND iswaterlock LIKE '%'||to_char(#{iswaterlock})||'%'
+					</if>
+					<if test="managerName != null and managerName !='' ">AND manager_Name LIKE '%'||to_char(#{managerName})||'%'
+					</if>
+					<if test="areaId != null and areaId !='' ">AND area_Id in (select area_id FROM sys_area START WITH
+						area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+					</if>
+					<if test="createTime != null and createTime !='' ">AND create_Time like '%'||to_char(#{createTime})||'%'
+					</if>
+					<if test="managerCode != null and managerCode !='' ">AND manager_Code like '%'||to_char(#{managerCode})||'%'
+					</if>
+					<if test="underManager != null and underManager !='' ">AND under_Manager like
+						'%'||to_char(#{underManager})||'%'
+					</if>
+					<if test="id != null and id !='' ">AND ID like '%'||to_char(#{id})||'%'
+					</if>
+					<if test="name != null and name !='' ">AND name like '%'||to_char(#{name})||'%'
+					</if>
+					<if test="resourceType != null and resourceType!=''">AND resource_Type like
+						'%'||to_char(#{resourceType})||'%'
+					</if>
+					<if test="resourceId != null and resourceId!=''">AND resource_Id like '%'||to_char(#{resourceId})||'%'
+					</if>
+					<if test="grade != null and grade !=''">AND GRADE like '%'||to_char(#{GRADE})||'%'
+					</if>
+					<if test="resourceName != null and resourceName!=''">AND resource_Id in (select id from river where name
+						like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_river where name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from lake where name
+						like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_lake where name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from canal where name
+						like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_canal where name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from reservoir where
+						name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_reservoir where name like
+						'%'||to_char(#{resourceName})||'%')
+					</if>
+				</where>
+			</otherwise>
+		</choose>
+
+	</select>
+
+
+	<select id="queryTotal" resultType="int">
+		select count(*) from watergate
+		<where>
+			<if test="code != null and code !='' ">AND code like '%'||to_char(#{code})||'%'
+			</if>
+			<if test="x != null and x !='' ">AND x like '%'||to_char(#{x})||'%'
+			</if>
+			<if test="y != null and y !='' ">AND y like '%'||to_char(#{y})||'%'
+			</if>
+			<if test="type != null and type !='' ">AND type like '%'||to_char(#{type})||'%'
+			</if>
+			<if test="buildSituation != null and buildSituation !='' ">AND build_Situation like
+				'%'||to_char(#{buildSituation})||'%'
+			</if>
+			<if test="buildTime != null and buildTime !='' ">AND build_Time like '%'||to_char(#{buildTime})||'%'
+			</if>
+			<if test="irrigatedId != null and irrigatedId !='' ">AND irrigated_Id like '%'||to_char(#{irrigatedId})||'%'
+			</if>
+			<if test="islockstation != null and islockstation !='' ">AND islockstation LIKE
+				'%'||to_char(#{islockstation})||'%'
+			</if>
+			<if test="iswaterlock != null and iswaterlock !='' ">AND iswaterlock LIKE '%'||to_char(#{iswaterlock})||'%'
+			</if>
+			<if test="managerName != null and managerName !='' ">AND manager_Name LIKE '%'||to_char(#{managerName})||'%'
+			</if>
+			<if test="areaId != null and areaId !='' ">AND area_Id in (select area_id FROM sys_area START WITH
+				area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+			</if>
+			<if test="createTime != null and createTime !='' ">AND create_Time like '%'||to_char(#{createTime})||'%'
+			</if>
+			<if test="managerCode != null and managerCode !='' ">AND manager_Code like '%'||to_char(#{managerCode})||'%'
+			</if>
+			<if test="underManager != null and underManager !='' ">AND under_Manager like
+				'%'||to_char(#{underManager})||'%'
+			</if>
+			<if test="id != null and id !='' ">AND ID like '%'||to_char(#{id})||'%'
+			</if>
+			<if test="name != null and name !='' ">AND name like '%'||to_char(#{name})||'%'
+			</if>
+			<if test="resourceType != null and resourceType!=''">AND resource_Type like
+				'%'||to_char(#{resourceType})||'%'
+			</if>
+			<if test="resourceId != null and resourceId!=''">AND resource_Id like '%'||to_char(#{resourceId})||'%'
+			</if>
+			<if test="grade != null and grade !=''">AND GRADE like '%'||to_char(#{GRADE})||'%'
+			</if>
+			<if test="resourceName != null and resourceName!=''">AND resource_Id in (select id from river where name
+						like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_river where name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from lake where name
+						like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_lake where name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from canal where name
+						like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_canal where name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from reservoir where
+						name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_reservoir where name like
+						'%'||to_char(#{resourceName})||'%')
+					</if>
+		</where>
+	</select>
+
+	<insert id="save" parameterType="com.khidi.manager.basicinfo.entity.WatergateEntity">
+		insert into watergate
+		(
+		ID ,
+		NAME ,
+		CODE ,
+		X ,
+		Y ,
+		type ,
+		build_Situation ,
+		build_time ,
+		irrigated_Id ,
+		islockstation ,
+		iswaterlock ,
+		manager_Name ,
+		area_Id ,
+		create_Time ,
+		manager_Code ,
+		under_Manager,
+		resource_Id,
+		resource_Type,
+		GRADE
+		)
+		values
+		(
+		#{id,jdbcType = VARCHAR},
+		#{name,jdbcType = VARCHAR},
+		#{code,jdbcType =
+		VARCHAR},
+		#{x,jdbcType =
+		VARCHAR},
+		#{y,jdbcType = VARCHAR},
+		#{type,jdbcType = VARCHAR},
+		#{buildSituation,jdbcType = VARCHAR},
+		#{buildTime,jdbcType = DATE},
+		#{irrigatedId,jdbcType = VARCHAR},
+		#{islockstation,jdbcType = VARCHAR},
+		#{iswaterlock,jdbcType = VARCHAR},
+		#{managerName,jdbcType = VARCHAR},
+		#{areaId,jdbcType = VARCHAR},
+		#{createTime,jdbcType = DATE},
+		#{managerCode,jdbcType = VARCHAR},
+		#{underManager,jdbcType = VARCHAR},
+		#{resourceId,jdbcType = VARCHAR},
+		#{resourceType,jdbcType = VARCHAR},
+		#{grade,jdbcType = VARCHAR}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.khidi.manager.basicinfo.entity.WatergateEntity">
+		update watergate
+		<set>
+			<if test="code != null">code = #{code},
+			</if>
+			<if test="x != null">x = #{x},
+			</if>
+			<if test="y != null">y = #{y},
+			</if>
+			<if test="type != null">type = #{type},
+			</if>
+			<if test="buildSituation != null">build_Situation = #{buildSituation},
+			</if>
+			<if test="buildTime != null">build_Time = #{buildTime},
+			</if>
+			<if test="irrigatedId != null">irrigated_Id = #{irrigatedId},
+			</if>
+			<if test="islockstation != null">islockstation = #{islockstation},
+			</if>
+			<if test="iswaterlock != null">iswaterlock = #{iswaterlock},
+			</if>
+			<if test="managerName != null">manager_Name = #{managerName},
+			</if>
+			<if test="areaId != null">area_Id = #{areaId},
+			</if>
+			<if test="createTime != null">create_Time = #{createTime},
+			</if>
+			<if test="managerCode != null">manager_Code = #{managerCode},
+			</if>
+			<if test="underManager != null">under_Manager = #{underManager},
+			</if>
+			<if test="id != null">ID = #{id},
+			</if>
+			<if test="name != null">name = #{name},
+			</if>
+			<if test="resourceType != null">resource_Type = #{resourceType},
+			</if>
+			<if test="resourceId != null">resource_Id = #{resourceId},
+			</if>
+			<if test="grade != null">GRADE = #{grade},
+			</if>
+		</set>
+		where ID = #{id}
+	</update>
+
+	<delete id="delete">
+		delete from watergate where ID = #{id}
+	</delete>
+</mapper>

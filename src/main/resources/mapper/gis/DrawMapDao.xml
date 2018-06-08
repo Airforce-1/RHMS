@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.gis.dao.DrawMapDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.gis.entity.DrawMapEntity" id="drawMapMap">
+        <result property="id" column="ID"/>
+        <result property="pointSet" column="POINTSET"/>
+    </resultMap>
+
+    <!-- 画功能区图 -->
+    <update id="drawMap4WaterAbility" parameterType="com.khidi.manager.gis.entity.DrawMapEntity">
+        update RESOURCE_WATERABILITY
+        <set>
+            <if test="pointSet != null">
+                POINTSET = #{pointSet},
+            </if>
+        </set>
+        where ID = #{id}
+    </update>
+
+
+
+    <!-- 画灌区图 -->
+    <update id="drawMap4Irrigated" parameterType="com.khidi.manager.gis.entity.DrawMapEntity">
+        update RESOURCE_IRRIGATED
+        <set>
+            <if test="pointSet != null">
+                POINTSET = #{pointSet},
+            </if>
+        </set>
+        where ID = #{id}
+    </update>
+</mapper>

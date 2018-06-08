@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.maintask.dao.StSubtaskprogressDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.maintask.entity.StSubtaskprogressEntity" id="stSubtaskprogressMap">
+        <result property="id" column="ID"/>
+        <result property="subtaskid" column="SUBTASKID"/>
+        <result property="lakeid" column="LAKEID"/>
+        <result property="lakebelongto" column="LAKEBELONGTO"/>
+        <result property="measures" column="MEASURES"/>
+        <result property="riverunit" column="RIVERUNIT"/>
+        <result property="mainmeasurescontent" column="MAINMEASURESCONTENT"/>
+        <result property="qtdept" column="QTDEPT"/>
+        <result property="phdept" column="PHDEPT"/>
+        <result property="stime" column="STIME"/>
+        <result property="etime" column="ETIME"/>
+        <result property="importlinksmemo" column="IMPORTLINKSMEMO"/>
+        <result property="desiredeffect" column="DESIREDEFFECT"/>
+        <result property="memo" column="MEMO"/>
+        <result property="taskglobaltype" column="TASKGLOBALTYPE"/>
+		<result property="progress" column="PROGRESS"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.khidi.manager.maintask.entity.StSubtaskprogressEntity">
+		select * from ST_SUBTASKPROGRESS where ID = #{id}
+	</select>
+
+
+    <select id="queryList" resultType="com.khidi.manager.maintask.entity.StSubtaskprogressEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN
+                FROM (select * from ST_SUBTASKPROGRESS
+                <where>
+                                            <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                        </if>
+                                            <if test="subtaskid != null and subtaskid!=''">AND SUBTASKID like '%'||to_char(#{subtaskid})||'%'
+                        </if>
+                                            <if test="lakeid != null and lakeid!=''">AND LAKEID like '%'||to_char(#{lakeid})||'%'
+                        </if>
+                                            <if test="lakebelongto != null and lakebelongto!=''">AND LAKEBELONGTO like '%'||to_char(#{lakebelongto})||'%'
+                        </if>
+                                            <if test="measures != null and measures!=''">AND MEASURES like '%'||to_char(#{measures})||'%'
+                        </if>
+                                            <if test="riverunit != null and riverunit!=''">AND RIVERUNIT like '%'||to_char(#{riverunit})||'%'
+                        </if>
+                                            <if test="mainmeasurescontent != null and mainmeasurescontent!=''">AND MAINMEASURESCONTENT like '%'||to_char(#{mainmeasurescontent})||'%'
+                        </if>
+                                            <if test="qtdept != null and qtdept!=''">AND QTDEPT like '%'||to_char(#{qtdept})||'%'
+                        </if>
+                                            <if test="phdept != null and phdept!=''">AND PHDEPT like '%'||to_char(#{phdept})||'%'
+                        </if>
+                                            <if test="stime != null and stime!=''">AND STIME like '%'||to_char(#{stime})||'%'
+                        </if>
+                                            <if test="etime != null and etime!=''">AND ETIME like '%'||to_char(#{etime})||'%'
+                        </if>
+                                            <if test="importlinksmemo != null and importlinksmemo!=''">AND IMPORTLINKSMEMO like '%'||to_char(#{importlinksmemo})||'%'
+                        </if>
+                                            <if test="desiredeffect != null and desiredeffect!=''">AND DESIREDEFFECT like '%'||to_char(#{desiredeffect})||'%'
+                        </if>
+                                            <if test="memo != null and memo!=''">AND MEMO like '%'||to_char(#{memo})||'%'
+                        </if>
+                                            <if test="progress != null and progress!=''">AND PROGRESS like '%'||to_char(#{progress})||'%'
+                        </if>
+                                            <if test="taskglobaltype != null and taskglobaltype!=''">AND TASKGLOBALTYPE like '%'||to_char(#{taskglobaltype})||'%'
+                        </if>
+                                    </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by createtime desc
+                    </otherwise>
+                </choose>
+                )a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from ST_SUBTASKPROGRESS
+            </otherwise>
+        </choose>
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from ST_SUBTASKPROGRESS
+        <where>
+			                <if test="id != null and id!=''">AND  ID like '%'||to_char(#{id})||'%'
+                </if>
+			                <if test="subtaskid != null and subtaskid!=''">AND  SUBTASKID like '%'||to_char(#{subtaskid})||'%'
+                </if>
+			                <if test="lakeid != null and lakeid!=''">AND  LAKEID like '%'||to_char(#{lakeid})||'%'
+                </if>
+			                <if test="lakebelongto != null and lakebelongto!=''">AND  LAKEBELONGTO like '%'||to_char(#{lakebelongto})||'%'
+                </if>
+			                <if test="measures != null and measures!=''">AND  MEASURES like '%'||to_char(#{measures})||'%'
+                </if>
+			                <if test="riverunit != null and riverunit!=''">AND  RIVERUNIT like '%'||to_char(#{riverunit})||'%'
+                </if>
+			                <if test="mainmeasurescontent != null and mainmeasurescontent!=''">AND  MAINMEASURESCONTENT like '%'||to_char(#{mainmeasurescontent})||'%'
+                </if>
+			                <if test="qtdept != null and qtdept!=''">AND  QTDEPT like '%'||to_char(#{qtdept})||'%'
+                </if>
+			                <if test="phdept != null and phdept!=''">AND  PHDEPT like '%'||to_char(#{phdept})||'%'
+                </if>
+			                <if test="stime != null and stime!=''">AND  STIME like '%'||to_char(#{stime})||'%'
+                </if>
+			                <if test="etime != null and etime!=''">AND  ETIME like '%'||to_char(#{etime})||'%'
+                </if>
+			                <if test="importlinksmemo != null and importlinksmemo!=''">AND  IMPORTLINKSMEMO like '%'||to_char(#{importlinksmemo})||'%'
+                </if>
+			                <if test="desiredeffect != null and desiredeffect!=''">AND  DESIREDEFFECT like '%'||to_char(#{desiredeffect})||'%'
+                </if>
+			                <if test="memo != null and memo!=''">AND  MEMO like '%'||to_char(#{memo})||'%'
+                </if>
+			                <if test="progress != null and progress!=''">AND  PROGRESS like '%'||to_char(#{progress})||'%'
+                </if>
+			                <if test="taskglobaltype != null and taskglobaltype!=''">AND  TASKGLOBALTYPE like '%'||to_char(#{taskglobaltype})||'%'
+                </if>
+			        </where>
+	</select>
+	 
+	<insert id="save" parameterType="com.khidi.manager.maintask.entity.StSubtaskprogressEntity">
+		insert into ST_SUBTASKPROGRESS
+		(
+			ID , 
+			SUBTASKID , 
+			LAKEID , 
+			LAKEBELONGTO , 
+			MEASURES , 
+			RIVERUNIT , 
+			MAINMEASURESCONTENT , 
+			QTDEPT , 
+			PHDEPT , 
+			STIME , 
+			ETIME , 
+			IMPORTLINKSMEMO , 
+			DESIREDEFFECT , 
+			MEMO ,
+			TASKGLOBALTYPE 
+		)
+		values
+		(
+			#{id,jdbcType = VARCHAR}, 
+			#{subtaskid,jdbcType = VARCHAR}, 
+			#{lakeid,jdbcType = VARCHAR}, 
+			#{lakebelongto,jdbcType = VARCHAR}, 
+			#{measures,jdbcType = VARCHAR}, 
+			#{riverunit,jdbcType = VARCHAR}, 
+			#{mainmeasurescontent,jdbcType = VARCHAR}, 
+			#{qtdept,jdbcType = VARCHAR}, 
+			#{phdept,jdbcType = VARCHAR}, 
+			to_date(substr(#{stime,jdbcType = DATE},1,10),'yyyy-MM-dd'),
+			to_date(substr(#{etime,jdbcType = DATE},1,10),'yyyy-MM-dd'),
+			#{importlinksmemo,jdbcType = VARCHAR}, 
+			#{desiredeffect,jdbcType = VARCHAR}, 
+			#{memo,jdbcType = VARCHAR},
+			#{taskglobaltype,jdbcType = VARCHAR}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.khidi.manager.maintask.entity.StSubtaskprogressEntity">
+		update ST_SUBTASKPROGRESS 
+		<set>
+			<if test="subtaskid != null">
+				SUBTASKID = #{subtaskid}  , </if>
+			<if test="lakeid != null">
+				LAKEID = #{lakeid}  , </if>
+			<if test="lakebelongto != null">
+				LAKEBELONGTO = #{lakebelongto}  , </if>
+			<if test="measures != null">
+				MEASURES = #{measures}  , </if>
+			<if test="riverunit != null">
+				RIVERUNIT = #{riverunit}  , </if>
+			<if test="mainmeasurescontent != null">
+				MAINMEASURESCONTENT = #{mainmeasurescontent}  , </if>
+			<if test="qtdept != null">
+				QTDEPT = #{qtdept}  , </if>
+			<if test="phdept != null">
+				PHDEPT = #{phdept}  , </if>
+			<if test="stime != null">
+				STIME = to_date(substr(#{stime,jdbcType = DATE},1,10),'yyyy-MM-dd'), </if>
+			<if test="etime != null">
+				ETIME =to_date(substr(#{etime,jdbcType = DATE},1,10),'yyyy-MM-dd'), </if>
+			<if test="importlinksmemo != null">
+				IMPORTLINKSMEMO = #{importlinksmemo}  , </if>
+			<if test="desiredeffect != null">
+				DESIREDEFFECT = #{desiredeffect}  , </if>
+			<if test="memo != null">
+				MEMO = #{memo}  , </if>
+			<if test="progress != null">
+				PROGRESS = #{progress}  , </if>
+			<if test="taskglobaltype != null">
+				TASKGLOBALTYPE = #{taskglobaltype}  </if>
+		</set>
+		where ID = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from ST_SUBTASKPROGRESS where ID = #{id}
+	</delete>
+</mapper>

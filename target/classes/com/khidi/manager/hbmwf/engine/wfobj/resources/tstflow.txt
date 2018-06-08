@@ -1,0 +1,164 @@
+锘縶
+    "title": "newFlow_1",
+    "nodes": [{
+		    "id":"demo_node_1",
+            "name": "开始",
+            "left": 42,
+            "top": 38,
+            "type": "start round mix",
+            "width": 28,
+            "height": 28,
+            "alt": true
+        },
+        {
+		    "id":"demo_node_2",
+            "name": "结束",
+            "left": 797,
+            "top": 42,
+            "type": "end round mix",
+            "width": 28,
+            "height": 28,
+            "alt": true,
+			"prelogic":"and(or)",
+			"backto":""
+        },
+        {
+		    "id":"demo_node_3",
+            "name": "入职申请",
+            "left": 155,
+            "top": 39,
+            "type": "task",
+            "width": 104,
+            "height": 28,
+            "marked": true,
+            "alt": true,
+			"prelogic":"and(or)",
+			"backto":""
+        },
+        {
+		    "id" : "demo_node_4",
+            "name": "人力审批",
+            "left": 364,
+            "top": 42,
+            "type": "task",
+            "width": 104,
+            "height": 28,
+            "alt": true,
+			"prelogic":"and(or)",
+			"backto":""
+        },
+        {
+		    "id":"demo_node_8",
+            "name": "工资判断",
+            "left": 571,
+            "top": 43,
+            "type": "node",
+            "width": 104,
+            "height": 28,
+            "alt": true,
+			"prelogic":"and(or)",
+			"backto":""
+        },
+        {
+		    "id":"demo_node_9",
+            "name": "经理终审",
+            "left": 559,
+            "top": 141,
+            "type": "task",
+            "width": 104,
+            "height": 28,
+            "alt": true,
+			"prelogic":"and(or)",
+			"backto":""
+        }
+    ],
+    "lines": [
+        {
+		    "id" : "demo_line_5",
+            "type": "sl",
+            "from": "demo_node_3",
+            "to": "demo_node_4",
+            "name": "提交申请",
+            "dash": false,
+			"logictype":"forward"
+        },
+        {
+		    "id": "demo_line_6",
+            "type": "sl",
+            "from": "demo_node_1",
+            "to": "demo_node_3",
+            "name": "",
+            "dash": true,
+			"logictype":"forward"
+        },
+        {
+		    "id": "demo_line_7",
+            "type": "tb",
+            "M": 18.5,
+            "from": "demo_node_4",
+            "to": "demo_node_3",
+            "name": "不通过",
+            "dash": false,
+			"logictype":"back"
+        },
+        {
+		    "id": "demo_line_10",
+            "type": "sl",
+            "from": "demo_node_4",
+            "to": "demo_node_8",
+            "name": "通过",
+            "dash": true,
+			"logictype":"forward"
+        },
+        {
+		    "id":"demo_line_11",
+            "type": "tb",
+            "M": 157,
+            "from": "demo_node_9",
+            "to": "demo_node_4",
+            "name": "不接受",
+            "dash": true,
+			"logictype":"back"			
+        },
+        {
+		    "id": "demo_line_12",
+            "type": "sl",
+            "from": "demo_node_8",
+            "to": "demo_node_9",
+            "name": "大于8000",
+            "dash": false,
+			"logictype":"forward"
+        },
+        {
+		    "id": "demo_line_13",
+            "type": "sl",
+            "from": "demo_node_8",
+            "to": "demo_node_2",
+            "name": "小于8000",
+            "dash": false,
+			"logictype":"forward"
+        },
+        {
+		    "id": "demo_line_14",
+            "type": "sl",
+            "from": "demo_node_9",
+            "to": "demo_node_2",
+            "name": "接受",
+            "marked": true,
+            "dash": false,
+			"logictype":"forward"
+        }
+    ],
+    "areas": {
+        "1497581247380": {
+            "name": "审议会",
+            "left": 451,
+            "top": 110,
+            "color": "red",
+            "width": 226,
+            "height": 108,
+            "alt": true
+        }
+    },
+    "initNum": 16
+}

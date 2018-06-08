@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.basicinfo.dao.ResourceCompanywaterDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.basicinfo.entity.ResourceCompanywaterEntity" id="resourceCompanywaterMap">
+        <result property="id" column="ID"/>
+        <result property="code" column="CODE"/>
+        <result property="name" column="NAME"/>
+        <result property="x" column="X"/>
+        <result property="y" column="Y"/>
+        <result property="owner" column="OWNER"/>
+        <result property="phone" column="PHONE"/>
+        <result property="yearUse" column="YEARUSE"/>
+        <result property="industrialValue" column="INDUSTRIALVALUE"/>
+        <result property="waterPermission" column="WATERPERMISSION"/>
+        <result property="permissionNumber" column="PERMISSIONNUMBER"/>
+        <result property="permissionSum" column="PERMISSIONSUM"/>
+        <result property="displacement" column="DISPLACEMENT"/>
+        <result property="outputDirection" column="OUTPUTDIRECTION"/>
+        <result property="tapwaterMode" column="TAPWATERMODE"/>
+        <result property="surfacewaterMode" column="SURFACEWATERMODE"/>
+        <result property="groundwaterMode" column="GROUNDWATERMODE"/>
+        <result property="reclaimedwaterMode" column="RECLAIMEDWATERMODE"/>
+        <result property="otherwaterMode" column="OTHERWATERMODE"/>
+        <result property="areaId" column="AREA_ID"/>
+        <result property="address" column="ADDRESS"/>
+        <result property="remark" column="REMARK"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.khidi.manager.basicinfo.entity.ResourceCompanywaterEntity">
+		select * from RESOURCE_COMPANYWATER where ID = #{id}
+	</select>
+
+
+    <select id="queryList" resultType="com.khidi.manager.basicinfo.entity.ResourceCompanywaterEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN
+                FROM (select * from RESOURCE_COMPANYWATER
+                <where>
+                                            <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                        </if>
+                                            <if test="code != null and code!=''">AND CODE like '%'||to_char(#{code})||'%'
+                        </if>
+                                            <if test="name != null and name!=''">AND NAME like '%'||to_char(#{name})||'%'
+                        </if>
+                                            <if test="x != null and x!=''">AND X like '%'||to_char(#{x})||'%'
+                        </if>
+                                            <if test="y != null and y!=''">AND Y like '%'||to_char(#{y})||'%'
+                        </if>
+                                            <if test="owner != null and owner!=''">AND OWNER like '%'||to_char(#{owner})||'%'
+                        </if>
+                                            <if test="phone != null and phone!=''">AND PHONE like '%'||to_char(#{phone})||'%'
+                        </if>
+                                            <if test="yearUse != null and yearUse!=''">AND YEARUSE like '%'||to_char(#{yearUse})||'%'
+                        </if>
+                                            <if test="industrialValue != null and industrialValue!=''">AND INDUSTRIALVALUE like '%'||to_char(#{industrialValue})||'%'
+                        </if>
+                                            <if test="waterPermission != null and waterPermission!=''">AND WATERPERMISSION like '%'||to_char(#{waterPermission})||'%'
+                        </if>
+                                            <if test="permissionNumber != null and permissionNumber!=''">AND PERMISSIONNUMBER like '%'||to_char(#{permissionNumber})||'%'
+                        </if>
+                                            <if test="permissionSum != null and permissionSum!=''">AND PERMISSIONSUM like '%'||to_char(#{permissionSum})||'%'
+                        </if>
+                                            <if test="displacement != null and displacement!=''">AND DISPLACEMENT like '%'||to_char(#{displacement})||'%'
+                        </if>
+                                            <if test="outputDirection != null and outputDirection!=''">AND OUTPUTDIRECTION like '%'||to_char(#{outputDirection})||'%'
+                        </if>
+                                            <if test="tapwaterMode != null and tapwaterMode!=''">AND TAPWATERMODE like '%'||to_char(#{tapwaterMode})||'%'
+                        </if>
+                                            <if test="surfacewaterMode != null and surfacewaterMode!=''">AND SURFACEWATERMODE like '%'||to_char(#{surfacewaterMode})||'%'
+                        </if>
+                                            <if test="groundwaterMode != null and groundwaterMode!=''">AND GROUNDWATERMODE like '%'||to_char(#{groundwaterMode})||'%'
+                        </if>
+                                            <if test="reclaimedwaterMode != null and reclaimedwaterMode!=''">AND RECLAIMEDWATERMODE like '%'||to_char(#{reclaimedwaterMode})||'%'
+                        </if>
+                                            <if test="otherwaterMode != null and otherwaterMode!=''">AND OTHERWATERMODE like '%'||to_char(#{otherwaterMode})||'%'
+                        </if>
+					<if test="areaId != null and areaId!=''">AND AREA_ID in (select area_id FROM sys_area START WITH area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+					</if>
+                                            <if test="address != null and address!=''">AND ADDRESS like '%'||to_char(#{address})||'%'
+                        </if>
+                                            <if test="remark != null and remark!=''">AND REMARK like '%'||to_char(#{remark})||'%'
+                        </if>
+                                    </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by createtime desc
+                    </otherwise>
+                </choose>
+                )a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from RESOURCE_COMPANYWATER
+            </otherwise>
+        </choose>
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from RESOURCE_COMPANYWATER
+        <where>
+			                <if test="id != null and id!=''">AND  ID like '%'||to_char(#{id})||'%'
+                </if>
+			                <if test="code != null and code!=''">AND  CODE like '%'||to_char(#{code})||'%'
+                </if>
+			                <if test="name != null and name!=''">AND  NAME like '%'||to_char(#{name})||'%'
+                </if>
+			                <if test="x != null and x!=''">AND  X like '%'||to_char(#{x})||'%'
+                </if>
+			                <if test="y != null and y!=''">AND  Y like '%'||to_char(#{y})||'%'
+                </if>
+			                <if test="owner != null and owner!=''">AND  OWNER like '%'||to_char(#{owner})||'%'
+                </if>
+			                <if test="phone != null and phone!=''">AND  PHONE like '%'||to_char(#{phone})||'%'
+                </if>
+			                <if test="yearUse != null and yearUse!=''">AND  YEARUSE like '%'||to_char(#{yearUse})||'%'
+                </if>
+			                <if test="industrialValue != null and industrialValue!=''">AND  INDUSTRIALVALUE like '%'||to_char(#{industrialValue})||'%'
+                </if>
+			                <if test="waterPermission != null and waterPermission!=''">AND  WATERPERMISSION like '%'||to_char(#{waterPermission})||'%'
+                </if>
+			                <if test="permissionNumber != null and permissionNumber!=''">AND  PERMISSIONNUMBER like '%'||to_char(#{permissionNumber})||'%'
+                </if>
+			                <if test="permissionSum != null and permissionSum!=''">AND  PERMISSIONSUM like '%'||to_char(#{permissionSum})||'%'
+                </if>
+			                <if test="displacement != null and displacement!=''">AND  DISPLACEMENT like '%'||to_char(#{displacement})||'%'
+                </if>
+			                <if test="outputDirection != null and outputDirection!=''">AND  OUTPUTDIRECTION like '%'||to_char(#{outputDirection})||'%'
+                </if>
+			                <if test="tapwaterMode != null and tapwaterMode!=''">AND  TAPWATERMODE like '%'||to_char(#{tapwaterMode})||'%'
+                </if>
+			                <if test="surfacewaterMode != null and surfacewaterMode!=''">AND  SURFACEWATERMODE like '%'||to_char(#{surfacewaterMode})||'%'
+                </if>
+			                <if test="groundwaterMode != null and groundwaterMode!=''">AND  GROUNDWATERMODE like '%'||to_char(#{groundwaterMode})||'%'
+                </if>
+			                <if test="reclaimedwaterMode != null and reclaimedwaterMode!=''">AND  RECLAIMEDWATERMODE like '%'||to_char(#{reclaimedwaterMode})||'%'
+                </if>
+			                <if test="otherwaterMode != null and otherwaterMode!=''">AND  OTHERWATERMODE like '%'||to_char(#{otherwaterMode})||'%'
+                </if>
+			<if test="areaId != null and areaId!=''">AND AREA_ID in (select area_id FROM sys_area START WITH area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+			</if>
+			                <if test="address != null and address!=''">AND  ADDRESS like '%'||to_char(#{address})||'%'
+                </if>
+			                <if test="remark != null and remark!=''">AND  REMARK like '%'||to_char(#{remark})||'%'
+                </if>
+			        </where>
+	</select>
+	 
+	<insert id="save" parameterType="com.khidi.manager.basicinfo.entity.ResourceCompanywaterEntity">
+		insert into RESOURCE_COMPANYWATER
+		(
+			ID , 
+			CODE , 
+			NAME , 
+			X , 
+			Y , 
+			OWNER , 
+			PHONE , 
+			YEARUSE , 
+			INDUSTRIALVALUE , 
+			WATERPERMISSION , 
+			PERMISSIONNUMBER , 
+			PERMISSIONSUM , 
+			DISPLACEMENT , 
+			OUTPUTDIRECTION , 
+			TAPWATERMODE , 
+			SURFACEWATERMODE , 
+			GROUNDWATERMODE , 
+			RECLAIMEDWATERMODE , 
+			OTHERWATERMODE , 
+			AREA_ID , 
+			ADDRESS , 
+			REMARK 
+		)
+		values
+		(
+			#{id,jdbcType = VARCHAR}, 
+			#{code,jdbcType = VARCHAR}, 
+			#{name,jdbcType = VARCHAR}, 
+			#{x,jdbcType = VARCHAR}, 
+			#{y,jdbcType = VARCHAR}, 
+			#{owner,jdbcType = VARCHAR}, 
+			#{phone,jdbcType = VARCHAR}, 
+			#{yearUse,jdbcType = VARCHAR}, 
+			#{industrialValue,jdbcType = VARCHAR}, 
+			#{waterPermission,jdbcType = VARCHAR}, 
+			#{permissionNumber,jdbcType = VARCHAR}, 
+			#{permissionSum,jdbcType = VARCHAR}, 
+			#{displacement,jdbcType = VARCHAR}, 
+			#{outputDirection,jdbcType = VARCHAR}, 
+			#{tapwaterMode,jdbcType = VARCHAR}, 
+			#{surfacewaterMode,jdbcType = VARCHAR}, 
+			#{groundwaterMode,jdbcType = VARCHAR}, 
+			#{reclaimedwaterMode,jdbcType = VARCHAR}, 
+			#{otherwaterMode,jdbcType = VARCHAR}, 
+			#{areaId,jdbcType = VARCHAR}, 
+			#{address,jdbcType = VARCHAR}, 
+			#{remark,jdbcType = VARCHAR}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.khidi.manager.basicinfo.entity.ResourceCompanywaterEntity">
+		update RESOURCE_COMPANYWATER 
+		<set>
+			<if test="code != null">
+				CODE = #{code}  , </if>
+			<if test="name != null">
+				NAME = #{name}  , </if>
+			<if test="x != null">
+				X = #{x}  , </if>
+			<if test="y != null">
+				Y = #{y}  , </if>
+			<if test="owner != null">
+				OWNER = #{owner}  , </if>
+			<if test="phone != null">
+				PHONE = #{phone}  , </if>
+			<if test="yearUse != null">
+				YEARUSE = #{yearUse}  , </if>
+			<if test="industrialValue != null">
+				INDUSTRIALVALUE = #{industrialValue}  , </if>
+			<if test="waterPermission != null">
+				WATERPERMISSION = #{waterPermission}  , </if>
+			<if test="permissionNumber != null">
+				PERMISSIONNUMBER = #{permissionNumber}  , </if>
+			<if test="permissionSum != null">
+				PERMISSIONSUM = #{permissionSum}  , </if>
+			<if test="displacement != null">
+				DISPLACEMENT = #{displacement}  , </if>
+			<if test="outputDirection != null">
+				OUTPUTDIRECTION = #{outputDirection}  , </if>
+			<if test="tapwaterMode != null">
+				TAPWATERMODE = #{tapwaterMode}  , </if>
+			<if test="surfacewaterMode != null">
+				SURFACEWATERMODE = #{surfacewaterMode}  , </if>
+			<if test="groundwaterMode != null">
+				GROUNDWATERMODE = #{groundwaterMode}  , </if>
+			<if test="reclaimedwaterMode != null">
+				RECLAIMEDWATERMODE = #{reclaimedwaterMode}  , </if>
+			<if test="otherwaterMode != null">
+				OTHERWATERMODE = #{otherwaterMode}  , </if>
+			<if test="areaId != null">
+				AREA_ID = #{areaId}  , </if>
+			<if test="address != null">
+				ADDRESS = #{address}  , </if>
+			<if test="remark != null">
+				REMARK = #{remark}  </if>
+		</set>
+		where ID = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from RESOURCE_COMPANYWATER where ID = #{id}
+	</delete>
+</mapper>

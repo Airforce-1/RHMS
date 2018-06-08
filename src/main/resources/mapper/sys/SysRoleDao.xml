@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.sys.dao.SysRoleDao">
+
+	<select id="queryObject" resultType="com.khidi.manager.sys.entity.SysRoleEntity">
+		select * from sys_role where role_id = #{value}
+	</select>
+
+
+
+
+	<select id="queryParentIdIsCorrent" parameterType="com.khidi.manager.sys.entity.SysRoleEntity" resultType="String">
+	select role_id from (select role_id from sys_role START WITH role_id= #{roleId} CONNECT BY prior role_id = parent_id) b
+	where b.role_id = #{parentId}
+	</select>
+
+
+	<select id="queryRoleList" resultType="String">
+		select a.role_id from sys_role a , sys_user_role b where  a.role_id = b.role_id  and  b.user_id = #{user_id}
+	</select>
+
+
+
+
+
+	<select id="queryList" resultType="com.khidi.manager.sys.entity.SysRoleEntity">
+
+		SELECT m.*,
+		(SELECT p.role_name FROM sys_role p WHERE p.role_id = m.parent_id
+		) AS parentName,
+		(SELECT name FROM sys_area WHERE area_id = m.area_id
+		) AS areaName,
+		(SELECT name FROM sys_dept WHERE dept_id = m.dept_id
+		) AS deptName,
+		(case when exists(select 1 from sys_role where m.role_id = parent_id) then 1 else 0 end ) AS isParent
+		FROM sys_role m
+
+
+		<where>
+			<if test="roleId != null and roleId!=''">AND ROLE_ID like '%'||to_char(#{roleId})||'%'
+			</if>
+			<if test="parentId != null and parentId!=''">AND PARENT_ID like '%'||to_char(#{parentId})||'%'
+			</if>
+			<if test="roleName != null and roleName!=''">AND ROLE_NAME like '%'||to_char(#{roleName})||'%'
+			</if>
+			<if test="areaId != null and areaId!=''">AND AREA_ID like '%'||to_char(#{areaId})||'%'
+			</if>
+			<if test="roleLevel != null and roleLevel!=''">AND ROLE_LEVEL like '%'||to_char(#{roleLevel})||'%'
+			</if>
+			<if test="roleType != null and roleType!=''">AND ROLE_TYPE like '%'||to_char(#{roleType})||'%'
+			</if>
+			<if test="createUserId != null and createUserId!=''">AND CREATE_USERID like '%'||to_char(#{createUserId})||'%'
+			</if>
+		</where>
+		order by NLSSORT(role_name,'NLS_SORT = SCHINESE_PINYIN_M') asc
+	</select>
+
+
+
+	<select id="queryTotal" resultType="int">
+		select count(*) from sys_role 
+		<where>
+			<if test="roleName != null and roleName.trim() != ''">
+				and `role_name` like concat('%',#{roleName},'%') 
+			</if>
+		</where>
+	</select>
+
+
+	<select id="queryRoleIdList" resultType="String">
+		select role_id from sys_role where parent_id = #{value}
+	</select>
+
+
+	<select id="querySonList" resultType="com.khidi.manager.sys.entity.SysRoleEntity">
+		SELECT m.*,
+		(SELECT p.role_name FROM sys_role p WHERE p.role_id = m.parent_id
+		) AS parentName,
+		(SELECT name FROM sys_area WHERE area_id = m.area_id
+		) AS areaName,
+		(SELECT name FROM sys_dept WHERE dept_id = m.dept_id
+		) AS deptName,
+		(case when exists(select 1 from sys_role where m.role_id = parent_id) then 1 else 0 end ) AS isParent
+		FROM sys_role m
+		where m.parent_id = #{value}
+	</select>
+
+
+
+	
+	<insert id="save" parameterType="com.khidi.manager.sys.entity.SysRoleEntity" useGeneratedKeys="true" keyProperty="roleId">
+		insert into sys_role
+		(
+			role_id,
+			parent_id,
+			role_name,
+			remark,
+			dept_id,
+			area_id,
+			role_type,
+			role_describe,
+			role_level
+		)
+		values
+		(
+			#{roleId},
+			#{parentId},
+			#{roleName}, 
+			#{remark,jdbcType=VARCHAR},
+			#{deptId,jdbcType=VARCHAR},
+			#{areaId,jdbcType=VARCHAR},
+			#{roleType,jdbcType=DOUBLE},
+			#{roleDescribe,jdbcType=VARCHAR},
+			#{roleLevel,jdbcType=DOUBLE}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.khidi.manager.sys.entity.SysRoleEntity">
+		update sys_role 
+		<set>
+			<if test="areaId != null">area_id = #{areaId}, </if>
+			<if test="roleName != null">role_name = #{roleName}, </if>
+			<if test="remark != null">remark = #{remark},</if>
+			<if test="deptId != null">dept_id = #{deptId}, </if>
+			<if test="parentId != null">PARENT_ID = #{parentId},</if>
+			<if test="roleLevel != null">ROLE_LEVEL = #{roleLevel},</if>
+			<if test="roleType != null">ROLE_TYPE= #{roleType},</if>
+			<if test="roleDescribe != null">role_describe= #{roleDescribe},</if>
+		</set>
+		where role_id = #{roleId}
+	</update>
+	
+	<delete id="delete" parameterType="String">
+		delete from sys_role where role_id = #{roleId}
+	</delete>
+
+
+
+
+
+
+
+
+
+
+</mapper>

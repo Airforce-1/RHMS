@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.sys.dao.SysRoleResourceDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.sys.entity.SysRoleResourceEntity" id="sysRoleResourceMap">
+        <result property="riverids" column="RIVERIDS"/>
+        <result property="id" column="ID"/>
+        <result property="roleId" column="ROLEID"/>
+        <result property="lakeids" column="LAKEIDS"/>
+        <result property="videostationids" column="VIDEOSTATIONIDS"/>
+        <result property="canalids" column="CANALIDS"/>
+        <result property="riverstationids" column="RIVERSTATIONIDS"/>
+        <result property="reservoirids" column="RESERVOIRIDS"/>
+        <result property="partriverids" column="PARTRIVERIDS"/>
+        <result property="partcanalids" column="PARTCANALIDS"/>
+        <result property="partlakeids" column="PARTLAKEIDS"/>
+        <result property="partreservoirids" column="PARTRESERVOIRIDS"/>
+        <result property="areaids" column="AREAIDS"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.khidi.manager.sys.entity.SysRoleResourceEntity">
+		select * from SYS_ROLE_RESOURCE where ID = #{id}
+	</select>
+
+
+	<select id="queryObjectByRoleId" resultType="com.khidi.manager.sys.entity.SysRoleResourceEntity">
+		select * from SYS_ROLE_RESOURCE where ROLEID = #{roleId}
+	</select>
+
+
+    <select id="queryList" resultType="com.khidi.manager.sys.entity.SysRoleResourceEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN
+                FROM (select * from SYS_ROLE_RESOURCE
+                <where>
+                                            <if test="riverids != null and riverids!=''">AND RIVERIDS like '%'||to_char(#{riverids})||'%'
+                        </if>
+                                            <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                        </if>
+                                            <if test="roleId != null and roleId!=''">AND ROLEID like '%'||to_char(#{roleId})||'%'
+                        </if>
+                                            <if test="lakeids != null and lakeids!=''">AND LAKEIDS like '%'||to_char(#{lakeids})||'%'
+                        </if>
+                                            <if test="videostationids != null and videostationids!=''">AND VIDEOSTATIONIDS like '%'||to_char(#{videostationids})||'%'
+                        </if>
+                                            <if test="canalids != null and canalids!=''">AND CANALIDS like '%'||to_char(#{canalids})||'%'
+                        </if>
+                                            <if test="riverstationids != null and riverstationids!=''">AND RIVERSTATIONIDS like '%'||to_char(#{riverstationids})||'%'
+                        </if>
+                                            <if test="reservoirids != null and reservoirids!=''">AND RESERVOIRIDS like '%'||to_char(#{reservoirids})||'%'
+                        </if>
+                                            <if test="partriverids != null and partriverids!=''">AND PARTRIVERIDS like '%'||to_char(#{partriverids})||'%'
+                        </if>
+                                            <if test="partcanalids != null and partcanalids!=''">AND PARTCANALIDS like '%'||to_char(#{partcanalids})||'%'
+                        </if>
+                                            <if test="partlakeids != null and partlakeids!=''">AND PARTLAKEIDS like '%'||to_char(#{partlakeids})||'%'
+                        </if>
+                                            <if test="partreservoirids != null and partreservoirids!=''">AND PARTRESERVOIRIDS like '%'||to_char(#{partreservoirids})||'%'
+                        </if>
+                                            <if test="areaids != null and areaids!=''">AND AREAIDS like '%'||to_char(#{areaids})||'%'
+                        </if>
+                                    </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by createtime desc
+                    </otherwise>
+                </choose>
+                )a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from SYS_ROLE_RESOURCE
+				<where>
+					<if test="riverids != null and riverids!=''">AND RIVERIDS like '%'||to_char(#{riverids})||'%'
+					</if>
+					<if test="id != null and id!=''">AND ID =  #{id}
+					</if>
+					<if test="roleId != null and roleId!=''">AND ROLEID = #{roleId}
+					</if>
+					<if test="lakeids != null and lakeids!=''">AND LAKEIDS like '%'||to_char(#{lakeids})||'%'
+					</if>
+					<if test="videostationids != null and videostationids!=''">AND VIDEOSTATIONIDS like '%'||to_char(#{videostationids})||'%'
+					</if>
+					<if test="canalids != null and canalids!=''">AND CANALIDS like '%'||to_char(#{canalids})||'%'
+					</if>
+					<if test="riverstationids != null and riverstationids!=''">AND RIVERSTATIONIDS like '%'||to_char(#{riverstationids})||'%'
+					</if>
+					<if test="reservoirids != null and reservoirids!=''">AND RESERVOIRIDS like '%'||to_char(#{reservoirids})||'%'
+					</if>
+					<if test="partriverids != null and partriverids!=''">AND PARTRIVERIDS like '%'||to_char(#{partriverids})||'%'
+					</if>
+					<if test="partcanalids != null and partcanalids!=''">AND PARTCANALIDS like '%'||to_char(#{partcanalids})||'%'
+					</if>
+					<if test="partlakeids != null and partlakeids!=''">AND PARTLAKEIDS like '%'||to_char(#{partlakeids})||'%'
+					</if>
+					<if test="partreservoirids != null and partreservoirids!=''">AND PARTRESERVOIRIDS like '%'||to_char(#{partreservoirids})||'%'
+					</if>
+					<if test="areaids != null and areaids!=''">AND AREAIDS like '%'||to_char(#{areaids})||'%'
+					</if>
+				</where>
+            </otherwise>
+        </choose>
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from SYS_ROLE_RESOURCE
+        <where>
+			                <if test="riverids != null and riverids!=''">AND  RIVERIDS like '%'||to_char(#{riverids})||'%'
+                </if>
+			                <if test="id != null and id!=''">AND  ID like '%'||to_char(#{id})||'%'
+                </if>
+			                <if test="roleId != null and roleId!=''">AND  ROLEID like '%'||to_char(#{roleId})||'%'
+                </if>
+			                <if test="lakeids != null and lakeids!=''">AND  LAKEIDS like '%'||to_char(#{lakeids})||'%'
+                </if>
+			                <if test="videostationids != null and videostationids!=''">AND  VIDEOSTATIONIDS like '%'||to_char(#{videostationids})||'%'
+                </if>
+			                <if test="canalids != null and canalids!=''">AND  CANALIDS like '%'||to_char(#{canalids})||'%'
+                </if>
+			                <if test="riverstationids != null and riverstationids!=''">AND  RIVERSTATIONIDS like '%'||to_char(#{riverstationids})||'%'
+                </if>
+			                <if test="reservoirids != null and reservoirids!=''">AND  RESERVOIRIDS like '%'||to_char(#{reservoirids})||'%'
+                </if>
+			                <if test="partriverids != null and partriverids!=''">AND  PARTRIVERIDS like '%'||to_char(#{partriverids})||'%'
+                </if>
+			                <if test="partcanalids != null and partcanalids!=''">AND  PARTCANALIDS like '%'||to_char(#{partcanalids})||'%'
+                </if>
+			                <if test="partlakeids != null and partlakeids!=''">AND  PARTLAKEIDS like '%'||to_char(#{partlakeids})||'%'
+                </if>
+			                <if test="partreservoirids != null and partreservoirids!=''">AND  PARTRESERVOIRIDS like '%'||to_char(#{partreservoirids})||'%'
+                </if>
+			                <if test="areaids != null and areaids!=''">AND  AREAIDS like '%'||to_char(#{areaids})||'%'
+                </if>
+			        </where>
+	</select>
+	 
+	<insert id="save" parameterType="com.khidi.manager.sys.entity.SysRoleResourceEntity">
+		insert into SYS_ROLE_RESOURCE
+		(
+			RIVERIDS , 
+			ID , 
+			ROLEID ,
+			LAKEIDS , 
+			VIDEOSTATIONIDS , 
+			CANALIDS , 
+			RIVERSTATIONIDS , 
+			RESERVOIRIDS , 
+			PARTRIVERIDS , 
+			PARTCANALIDS , 
+			PARTLAKEIDS , 
+			PARTRESERVOIRIDS , 
+			AREAIDS,
+			MENUIDS
+		)
+		values
+		(
+			#{riverids,jdbcType = VARCHAR}, 
+			#{id,jdbcType = VARCHAR}, 
+			#{roleId,jdbcType = VARCHAR}, 
+			#{lakeids,jdbcType = VARCHAR}, 
+			#{videostationids,jdbcType = VARCHAR}, 
+			#{canalids,jdbcType = VARCHAR}, 
+			#{riverstationids,jdbcType = VARCHAR}, 
+			#{reservoirids,jdbcType = VARCHAR}, 
+			#{partriverids,jdbcType = VARCHAR}, 
+			#{partcanalids,jdbcType = VARCHAR}, 
+			#{partlakeids,jdbcType = VARCHAR}, 
+			#{partreservoirids,jdbcType = VARCHAR}, 
+			#{areaids,jdbcType = VARCHAR},
+			#{menuids,jdbcType = VARCHAR}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.khidi.manager.sys.entity.SysRoleResourceEntity">
+		update SYS_ROLE_RESOURCE 
+		<set>
+			<if test="id != null">
+				ID = #{id}  , </if>
+			<if test="roleId != null">
+				ROLEID = #{roleId}  , </if>
+			<if test="lakeids != null">
+				LAKEIDS = #{lakeids}  , </if>
+			<if test="videostationids != null">
+				VIDEOSTATIONIDS = #{videostationids}  , </if>
+			<if test="canalids != null">
+				CANALIDS = #{canalids}  , </if>
+			<if test="riverstationids != null">
+				RIVERSTATIONIDS = #{riverstationids}  , </if>
+			<if test="reservoirids != null">
+				RESERVOIRIDS = #{reservoirids}  , </if>
+			<if test="partriverids != null">
+				PARTRIVERIDS = #{partriverids}  , </if>
+			<if test="partcanalids != null">
+				PARTCANALIDS = #{partcanalids}  , </if>
+			<if test="partlakeids != null">
+				PARTLAKEIDS = #{partlakeids}  , </if>
+			<if test="partreservoirids != null">
+				PARTRESERVOIRIDS = #{partreservoirids}  , </if>
+			<if test="areaids != null">
+				AREAIDS = #{areaids}  </if>
+		</set>
+		where RIVERIDS = #{riverids}
+	</update>
+	
+	<delete id="delete">
+		delete from SYS_ROLE_RESOURCE where ID = #{id}
+	</delete>
+
+
+	<delete id="deleteByRoleId">
+		delete from SYS_ROLE_RESOURCE where ROLEID = #{roleId}
+	</delete>
+</mapper>

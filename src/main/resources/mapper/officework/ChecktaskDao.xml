@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.officework.dao.ChecktaskDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.officework.entity.ChecktaskEntity" id="checktaskMap">
+        <result property="id" column="ID"/>
+        <result property="routeid" column="ROUTEID"/>
+        <result property="checker" column="CHECKER"/>
+        <result property="startdate" column="STARTDATE"/>
+        <result property="enddate" column="ENDDATE"/>
+        <result property="createtime" column="CREATETIME"/>
+        <result property="type" column="TYPE"/>
+        <result property="tasksender" column="TASKSENDER"/>
+        <result property="lastStartDate" column="LASTSTARTDATE"/>
+        <result property="dailyTaskId" column="DAILYTASKID"/>
+        <result property="featureId" column="featureId"/>
+        <result property="resourceType" column="resourceType"/>
+        <result property="resourceId" column="resourceId"/>
+        <result property="status" column="STATUS"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.khidi.manager.officework.entity.ChecktaskEntity">
+		select * from CHECKTASK where ID = #{id}
+	</select>
+
+
+    <select id="queryList" resultType="com.khidi.manager.officework.entity.ChecktaskEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN
+                FROM (select CHECKTASK.*, (SELECT RESOURCETYPE FROM checkroute WHERE checkroute.id = CHECKTASK.routeid
+                ) AS resourceType,
+                (SELECT RESOURCEid
+                FROM checkroute
+                WHERE checkroute.id = CHECKTASK.routeid
+                ) AS resourceId,
+                (
+                CASE
+                (SELECT RESOURCETYPE FROM checkroute WHERE checkroute.id = CHECKTASK.routeid
+                )
+                WHEN '1'
+                THEN
+                (SELECT featureid
+                FROM river
+                WHERE river.id =
+                (SELECT RESOURCEid FROM checkroute WHERE checkroute.id = CHECKTASK.routeid
+                )
+                )
+                WHEN '2'
+                THEN
+                (SELECT featureid
+                FROM part_river
+                WHERE part_river.id =
+                (SELECT RESOURCEid FROM checkroute WHERE checkroute.id = CHECKTASK.routeid
+                )
+                )
+                WHEN '3'
+                THEN
+                (SELECT featureid
+                FROM canal
+                WHERE canal.id =
+                (SELECT RESOURCEid FROM checkroute WHERE checkroute.id = CHECKTASK.routeid
+                )
+                )
+                WHEN '4'
+                THEN
+                (SELECT featureid
+                FROM part_canal
+                WHERE part_canal.id =
+                (SELECT RESOURCEid FROM checkroute WHERE checkroute.id = CHECKTASK.routeid
+                )
+                )
+                WHEN '5'
+                THEN
+                (SELECT featureid
+                FROM lake
+                WHERE lake.id =
+                (SELECT RESOURCEid FROM checkroute WHERE checkroute.id = CHECKTASK.routeid
+                )
+                )
+                WHEN '6'
+                THEN
+                (SELECT featureid
+                FROM part_lake
+                WHERE part_lake.id =
+                (SELECT RESOURCEid FROM checkroute WHERE checkroute.id = CHECKTASK.routeid
+                )
+                )
+                WHEN '7'
+                THEN
+                (SELECT featureid
+                FROM reservoir
+                WHERE reservoir.id =
+                (SELECT RESOURCEid FROM checkroute WHERE checkroute.id = CHECKTASK.routeid
+                )
+                )
+                ELSE
+                (SELECT featureid
+                FROM river
+                WHERE river.id =
+                (SELECT RESOURCEid FROM checkroute WHERE checkroute.id = CHECKTASK.routeid
+                )
+                )
+                END ) AS featureId
+                from CHECKTASK
+
+                <where>
+                        <if test="true">
+                            <!--控制显示列表出来的数据只为当前时间+2天往后的 -->
+                            <![CDATA[STARTDATE  <=  sysdate+2 ]]>  and (checker) like '%'||TO_CHAR(#{userId})||'%'
+                        </if>
+                        <if test="checker != null and checker!=''">and checker in (select user_id from sys_user where name like '%' ||TO_CHAR(#{checker}) ||'%')
+                        </if>
+                        <if test="resourceName != null and resourceName!=''">
+                        and routeid in (select id from checkroute where name like '%' ||TO_CHAR(#{resourceName}) ||'%')
+                        </if>
+                        <if test="areaid != null and areaid!=''">
+                        and routeid in (select id from checkroute where areaid in (select area_id FROM sys_area START WITH
+                            area_id=#{areaid} CONNECT BY prior area_id = parent_id))
+                        </if>
+
+                                            <if test="type != null and type!=''">AND TYPE like '%'||to_char(#{type})||'%'
+                        </if>
+                                            <if test="tasksender != null and tasksender!=''">AND TASKSENDER like '%'||to_char(#{tasksender})||'%'
+                        </if>
+                                            <if test="status != null and status!=''">AND #{status} like '%'|| STATUS ||'%'
+                        </if>
+                                            <if test="createtime4start != null">AND CREATETIME  &gt;= #{createtime4start}
+                        </if>
+                                            <if test="createtime4end != null">AND CREATETIME &lt;= #{createtime4end}
+                        </if>
+                                            <if test="begintime4start != null">AND STARTDATE  &gt;= #{begintime4start}
+                        </if>
+                                            <if test="begintime4end != null">AND STARTDATE &lt;= #{begintime4end}
+                        </if>
+                </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by STARTDATE desc
+                    </otherwise>
+                </choose>
+                )a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from CHECKTASK
+                <where>
+
+                    <if test="true">
+                        <!--控制显示列表出来的数据只为当前时间+2天往后的 -->
+                        <![CDATA[STARTDATE  <=  sysdate+2 ]]>  and (checker) like '%'||TO_CHAR(#{userId})||'%'
+                    </if>
+                    <if test="checker != null and checker!=''">and checker in (select user_id from sys_user where name like '%' ||TO_CHAR(#{checker}) ||'%')
+                    </if>
+                    <if test="resourceName != null and resourceName!=''">
+                        and routeid in (select id from checkroute where name like '%' ||TO_CHAR(#{resourceName}) ||'%')
+                    </if>
+                    <if test="areaid != null and areaid!=''">
+                        and routeid in (select id from checkroute where areaid in (select area_id FROM sys_area START WITH
+                        area_id=#{areaid} CONNECT BY prior area_id = parent_id))
+                    </if>
+
+                    <if test="type != null and type!=''">AND TYPE like '%'||to_char(#{type})||'%'
+                    </if>
+                    <if test="tasksender != null and tasksender!=''">AND TASKSENDER like '%'||to_char(#{tasksender})||'%'
+                    </if>
+                    <if test="status != null and status!=''">AND #{status} like '%'|| STATUS ||'%'
+                    </if>
+                    <if test="createtime4start != null">AND CREATETIME  &gt;= #{createtime4start}
+                    </if>
+                    <if test="createtime4end != null">AND CREATETIME &lt;= #{createtime4end}
+                    </if>
+                    <if test="begintime4start != null">AND STARTDATE  &gt;= #{begintime4start}
+                    </if>
+                    <if test="begintime4end != null">AND STARTDATE &lt;= #{begintime4end}
+                    </if>
+                </where>
+            </otherwise>
+        </choose>
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from CHECKTASK
+        <where>
+            <if test="true">
+                <!--控制显示列表出来的数据只为当前时间+2天往后的 -->
+                <![CDATA[STARTDATE  <=  sysdate+2 ]]>    and (checker) like '%'||TO_CHAR(#{userId})||'%'
+            </if>
+            <if test="checker != null and checker!=''">and checker in (select user_id from sys_user where name like '%' ||TO_CHAR(#{checker}) ||'%')
+            </if>
+            <if test="resourceName != null and resourceName!=''">
+                and routeid in (select id from checkroute where name like '%' ||TO_CHAR(#{resourceName}) ||'%')
+            </if>
+            <if test="areaid != null and areaid!=''">
+                and routeid in (select id from checkroute where areaid in (select area_id FROM sys_area START WITH
+                area_id=#{areaid} CONNECT BY prior area_id = parent_id))
+            </if>
+
+            <if test="type != null and type!=''">AND TYPE like '%'||to_char(#{type})||'%'
+            </if>
+            <if test="tasksender != null and tasksender!=''">AND TASKSENDER like '%'||to_char(#{tasksender})||'%'
+            </if>
+            <if test="status != null and status!=''">AND #{status} like '%'|| STATUS ||'%'
+            </if>
+            <if test="createtime4start != null">AND CREATETIME  &gt;= #{createtime4start}
+            </if>
+            <if test="createtime4end != null">AND CREATETIME &lt;= #{createtime4end}
+            </if>
+            <if test="begintime4start != null">AND STARTDATE  &gt;= #{begintime4start}
+            </if>
+            <if test="begintime4end != null">AND STARTDATE &lt;= #{begintime4end}
+            </if>
+        </where>
+	</select>
+	 
+	<insert id="save" parameterType="com.khidi.manager.officework.entity.ChecktaskEntity">
+		insert into CHECKTASK
+		(
+			ID , 
+			ROUTEID , 
+			CHECKER , 
+			STARTDATE , 
+			ENDDATE , 
+			TYPE ,
+			TASKSENDER , 
+			STATUS,
+			LASTSTARTDATE,
+			DAILYTASKID
+		)
+		values
+		(
+			#{id,jdbcType = VARCHAR}, 
+			#{routeid,jdbcType = VARCHAR}, 
+			#{checker,jdbcType = VARCHAR}, 
+			#{startdate,jdbcType = VARCHAR}, 
+			#{enddate,jdbcType = VARCHAR}, 
+			#{type,jdbcType = VARCHAR},
+			#{tasksender,jdbcType = VARCHAR}, 
+			#{status,jdbcType = VARCHAR},
+			#{lastStartDate,jdbcType = VARCHAR},
+			#{dailyTaskId,jdbcType = VARCHAR}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.khidi.manager.officework.entity.ChecktaskEntity">
+		update CHECKTASK 
+		<set>
+			<if test="routeid != null">
+				ROUTEID = #{routeid}  , </if>
+			<if test="checker != null">
+				CHECKER = #{checker}  , </if>
+			<if test="startdate != null">
+				STARTDATE = #{startdate}  , </if>
+			<if test="enddate != null">
+				ENDDATE = #{enddate}  , </if>
+			<if test="createtime != null">
+				CREATETIME = #{createtime}  , </if>
+			<if test="type != null">
+				TYPE = #{type}  , </if>
+			<if test="tasksender != null">
+				TASKSENDER = #{tasksender}  , </if>
+			<if test="status != null">
+				STATUS = #{status}  ,</if>
+            <if test="lastStartDate != null">
+                LASTSTARTDATE = #{lastStartDate},</if>
+            <if test="dailyTaskId != null">
+                DAILYTASKID = #{dailyTaskId}</if>
+		</set>
+		where ID = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from CHECKTASK where ID = #{id}
+	</delete>
+
+    <delete id="deleteByDailyTaskId">
+        delete from CHECKTASK where DAILYTASKID = #{dailyTaskId}
+    </delete>
+
+
+
+
+</mapper>

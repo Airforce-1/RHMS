@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.event.dao.AppeventStepsDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.event.entity.AppeventStepsEntity" id="appeventStepsMap">
+        <result property="id" column="ID"/>
+        <result property="esteptype" column="ESTEPTYPE"/>
+        <result property="reportid" column="REPORTID"/>
+        <result property="wpId" column="WP_ID"/>
+        <result property="wpHsId" column="WP_HS_ID"/>
+        <result property="clid" column="CLID"/>
+        <result property="createtime" column="CREATETIME"/>
+        <result property="eid" column="EID"/>
+        <result property="grpid" column="GRPID"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.khidi.manager.event.entity.AppeventStepsEntity">
+		select * from APPEVENT_STEPS where ID = #{id}
+	</select>
+
+
+    <select id="queryList" resultType="com.khidi.manager.event.entity.AppeventStepsEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN
+                FROM (select * from APPEVENT_STEPS
+                <where>
+                                            <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                        </if>
+                                            <if test="esteptype != null and esteptype!=''">AND ESTEPTYPE like '%'||to_char(#{esteptype})||'%'
+                        </if>
+                                            <if test="reportid != null and reportid!=''">AND REPORTID like '%'||to_char(#{reportid})||'%'
+                        </if>
+                                            <if test="wpId != null and wpId!=''">AND WP_ID like '%'||to_char(#{wpId})||'%'
+                        </if>
+                                            <if test="wpHsId != null and wpHsId!=''">AND WP_HS_ID like '%'||to_char(#{wpHsId})||'%'
+                        </if>
+                                            <if test="clid != null and clid!=''">AND CLID like '%'||to_char(#{clid})||'%'
+                        </if>
+                                            <if test="createtime != null and createtime!=''">AND CREATETIME like '%'||to_char(#{createtime})||'%'
+                        </if>
+                                            <if test="eid != null and eid!=''">AND EID like '%'||to_char(#{eid})||'%'
+                        </if>
+                                            <if test="grpid != null and grpid!=''">AND GRPID like '%'||to_char(#{grpid})||'%'
+                        </if>
+                                    </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by createtime desc
+                    </otherwise>
+                </choose>
+                )a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from APPEVENT_STEPS
+            </otherwise>
+        </choose>
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from APPEVENT_STEPS
+        <where>
+			                <if test="id != null and id!=''">AND  ID like '%'||to_char(#{id})||'%'
+                </if>
+			                <if test="esteptype != null and esteptype!=''">AND  ESTEPTYPE like '%'||to_char(#{esteptype})||'%'
+                </if>
+			                <if test="reportid != null and reportid!=''">AND  REPORTID like '%'||to_char(#{reportid})||'%'
+                </if>
+			                <if test="wpId != null and wpId!=''">AND  WP_ID like '%'||to_char(#{wpId})||'%'
+                </if>
+			                <if test="wpHsId != null and wpHsId!=''">AND  WP_HS_ID like '%'||to_char(#{wpHsId})||'%'
+                </if>
+			                <if test="clid != null and clid!=''">AND  CLID like '%'||to_char(#{clid})||'%'
+                </if>
+			                <if test="createtime != null and createtime!=''">AND  CREATETIME like '%'||to_char(#{createtime})||'%'
+                </if>
+			                <if test="eid != null and eid!=''">AND  EID like '%'||to_char(#{eid})||'%'
+                </if>
+			                <if test="grpid != null and grpid!=''">AND  GRPID like '%'||to_char(#{grpid})||'%'
+                </if>
+			        </where>
+	</select>
+	 
+	<insert id="save" parameterType="com.khidi.manager.event.entity.AppeventStepsEntity">
+		insert into APPEVENT_STEPS
+		(
+			ID , 
+			ESTEPTYPE , 
+			REPORTID , 
+			WP_ID , 
+			WP_HS_ID , 
+			CLID , 
+			CREATETIME , 
+			EID , 
+			GRPID 
+		)
+		values
+		(
+			#{id,jdbcType = VARCHAR}, 
+			#{esteptype,jdbcType = VARCHAR}, 
+			#{reportid,jdbcType = VARCHAR}, 
+			#{wpId,jdbcType = VARCHAR}, 
+			#{wpHsId,jdbcType = VARCHAR}, 
+			#{clid,jdbcType = VARCHAR}, 
+			#{createtime,jdbcType = DATE}, 
+			#{eid,jdbcType = VARCHAR}, 
+			#{grpid,jdbcType = VARCHAR}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.khidi.manager.event.entity.AppeventStepsEntity">
+		update APPEVENT_STEPS 
+		<set>
+			<if test="esteptype != null">
+				ESTEPTYPE = #{esteptype}  , </if>
+			<if test="reportid != null">
+				REPORTID = #{reportid}  , </if>
+			<if test="wpId != null">
+				WP_ID = #{wpId}  , </if>
+			<if test="wpHsId != null">
+				WP_HS_ID = #{wpHsId}  , </if>
+			<if test="clid != null">
+				CLID = #{clid}  , </if>
+			<if test="createtime != null">
+				CREATETIME = #{createtime}  , </if>
+			<if test="eid != null">
+				EID = #{eid}  , </if>
+			<if test="grpid != null">
+				GRPID = #{grpid}  </if>
+		</set>
+		where ID = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from APPEVENT_STEPS where ID = #{id}
+	</delete>
+</mapper>

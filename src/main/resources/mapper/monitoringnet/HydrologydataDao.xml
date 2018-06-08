@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.monitoringnet.dao.HydrologydataDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.monitoringnet.entity.HydrologydataEntity" id="hydrologydataMap">
+        <result property="id" column="ID"/>
+        <result property="stationId" column="STATIONID"/>
+        <result property="createtime" column="CREATETIME"/>
+        <result property="speed" column="SPEED"/>
+        <result property="flow" column="FLOW"/>
+        <result property="yield" column="YIELD"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.khidi.manager.monitoringnet.entity.HydrologydataEntity">
+		select * from HYDROLOGYDATA where ID = #{id}
+	</select>
+
+    <select id="queryObjectfortop" resultType="com.khidi.manager.monitoringnet.entity.HydrologydataEntity">
+        select * from (select * from HYDROLOGYDATA
+        where stationId = #{id}
+        order by createtime desc) where rownum  &lt;=1 order by rownum
+    </select>
+
+
+
+
+
+
+    <select id="queryList" resultType="com.khidi.manager.monitoringnet.entity.HydrologydataEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN
+                FROM (select * from HYDROLOGYDATA
+                <where>
+                                            <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                        </if>
+                                            <if test="stationId != null and stationId!=''">AND STATIONID like '%'||to_char(#{stationId})||'%'
+                        </if>
+                                            <if test="startDate != null">AND CREATETIME  &gt;= #{startDate}
+                                            </if>
+                                            <if test="endDate != null">AND CREATETIME &lt;= #{endDate}
+                    </if>
+                                            <if test="speed != null and speed!=''">AND SPEED like '%'||to_char(#{speed})||'%'
+                        </if>
+                                            <if test="flow != null and flow!=''">AND FLOW like '%'||to_char(#{flow})||'%'
+                        </if>
+                                            <if test="yield != null and yield!=''">AND YIELD like '%'||to_char(#{yield})||'%'
+                        </if>
+                                    </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by createtime desc
+                    </otherwise>
+                </choose>
+                )a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from HYDROLOGYDATA
+            </otherwise>
+        </choose>
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from HYDROLOGYDATA
+        <where>
+			                <if test="id != null and id!=''">AND  ID like '%'||to_char(#{id})||'%'
+                </if>
+			                <if test="stationId != null and stationId!=''">AND  STATIONID like '%'||to_char(#{stationId})||'%'
+                </if>
+			                <if test="createtime != null and createtime!=''">AND  CREATETIME like '%'||to_char(#{createtime})||'%'
+                </if>
+            <if test="startDate != null">AND CREATETIME  &gt;= #{startDate}
+            </if>
+            <if test="endDate != null">AND CREATETIME &lt;= #{endDate}
+            </if>
+                            <if test="speed != null and speed!=''">AND  SPEED like '%'||to_char(#{speed})||'%'
+                </if>
+			                <if test="flow != null and flow!=''">AND  FLOW like '%'||to_char(#{flow})||'%'
+                </if>
+			                <if test="yield != null and yield!=''">AND  YIELD like '%'||to_char(#{yield})||'%'
+                </if>
+			        </where>
+	</select>
+	 
+	<insert id="save" parameterType="com.khidi.manager.monitoringnet.entity.HydrologydataEntity">
+		insert into HYDROLOGYDATA
+		(
+			ID , 
+			STATIONID , 
+			CREATETIME ,
+			SPEED , 
+			FLOW , 
+			YIELD 
+		)
+		values
+		(
+			#{id,jdbcType = VARCHAR}, 
+			#{stationId,jdbcType = VARCHAR},
+			#{createtime,jdbcType = VARCHAR},
+			#{speed,jdbcType = VARCHAR}, 
+			#{flow,jdbcType = VARCHAR}, 
+			#{yield,jdbcType = VARCHAR}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.khidi.manager.monitoringnet.entity.HydrologydataEntity">
+		update HYDROLOGYDATA 
+		<set>
+			<if test="stationId != null">
+				STATIONID = #{stationId}  , </if>
+			<if test="createtime != null">
+				CREATETIME = #{createtime}  , </if>
+			<if test="speed != null">
+				SPEED = #{speed}  , </if>
+			<if test="flow != null">
+				FLOW = #{flow}  , </if>
+			<if test="yield != null">
+				YIELD = #{yield}  </if>
+		</set>
+		where ID = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from HYDROLOGYDATA where ID = #{id}
+	</delete>
+</mapper>

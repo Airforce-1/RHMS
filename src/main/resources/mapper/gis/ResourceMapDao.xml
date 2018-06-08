@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.gis.dao.ResourceMapDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.gis.entity.ResourceMapEntity" id="riverMap">
+        <result property="id" column="ID"/>
+        <result property="featureId" column="FEATUREID"/>
+    </resultMap>
+
+    <!-- 河流id和地图id关联 -->
+    <update id="updateRiverFeatureId" parameterType="com.khidi.manager.gis.entity.ResourceMapEntity">
+        update RIVER
+        <set>
+            <if test="featureId != null">
+                FEATUREID = #{featureId},
+            </if>
+        </set>
+        where ID = #{id}
+    </update>
+    <!--验证河流地图资源是否重复-->
+    <select id="queryRiverByFeatureId" resultType="String">
+        select name from River where FeatureId = #{featureId}
+    </select>
+
+
+
+
+
+
+
+
+
+    <!-- 河段id和地图id关联 -->
+    <update id="updatePartRiverFeatureId" parameterType="com.khidi.manager.gis.entity.ResourceMapEntity">
+        update PART_RIVER
+        <set>
+            <if test="featureId != null">
+                FEATUREID = #{featureId},
+            </if>
+        </set>
+        where ID = #{id}
+    </update>
+    <!--验证河段地图资源是否重复-->
+    <select id="queryPartRiverByFeatureId" resultType="String">
+        select name from part_River where FeatureId = #{featureId}
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- 渠道id和地图id关联 -->
+    <update id="updateCanalFeatureId" parameterType="com.khidi.manager.gis.entity.ResourceMapEntity">
+        update CANAL
+        <set>
+            <if test="featureId != null">
+                FEATUREID = #{featureId},
+            </if>
+        </set>
+        where ID = #{id}
+    </update>
+    <!--验证渠道地图资源是否重复-->
+    <select id="queryCanalByFeatureId" resultType="String">
+        select name from canal where FeatureId = #{featureId}
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- 渠段id和地图id关联 -->
+    <update id="updatePartCanalFeatureId" parameterType="com.khidi.manager.gis.entity.ResourceMapEntity">
+        update PART_CANAL
+        <set>
+            <if test="featureId != null">
+                FEATUREID = #{featureId},
+            </if>
+        </set>
+        where ID = #{id}
+    </update>
+    <!--验证渠段地图资源是否重复-->
+    <select id="queryPartCanalByFeatureId" resultType="String">
+        select name from part_canal where FeatureId = #{featureId}
+    </select>
+
+
+
+
+
+
+
+
+    <!-- 湖泊id和地图id关联 -->
+    <update id="updateLakeFeatureId" parameterType="com.khidi.manager.gis.entity.ResourceMapEntity">
+        update LAKE
+        <set>
+            <if test="featureId != null">
+                FEATUREID = #{featureId},
+            </if>
+        </set>
+        where ID = #{id}
+    </update>
+    <!--验证湖泊地图资源是否重复-->
+    <select id="queryLakeByFeatureId" resultType="String">
+        select name from lake  where FeatureId = #{featureId}
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+    <!-- 湖段id和地图id关联 -->
+    <update id="updatePartLakeFeatureId" parameterType="com.khidi.manager.gis.entity.ResourceMapEntity">
+        update part_LAKE
+        <set>
+            <if test="featureId != null">
+                FEATUREID = #{featureId},
+            </if>
+        </set>
+        where ID = #{id}
+    </update>
+    <!--验证湖段地图资源是否重复-->
+    <select id="queryPartLakeByFeatureId" resultType="String">
+        select name from part_lake  where FeatureId = #{featureId}
+    </select>
+
+
+
+
+
+
+
+
+    <!-- 水库id和地图id关联 -->
+    <update id="updateReservoirFeatureId" parameterType="com.khidi.manager.gis.entity.ResourceMapEntity">
+        update Reservoir
+        <set>
+            <if test="featureId != null">
+                FEATUREID = #{featureId},
+            </if>
+        </set>
+        where ID = #{id}
+    </update>
+    <!--验证水库地图资源是否重复-->
+    <select id="queryReservoirByFeatureId" resultType="String">
+        select name from Reservoir  where FeatureId = #{featureId}
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- 库段id和地图id关联 -->
+    <update id="updatePartReservoirFeatureId" parameterType="com.khidi.manager.gis.entity.ResourceMapEntity">
+        update part_Reservoir
+        <set>
+            <if test="featureId != null">
+                FEATUREID = #{featureId},
+            </if>
+        </set>
+        where ID = #{id}
+    </update>
+    <!--验证水库地图资源是否重复-->
+    <select id="queryPartReservoirByFeatureId" resultType="String">
+        select name from part_Reservoir  where FeatureId = #{featureId}
+    </select>
+</mapper>

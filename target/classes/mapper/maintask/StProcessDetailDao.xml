@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.maintask.dao.StProcessDetailDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.maintask.entity.StProcessDetailEntity" id="stProcessDetailMap">
+        <result property="id" column="ID"/>
+        <result property="targetid" column="TARGETID"/>
+        <result property="taskid" column="TASKID"/>
+        <result property="targetDetailId" column="TARGET_DETAIL_ID"/>
+        <result property="taskDetailId" column="TASK_DETAIL_ID"/>
+        <result property="taskdetailSubtaskId" column="TASKDETAIL_SUBTASK_ID"/>
+        <result property="objtype" column="OBJTYPE"/>
+        <result property="progress" column="PROGRESS"/>
+        <result property="createuserid" column="CREATEUSERID"/>
+        <result property="createdeptid" column="CREATEDEPTID"/>
+        <result property="memo" column="MEMO"/>
+    </resultMap>
+
+    <select id="queryObject" resultType="com.khidi.manager.maintask.entity.StProcessDetailEntity">
+		select * from ST_PROCESS_DETAIL where ID = #{id}
+	</select>
+
+
+    <select id="queryList" resultType="com.khidi.manager.maintask.entity.StProcessDetailEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN
+                FROM (select * from ST_PROCESS_DETAIL
+                <where>
+                    <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                    </if>
+                    <if test="targetid != null and targetid!=''">AND TARGETID like '%'||to_char(#{targetid})||'%'
+                    </if>
+                    <if test="taskid != null and taskid!=''">AND TASKID like '%'||to_char(#{taskid})||'%'
+                    </if>
+                    <if test="targetDetailId != null and targetDetailId!=''">AND TARGET_DETAIL_ID like
+                        '%'||to_char(#{targetDetailId})||'%'
+                    </if>
+                    <if test="taskDetailId != null and taskDetailId!=''">AND TASK_DETAIL_ID like
+                        '%'||to_char(#{taskDetailId})||'%'
+                    </if>
+                    <if test="taskdetailSubtaskId != null and taskdetailSubtaskId!=''">AND TASKDETAIL_SUBTASK_ID like
+                        '%'||to_char(#{taskdetailSubtaskId})||'%'
+                    </if>
+                    <if test="objtype != null and objtype!=''">AND OBJTYPE like '%'||to_char(#{objtype})||'%'
+                    </if>
+                    <if test="progress != null and progress!=''">AND PROGRESS like '%'||to_char(#{progress})||'%'
+                    </if>
+                    <if test="createuserid != null and createuserid!=''">AND CREATEUSERID like
+                        '%'||to_char(#{createuserid})||'%'
+                    </if>
+                    <if test="createdeptid != null and createdeptid!=''">AND CREATEDEPTID like
+                        '%'||to_char(#{createdeptid})||'%'
+                    </if>
+                    <if test="memo != null and memo!=''">AND MEMO like '%'||to_char(#{memo})||'%'
+                    </if>
+                </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by createtime asc
+                    </otherwise>
+                </choose>
+                )a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from ST_PROCESS_DETAIL
+            </otherwise>
+        </choose>
+    </select>
+
+
+    <select id="queryTotal" resultType="int">
+        select count(*) from ST_PROCESS_DETAIL
+        <where>
+            <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+            </if>
+            <if test="targetid != null and targetid!=''">AND TARGETID like '%'||to_char(#{targetid})||'%'
+            </if>
+            <if test="taskid != null and taskid!=''">AND TASKID like '%'||to_char(#{taskid})||'%'
+            </if>
+            <if test="targetDetailId != null and targetDetailId!=''">AND TARGET_DETAIL_ID like
+                '%'||to_char(#{targetDetailId})||'%'
+            </if>
+            <if test="taskDetailId != null and taskDetailId!=''">AND TASK_DETAIL_ID like
+                '%'||to_char(#{taskDetailId})||'%'
+            </if>
+            <if test="taskdetailSubtaskId != null and taskdetailSubtaskId!=''">AND TASKDETAIL_SUBTASK_ID like
+                '%'||to_char(#{taskdetailSubtaskId})||'%'
+            </if>
+            <if test="objtype != null and objtype!=''">AND OBJTYPE like '%'||to_char(#{objtype})||'%'
+            </if>
+            <if test="progress != null and progress!=''">AND PROGRESS like '%'||to_char(#{progress})||'%'
+            </if>
+            <if test="createuserid != null and createuserid!=''">AND CREATEUSERID like
+                '%'||to_char(#{createuserid})||'%'
+            </if>
+            <if test="createdeptid != null and createdeptid!=''">AND CREATEDEPTID like
+                '%'||to_char(#{createdeptid})||'%'
+            </if>
+            <if test="memo != null and memo!=''">AND MEMO like '%'||to_char(#{memo})||'%'
+            </if>
+        </where>
+    </select>
+
+    <insert id="save" parameterType="com.khidi.manager.maintask.entity.StProcessDetailEntity">
+		insert into ST_PROCESS_DETAIL
+		(
+			ID , 
+			TARGETID , 
+			TASKID , 
+			TARGET_DETAIL_ID , 
+			TASK_DETAIL_ID , 
+			TASKDETAIL_SUBTASK_ID , 
+			OBJTYPE , 
+			PROGRESS , 
+			CREATEUSERID , 
+			CREATEDEPTID ,
+			MEMO 
+		)
+		values
+		(
+			#{id,jdbcType = VARCHAR}, 
+			#{targetid,jdbcType = VARCHAR}, 
+			#{taskid,jdbcType = VARCHAR}, 
+			#{targetDetailId,jdbcType = VARCHAR}, 
+			#{taskDetailId,jdbcType = VARCHAR}, 
+			#{taskdetailSubtaskId,jdbcType = VARCHAR}, 
+			#{objtype,jdbcType = VARCHAR}, 
+			#{progress,jdbcType = VARCHAR}, 
+			#{createuserid,jdbcType = VARCHAR}, 
+			#{createdeptid,jdbcType = VARCHAR},
+			#{memo,jdbcType = VARCHAR}
+		)
+	</insert>
+
+    <update id="update" parameterType="com.khidi.manager.maintask.entity.StProcessDetailEntity">
+        update ST_PROCESS_DETAIL
+        <set>
+            <if test="targetid != null">
+                TARGETID = #{targetid} ,
+            </if>
+            <if test="taskid != null">
+                TASKID = #{taskid} ,
+            </if>
+            <if test="targetDetailId != null">
+                TARGET_DETAIL_ID = #{targetDetailId} ,
+            </if>
+            <if test="taskDetailId != null">
+                TASK_DETAIL_ID = #{taskDetailId} ,
+            </if>
+            <if test="taskdetailSubtaskId != null">
+                TASKDETAIL_SUBTASK_ID = #{taskdetailSubtaskId} ,
+            </if>
+            <if test="objtype != null">
+                OBJTYPE = #{objtype} ,
+            </if>
+            <if test="progress != null">
+                PROGRESS = #{progress} ,
+            </if>
+            <if test="createuserid != null">
+                CREATEUSERID = #{createuserid} ,
+            </if>
+            <if test="createdeptid != null">
+                CREATEDEPTID = #{createdeptid} ,
+            </if>
+            <if test="memo != null">
+                MEMO = #{memo}
+            </if>
+        </set>
+        where ID = #{id}
+    </update>
+
+    <delete id="delete">
+		delete from ST_PROCESS_DETAIL where ID = #{id}
+	</delete>
+</mapper>

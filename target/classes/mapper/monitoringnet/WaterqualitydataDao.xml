@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.monitoringnet.dao.WaterqualitydataDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap
+		type="com.khidi.manager.monitoringnet.entity.WaterqualitydataEntity"
+		id="waterqualitydataMap">
+		<result property="id" column="ID" />
+		<result property="createtime" column="CREATETIME" />
+		<result property="stationId" column="STATIONID" />
+		<result property="ph" column="PH" />
+		<result property="cod" column="COD" />
+		<result property="bod" column="BOD" />
+		<result property="coliform" column="COLIFORM" />
+		<result property="phosphor" column="PHOSPHOR" />
+		<result property="maxuptemp" column="MAXUPTEMP" />
+		<result property="maxfalltemp" column="MAXFALLTEMP" />
+		<result property="nh" column="NH" />
+		<result property="oxygen" column="OXYGEN" />
+		<result property="permanganate" column="PERMANGANATE" />
+		<result property="totaln" column="TOTALN" />
+		<result property="cu" column="CU" />
+		<result property="zn" column="ZN" />
+		<result property="fluoride" column="FLUORIDE" />
+		<result property="se" column="SE" />
+		<result property="arsenic" column="ARSENIC" />
+		<result property="hg" column="HG" />
+		<result property="cd" column="CD" />
+		<result property="chromium" column="CHROMIUM" />
+		<result property="lead" column="LEAD" />
+		<result property="cyanide" column="CYANIDE" />
+		<result property="phenol" column="PHENOL" />
+		<result property="petroleum" column="PETROLEUM" />
+		<result property="anionic" column="ANIONIC" />
+		<result property="sulfide" column="SULFIDE" />
+	</resultMap>
+
+	<!-- Jerry Wang 2017 12 25 -->
+	<resultMap
+		type="com.khidi.manager.monitoringnet.entity.WaterqualitydataEntity"
+		id="waterqualitydataMapView">
+		<result property="id" column="ID" />
+		<result property="createtime" column="CREATETIME" />
+		<result property="stationId" column="STATIONID" />
+		<result property="ph" column="PH" />
+		<result property="cod" column="COD" />
+		<result property="bod" column="BOD" />
+		<result property="coliform" column="COLIFORM" />
+		<result property="phosphor" column="PHOSPHOR" />
+		<result property="maxuptemp" column="MAXUPTEMP" />
+		<result property="maxfalltemp" column="MAXFALLTEMP" />
+		<result property="nh" column="NH" />
+		<result property="oxygen" column="OXYGEN" />
+		<result property="permanganate" column="PERMANGANATE" />
+		<result property="totaln" column="TOTALN" />
+		<result property="cu" column="CU" />
+		<result property="zn" column="ZN" />
+		<result property="fluoride" column="FLUORIDE" />
+		<result property="se" column="SE" />
+		<result property="arsenic" column="ARSENIC" />
+		<result property="hg" column="HG" />
+		<result property="cd" column="CD" />
+		<result property="chromium" column="CHROMIUM" />
+		<result property="lead" column="LEAD" />
+		<result property="cyanide" column="CYANIDE" />
+		<result property="phenol" column="PHENOL" />
+		<result property="petroleum" column="PETROLEUM" />
+		<result property="anionic" column="ANIONIC" />
+		<result property="sulfide" column="SULFIDE" />
+		<result property="stationName" column="STATIONNAME"></result>
+	</resultMap>
+
+	<select id="queryObject"
+		resultType="com.khidi.manager.monitoringnet.entity.WaterqualitydataEntity">
+		select * from WATERQUALITYDATA where ID = #{id}
+	</select>
+
+	<select id="queryObjectfortop"
+		resultType="com.khidi.manager.monitoringnet.entity.WaterqualitydataEntity">
+		select * from (select * from WATERQUALITYDATA
+		where
+		stationId = #{id}
+		order by createtime desc) where rownum &lt;=1 order
+		by rownum
+	</select>
+
+	<select id="queryObjectReleatedTime" resultMap="waterqualitydataMapView">
+		select * from WATERQUALITYDATA a JOIN RESOURCE_STATION b ON
+		a.STATIONID = b.ID WHERE a.STATIONID IN
+
+		<foreach item="item" index="index" collection="ids" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+
+		AND abs(a.createtime - to_date(#{thedate,jdbcType = DATE},'yyyy-MM-dd
+		hh24:mi:ss'))
+
+
+		= (select min(abs(a1.createtime -
+		to_date(#{thedate,jdbcType = DATE},'yyyy-MM-dd hh24:mi:ss'))) as tm1
+		from WATERQUALITYDATA a1)
+	</select>
+
+	<select id="queryObjectReleatedTimeSingle" resultMap="waterqualitydataMapView">
+		select *
+		from (select a.*,b.NAME AS STATIONNAME from WATERQUALITYDATA
+		a JOIN
+		RESOURCE_STATION b ON a.STATIONID = b.ID
+		where a.stationId = #{id} AND
+		a.createtime &lt;= #{thedate,jdbcType = DATE}
+		order by
+		a.createtime
+		desc) where rownum &lt;=1 order
+		by rownum
+	</select>
+
+
+	<select id="queryList"
+		resultType="com.khidi.manager.monitoringnet.entity.WaterqualitydataEntity">
+		<choose>
+			<when test="limit != null and offset !=null and page!=null">
+				select * FROM (
+				SELECT * FROM
+				(
+				SELECT a.*, ROWNUM RN
+				FROM (select *
+				from WATERQUALITYDATA
+				<where>
+					<if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+					</if>
+					<if test="startDate != null">AND CREATETIME &gt;= #{startDate}
+					</if>
+					<if test="endDate != null">AND CREATETIME &lt;= #{endDate}
+					</if>
+					<if test="stationId != null and stationId!=''">AND STATIONID like '%'||to_char(#{stationId})||'%'
+					</if>
+					<if test="ph != null and ph!=''">AND PH like '%'||to_char(#{ph})||'%'
+					</if>
+					<if test="cod != null and cod!=''">AND COD like '%'||to_char(#{cod})||'%'
+					</if>
+					<if test="bod != null and bod!=''">AND BOD like '%'||to_char(#{bod})||'%'
+					</if>
+					<if test="coliform != null and coliform!=''">AND COLIFORM like '%'||to_char(#{coliform})||'%'
+					</if>
+					<if test="phosphor != null and phosphor!=''">AND PHOSPHOR like '%'||to_char(#{phosphor})||'%'
+					</if>
+					<if test="maxuptemp != null and maxuptemp!=''">AND MAXUPTEMP like '%'||to_char(#{maxuptemp})||'%'
+					</if>
+					<if test="maxfalltemp != null and maxfalltemp!=''">AND MAXFALLTEMP like '%'||to_char(#{maxfalltemp})||'%'
+					</if>
+					<if test="nh != null and nh!=''">AND NH like '%'||to_char(#{nh})||'%'
+					</if>
+					<if test="oxygen != null and oxygen!=''">AND OXYGEN like '%'||to_char(#{oxygen})||'%'
+					</if>
+					<if test="permanganate != null and permanganate!=''">AND PERMANGANATE like
+						'%'||to_char(#{permanganate})||'%'
+					</if>
+					<if test="totaln != null and totaln!=''">AND TOTALN like '%'||to_char(#{totaln})||'%'
+					</if>
+					<if test="cu != null and cu!=''">AND CU like '%'||to_char(#{cu})||'%'
+					</if>
+					<if test="zn != null and zn!=''">AND ZN like '%'||to_char(#{zn})||'%'
+					</if>
+					<if test="fluoride != null and fluoride!=''">AND FLUORIDE like '%'||to_char(#{fluoride})||'%'
+					</if>
+					<if test="se != null and se!=''">AND SE like '%'||to_char(#{se})||'%'
+					</if>
+					<if test="arsenic != null and arsenic!=''">AND ARSENIC like '%'||to_char(#{arsenic})||'%'
+					</if>
+					<if test="hg != null and hg!=''">AND HG like '%'||to_char(#{hg})||'%'
+					</if>
+					<if test="cd != null and cd!=''">AND CD like '%'||to_char(#{cd})||'%'
+					</if>
+					<if test="chromium != null and chromium!=''">AND CHROMIUM like '%'||to_char(#{chromium})||'%'
+					</if>
+					<if test="lead != null and lead!=''">AND LEAD like '%'||to_char(#{lead})||'%'
+					</if>
+					<if test="cyanide != null and cyanide!=''">AND CYANIDE like '%'||to_char(#{cyanide})||'%'
+					</if>
+					<if test="phenol != null and phenol!=''">AND PHENOL like '%'||to_char(#{phenol})||'%'
+					</if>
+					<if test="petroleum != null and petroleum!=''">AND PETROLEUM like '%'||to_char(#{petroleum})||'%'
+					</if>
+					<if test="anionic != null and anionic!=''">AND ANIONIC like '%'||to_char(#{anionic})||'%'
+					</if>
+					<if test="sulfide != null and sulfide!=''">AND SULFIDE like '%'||to_char(#{sulfide})||'%'
+					</if>
+				</where>
+				<choose>
+					<when test="sidx != null and sidx.trim() != ''">
+						order by ${sidx} ${order}
+					</when>
+					<otherwise>
+						order by createtime desc
+					</otherwise>
+				</choose>
+				)a
+				WHERE ROWNUM &lt;= #{limit} * #{page}
+				)
+				WHERE RN > #{offset}
+				)
+			</when>
+			<otherwise>
+				select * from WATERQUALITYDATA
+			</otherwise>
+		</choose>
+	</select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<select id="queryTotal" resultType="int">
+		select count(*) from WATERQUALITYDATA
+		<where>
+			<if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+			</if>
+			<if test="startDate != null">AND CREATETIME &gt;= #{startDate}
+			</if>
+			<if test="endDate != null">AND CREATETIME &lt;= #{endDate}
+			</if>
+			<if test="stationId != null and stationId!=''">AND STATIONID like '%'||to_char(#{stationId})||'%'
+			</if>
+			<if test="ph != null and ph!=''">AND PH like '%'||to_char(#{ph})||'%'
+			</if>
+			<if test="cod != null and cod!=''">AND COD like '%'||to_char(#{cod})||'%'
+			</if>
+			<if test="bod != null and bod!=''">AND BOD like '%'||to_char(#{bod})||'%'
+			</if>
+			<if test="coliform != null and coliform!=''">AND COLIFORM like '%'||to_char(#{coliform})||'%'
+			</if>
+			<if test="phosphor != null and phosphor!=''">AND PHOSPHOR like '%'||to_char(#{phosphor})||'%'
+			</if>
+			<if test="maxuptemp != null and maxuptemp!=''">AND MAXUPTEMP like '%'||to_char(#{maxuptemp})||'%'
+			</if>
+			<if test="maxfalltemp != null and maxfalltemp!=''">AND MAXFALLTEMP like '%'||to_char(#{maxfalltemp})||'%'
+			</if>
+			<if test="nh != null and nh!=''">AND NH like '%'||to_char(#{nh})||'%'
+			</if>
+			<if test="oxygen != null and oxygen!=''">AND OXYGEN like '%'||to_char(#{oxygen})||'%'
+			</if>
+			<if test="permanganate != null and permanganate!=''">AND PERMANGANATE like '%'||to_char(#{permanganate})||'%'
+			</if>
+			<if test="totaln != null and totaln!=''">AND TOTALN like '%'||to_char(#{totaln})||'%'
+			</if>
+			<if test="cu != null and cu!=''">AND CU like '%'||to_char(#{cu})||'%'
+			</if>
+			<if test="zn != null and zn!=''">AND ZN like '%'||to_char(#{zn})||'%'
+			</if>
+			<if test="fluoride != null and fluoride!=''">AND FLUORIDE like '%'||to_char(#{fluoride})||'%'
+			</if>
+			<if test="se != null and se!=''">AND SE like '%'||to_char(#{se})||'%'
+			</if>
+			<if test="arsenic != null and arsenic!=''">AND ARSENIC like '%'||to_char(#{arsenic})||'%'
+			</if>
+			<if test="hg != null and hg!=''">AND HG like '%'||to_char(#{hg})||'%'
+			</if>
+			<if test="cd != null and cd!=''">AND CD like '%'||to_char(#{cd})||'%'
+			</if>
+			<if test="chromium != null and chromium!=''">AND CHROMIUM like '%'||to_char(#{chromium})||'%'
+			</if>
+			<if test="lead != null and lead!=''">AND LEAD like '%'||to_char(#{lead})||'%'
+			</if>
+			<if test="cyanide != null and cyanide!=''">AND CYANIDE like '%'||to_char(#{cyanide})||'%'
+			</if>
+			<if test="phenol != null and phenol!=''">AND PHENOL like '%'||to_char(#{phenol})||'%'
+			</if>
+			<if test="petroleum != null and petroleum!=''">AND PETROLEUM like '%'||to_char(#{petroleum})||'%'
+			</if>
+			<if test="anionic != null and anionic!=''">AND ANIONIC like '%'||to_char(#{anionic})||'%'
+			</if>
+			<if test="sulfide != null and sulfide!=''">AND SULFIDE like '%'||to_char(#{sulfide})||'%'
+			</if>
+		</where>
+	</select>
+
+	<insert id="save"
+		parameterType="com.khidi.manager.monitoringnet.entity.WaterqualitydataEntity">
+		insert into WATERQUALITYDATA
+		(
+		ID ,
+		CREATETIME ,
+		STATIONID ,
+		PH ,
+		COD ,
+		BOD ,
+		COLIFORM ,
+		PHOSPHOR ,
+		MAXUPTEMP ,
+		MAXFALLTEMP ,
+		NH ,
+		OXYGEN ,
+		PERMANGANATE ,
+		TOTALN ,
+		CU ,
+		ZN ,
+		FLUORIDE ,
+		SE ,
+		ARSENIC ,
+		HG ,
+		CD ,
+		CHROMIUM
+		,
+		LEAD ,
+		CYANIDE ,
+		PHENOL ,
+		PETROLEUM ,
+		ANIONIC ,
+		SULFIDE
+		)
+		values
+		(
+		#{id,jdbcType = VARCHAR},
+		#{createtime,jdbcType = VARCHAR},
+		#{stationId,jdbcType = VARCHAR},
+		#{ph,jdbcType = VARCHAR},
+		#{cod,jdbcType = VARCHAR},
+		#{bod,jdbcType = VARCHAR},
+		#{coliform,jdbcType = VARCHAR},
+		#{phosphor,jdbcType = VARCHAR},
+		#{maxuptemp,jdbcType = VARCHAR},
+		#{maxfalltemp,jdbcType = VARCHAR},
+		#{nh,jdbcType = VARCHAR},
+		#{oxygen,jdbcType = VARCHAR},
+		#{permanganate,jdbcType = VARCHAR},
+		#{totaln,jdbcType = VARCHAR},
+		#{cu,jdbcType = VARCHAR},
+		#{zn,jdbcType = VARCHAR},
+		#{fluoride,jdbcType
+		= VARCHAR},
+		#{se,jdbcType = VARCHAR},
+		#{arsenic,jdbcType = VARCHAR},
+		#{hg,jdbcType = VARCHAR},
+		#{cd,jdbcType = VARCHAR},
+		#{chromium,jdbcType
+		= VARCHAR},
+		#{lead,jdbcType = VARCHAR},
+		#{cyanide,jdbcType = VARCHAR},
+		#{phenol,jdbcType = VARCHAR},
+		#{petroleum,jdbcType = VARCHAR},
+		#{anionic,jdbcType = VARCHAR},
+		#{sulfide,jdbcType = VARCHAR}
+		)
+	</insert>
+
+	<update id="update"
+		parameterType="com.khidi.manager.monitoringnet.entity.WaterqualitydataEntity">
+		update WATERQUALITYDATA
+		<set>
+			<if test="createtime != null">
+				CREATETIME = #{createtime} ,
+			</if>
+			<if test="stationId != null">
+				STATIONID = #{stationId} ,
+			</if>
+			<if test="ph != null">
+				PH = #{ph} ,
+			</if>
+			<if test="cod != null">
+				COD = #{cod} ,
+			</if>
+			<if test="bod != null">
+				BOD = #{bod} ,
+			</if>
+			<if test="coliform != null">
+				COLIFORM = #{coliform} ,
+			</if>
+			<if test="phosphor != null">
+				PHOSPHOR = #{phosphor} ,
+			</if>
+			<if test="maxuptemp != null">
+				MAXUPTEMP = #{maxuptemp} ,
+			</if>
+			<if test="maxfalltemp != null">
+				MAXFALLTEMP = #{maxfalltemp} ,
+			</if>
+			<if test="nh != null">
+				NH = #{nh} ,
+			</if>
+			<if test="oxygen != null">
+				OXYGEN = #{oxygen} ,
+			</if>
+			<if test="permanganate != null">
+				PERMANGANATE = #{permanganate} ,
+			</if>
+			<if test="totaln != null">
+				TOTALN = #{totaln} ,
+			</if>
+			<if test="cu != null">
+				CU = #{cu} ,
+			</if>
+			<if test="zn != null">
+				ZN = #{zn} ,
+			</if>
+			<if test="fluoride != null">
+				FLUORIDE = #{fluoride} ,
+			</if>
+			<if test="se != null">
+				SE = #{se} ,
+			</if>
+			<if test="arsenic != null">
+				ARSENIC = #{arsenic} ,
+			</if>
+			<if test="hg != null">
+				HG = #{hg} ,
+			</if>
+			<if test="cd != null">
+				CD = #{cd} ,
+			</if>
+			<if test="chromium != null">
+				CHROMIUM = #{chromium} ,
+			</if>
+			<if test="lead != null">
+				LEAD = #{lead} ,
+			</if>
+			<if test="cyanide != null">
+				CYANIDE = #{cyanide} ,
+			</if>
+			<if test="phenol != null">
+				PHENOL = #{phenol} ,
+			</if>
+			<if test="petroleum != null">
+				PETROLEUM = #{petroleum} ,
+			</if>
+			<if test="anionic != null">
+				ANIONIC = #{anionic} ,
+			</if>
+			<if test="sulfide != null">
+				SULFIDE = #{sulfide}
+			</if>
+		</set>
+		where ID = #{id}
+	</update>
+
+	<delete id="delete">
+		delete from WATERQUALITYDATA where ID = #{id}
+	</delete>
+</mapper>

@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.sys.dao.SysLayertreeDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.sys.entity.SysLayertreeEntity" id="sysLayertreeMap">
+        <result property="id" column="ID"/>
+        <result property="name" column="NAME"/>
+        <result property="code" column="CODE"/>
+        <result property="type" column="TYPE"/>
+        <result property="parentId" column="PARENTID"/>
+        <result property="icon" column="ICON"/>
+        <result property="queryplant" column="QUERYPLANT"/>
+        <result property="title" column="TITLE"/>
+        <result property="layersource" column="LAYERSOURCE"/>
+        <result property="args" column="ARGS"/>
+        <result property="createtime" column="CREATETIME"/>
+		<result property="orderNum" column="ORDERNUM"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.khidi.manager.sys.entity.SysLayertreeEntity">
+		select * from SYS_LAYERTREE where ID = #{id}
+	</select>
+
+	<select id="queryParentIdIsCorrent" parameterType="com.khidi.manager.sys.entity.SysLayertreeEntity" resultType="String">
+		select id from (select id from SYS_LAYERTREE START WITH id= #{id} CONNECT BY prior id = parentid) b
+		where b.id = #{parentId}
+	</select>
+
+	<select id="queryCountbyParentId" resultType="int">
+		SELECT COUNT(*) FROM
+		SYS_LAYERTREE WHERE PARENTID = #{parentId}
+	</select>
+
+	<select id="querySonList" resultType="com.khidi.manager.sys.entity.SysLayertreeEntity">
+select * from SYS_LAYERTREE m  START WITH id=   '${_parameter}'  CONNECT BY prior id = parentid order by ordernum asc
+	</select>
+
+
+
+
+    <select id="queryList" resultType="com.khidi.manager.sys.entity.SysLayertreeEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN
+                FROM (select * from SYS_LAYERTREE
+                <where>
+                                            <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                        </if>
+                                            <if test="name != null and name!=''">AND NAME like '%'||to_char(#{name})||'%'
+                        </if>
+                                            <if test="code != null and code!=''">AND CODE like '%'||to_char(#{code})||'%'
+                        </if>
+                                            <if test="type != null and type!=''">AND TYPE like '%'||to_char(#{type})||'%'
+                        </if>
+                                            <if test="parentId != null and parentId!=''">AND PARENTID like '%'||to_char(#{parentId})||'%'
+                        </if>
+                                            <if test="icon != null and icon!=''">AND ICON like '%'||to_char(#{icon})||'%'
+                        </if>
+                                            <if test="queryplant != null and queryplant!=''">AND QUERYPLANT like '%'||to_char(#{queryplant})||'%'
+                        </if>
+                                            <if test="title != null and title!=''">AND TITLE like '%'||to_char(#{title})||'%'
+                        </if>
+                                            <if test="layersource != null and layersource!=''">AND LAYERSOURCE like '%'||to_char(#{layersource})||'%'
+                        </if>
+                                            <if test="args != null and args!=''">AND ARGS like '%'||to_char(#{args})||'%'
+                        </if>
+                                            <if test="createtime != null and createtime!=''">AND CREATETIME like '%'||to_char(#{createtime})||'%'
+                        </if>
+					<if test="orderNum != null and orderNum!=''">AND ORDERNUM = #{orderNum}
+					</if>
+                                    </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by ordernum desc
+                    </otherwise>
+                </choose>
+                )a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from SYS_LAYERTREE
+				<where>
+					<if test="orderNum != null and orderNum!=''">AND ORDERNUM = #{orderNum}
+					</if>
+					<if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+					</if>
+					<if test="name != null and name!=''">AND NAME like '%'||to_char(#{name})||'%'
+					</if>
+					<if test="code != null and code!=''">AND CODE like '%'||to_char(#{code})||'%'
+					</if>
+					<if test="type != null and type!=''">AND TYPE like '%'||to_char(#{type})||'%'
+					</if>
+					<if test="parentId != null and parentId!=''">AND PARENTID like '%'||to_char(#{parentId})||'%'
+					</if>
+					<if test="icon != null and icon!=''">AND ICON like '%'||to_char(#{icon})||'%'
+					</if>
+					<if test="queryplant != null and queryplant!=''">AND QUERYPLANT like '%'||to_char(#{queryplant})||'%'
+					</if>
+					<if test="title != null and title!=''">AND TITLE like '%'||to_char(#{title})||'%'
+					</if>
+					<if test="layersource != null and layersource!=''">AND LAYERSOURCE like '%'||to_char(#{layersource})||'%'
+					</if>
+					<if test="args != null and args!=''">AND ARGS like '%'||to_char(#{args})||'%'
+					</if>
+					<if test="createtime != null and createtime!=''">AND CREATETIME like '%'||to_char(#{createtime})||'%'
+					</if>
+				</where>
+            </otherwise>
+        </choose>
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from SYS_LAYERTREE
+        <where>
+			<if test="orderNum != null and orderNum!=''">AND ORDERNUM = #{orderNum}
+			</if>
+			                <if test="id != null and id!=''">AND  ID like '%'||to_char(#{id})||'%'
+                </if>
+			                <if test="name != null and name!=''">AND  NAME like '%'||to_char(#{name})||'%'
+                </if>
+			                <if test="code != null and code!=''">AND  CODE like '%'||to_char(#{code})||'%'
+                </if>
+			                <if test="type != null and type!=''">AND  TYPE like '%'||to_char(#{type})||'%'
+                </if>
+			                <if test="parentId != null and parentId!=''">AND  PARENTID like '%'||to_char(#{parentId})||'%'
+                </if>
+			                <if test="icon != null and icon!=''">AND  ICON like '%'||to_char(#{icon})||'%'
+                </if>
+			                <if test="queryplant != null and queryplant!=''">AND  QUERYPLANT like '%'||to_char(#{queryplant})||'%'
+                </if>
+			                <if test="title != null and title!=''">AND  TITLE like '%'||to_char(#{title})||'%'
+                </if>
+			                <if test="layersource != null and layersource!=''">AND  LAYERSOURCE like '%'||to_char(#{layersource})||'%'
+                </if>
+			                <if test="args != null and args!=''">AND  ARGS like '%'||to_char(#{args})||'%'
+                </if>
+			                <if test="createtime != null and createtime!=''">AND  CREATETIME like '%'||to_char(#{createtime})||'%'
+                </if>
+			        </where>
+	</select>
+	 
+	<insert id="save" parameterType="com.khidi.manager.sys.entity.SysLayertreeEntity">
+		insert into SYS_LAYERTREE
+		(
+			ID , 
+			NAME , 
+			CODE , 
+			TYPE , 
+			PARENTID , 
+			ICON , 
+			QUERYPLANT , 
+			TITLE , 
+			LAYERSOURCE , 
+			ARGS , 
+			ORDERNUM
+		)
+		values
+		(
+			#{id,jdbcType = VARCHAR}, 
+			#{name,jdbcType = VARCHAR}, 
+			#{code,jdbcType = VARCHAR}, 
+			#{type,jdbcType = VARCHAR}, 
+			#{parentId,jdbcType = VARCHAR},
+			#{icon,jdbcType = VARCHAR}, 
+			#{queryplant,jdbcType = VARCHAR}, 
+			#{title,jdbcType = VARCHAR}, 
+			#{layersource,jdbcType = VARCHAR}, 
+			#{args,jdbcType = VARCHAR}, 
+			#{orderNum,jdbcType = VARCHAR}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.khidi.manager.sys.entity.SysLayertreeEntity">
+		update SYS_LAYERTREE 
+		<set>
+			<if test="name != null">
+				NAME = #{name}  , </if>
+			<if test="code != null">
+				CODE = #{code}  , </if>
+			<if test="type != null">
+				TYPE = #{type}  , </if>
+			<if test="parentId != null">
+				PARENTID = #{parentId}  , </if>
+			<if test="icon != null">
+				ICON = #{icon}  , </if>
+			<if test="queryplant != null">
+				QUERYPLANT = #{queryplant}  , </if>
+			<if test="title != null">
+				TITLE = #{title}  , </if>
+			<if test="layersource != null">
+				LAYERSOURCE = #{layersource}  , </if>
+			<if test="args != null">
+				ARGS = #{args}  , </if>
+			<if test="createtime != null">
+				CREATETIME = #{createtime}  </if>
+			<if test="orderNum != null">
+				ORDERNUM = #{orderNum}  </if>
+		</set>
+		where ID = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from SYS_LAYERTREE where ID = #{id}
+	</delete>
+</mapper>

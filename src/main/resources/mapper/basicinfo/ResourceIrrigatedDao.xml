@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.basicinfo.dao.ResourceIrrigatedDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap type="com.khidi.manager.basicinfo.entity.ResourceIrrigatedEntity"
+		id="resourceIrrigatedMap">
+		<result property="code" column="CODE" />
+		<result property="name" column="NAME" />
+		<result property="leftX" column="LEFTX" />
+		<result property="leftY" column="LEFTY" />
+		<result property="rightX" column="RIGHTX" />
+		<result property="rightY" column="RIGHTY" />
+		<result property="areaId" column="AREA_ID" />
+		<result property="scale" column="SCALE" />
+		<result property="wateruserType" column="WATERUSERTYPE" />
+		<result property="waterType" column="WATERTYPE" />
+		<result property="build" column="BUILD" />
+		<result property="work" column="WORK" />
+		<result property="extent" column="EXTENT" />
+		<result property="designExtent" column="DESIGNEXTENT" />
+		<result property="sumExtent" column="SUMEXTENT" />
+		<result property="validExtent" column="VALIDEXTENT" />
+		<result property="starttime" column="STARTTIME" />
+		<result property="buildtime" column="BUILDTIME" />
+		<result property="reamrk" column="REAMRK" />
+		<result property="id" column="ID" />
+		<result property="pointSet" column="POINTSET"/>
+	</resultMap>
+
+	<select id="queryObject"
+		resultType="com.khidi.manager.basicinfo.entity.ResourceIrrigatedEntity">
+		select * from RESOURCE_IRRIGATED where ID = #{id}
+	</select>
+
+
+	<select id="queryList"
+		resultType="com.khidi.manager.basicinfo.entity.ResourceIrrigatedEntity">
+		<choose>
+			<when test="limit != null and offset !=null and page!=null">
+				select * FROM (
+				SELECT * FROM
+				(
+				SELECT a.*, ROWNUM RN
+				FROM (select * from RESOURCE_IRRIGATED
+				<where>
+					<!--通过角色带有的行政区划权限来过滤资源（行政区划）-->
+					<if test="roleId != null">
+						(SELECT XMLAGG(XMLELEMENT(E,AREAIDS
+						||',')).EXTRACT('//text()').getclobval() AS AREAIDS
+						FROM sys_role_resource
+						WHERE roleid IN (${roleId})) LIKE '%'||RESOURCE_IRRIGATED.AREA_ID||'%'
+					</if>
+					<if test="code != null and code!=''">AND CODE like '%'||to_char(#{code})||'%'
+					</if>
+					<if test="name != null and name!=''">AND NAME like '%'||to_char(#{name})||'%'
+					</if>
+					<if test="leftX != null and leftX!=''">AND LEFTX like '%'||to_char(#{leftX})||'%'
+					</if>
+					<if test="leftY != null and leftY!=''">AND LEFTY like '%'||to_char(#{leftY})||'%'
+					</if>
+					<if test="rightX != null and rightX!=''">AND RIGHTX like '%'||to_char(#{rightX})||'%'
+					</if>
+					<if test="rightY != null and rightY!=''">AND RIGHTY like '%'||to_char(#{rightY})||'%'
+					</if>
+					<if test="areaId != null and areaId!=''">AND AREA_ID in (select area_id FROM sys_area START WITH area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+					</if>
+					<if test="scale != null and scale!=''">AND SCALE like '%'||to_char(#{scale})||'%'
+					</if>
+					<if test="wateruserType != null and wateruserType!=''">AND WATERUSERTYPE like
+						'%'||to_char(#{wateruserType})||'%'
+					</if>
+					<if test="waterType != null and waterType!=''">AND WATERTYPE like '%'||to_char(#{waterType})||'%'
+					</if>
+					<if test="build != null and build!=''">AND BUILD like '%'||to_char(#{build})||'%'
+					</if>
+					<if test="work != null and work!=''">AND WORK like '%'||to_char(#{work})||'%'
+					</if>
+					<if test="extent != null and extent!=''">AND EXTENT like '%'||to_char(#{extent})||'%'
+					</if>
+					<if test="designExtent != null and designExtent!=''">AND DESIGNEXTENT like
+						'%'||to_char(#{designExtent})||'%'
+					</if>
+					<if test="sumExtent != null and sumExtent!=''">AND SUMEXTENT like '%'||to_char(#{sumExtent})||'%'
+					</if>
+					<if test="validExtent != null and validExtent!=''">AND VALIDEXTENT like '%'||to_char(#{validExtent})||'%'
+					</if>
+					<if test="starttime != null and starttime!=''">AND STARTTIME like '%'||to_char(#{starttime})||'%'
+					</if>
+					<if test="buildtime != null and buildtime!=''">AND BUILDTIME like '%'||to_char(#{buildtime})||'%'
+					</if>
+					<if test="reamrk != null and reamrk!=''">AND REAMRK like '%'||to_char(#{reamrk})||'%'
+					</if>
+					<if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+					</if>
+				</where>
+				<choose>
+					<when test="sidx != null and sidx.trim() != ''">
+						order by ${sidx} ${order}
+					</when>
+					<otherwise>
+						order by createtime desc
+					</otherwise>
+				</choose>
+				)a
+				WHERE ROWNUM &lt;= #{limit} * #{page}
+				)
+				WHERE RN > #{offset}
+				)
+			</when>
+			<otherwise>
+				select * from RESOURCE_IRRIGATED
+			</otherwise>
+		</choose>
+	</select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<select id="queryTotal" resultType="int">
+		select count(*) from RESOURCE_IRRIGATED
+		<where>
+			<!--通过角色带有的行政区划权限来过滤资源（行政区划）-->
+			<if test="roleId != null">
+				(SELECT XMLAGG(XMLELEMENT(E,AREAIDS
+				||',')).EXTRACT('//text()').getclobval() AS AREAIDS
+				FROM sys_role_resource
+				WHERE roleid IN (${roleId})) LIKE '%'||RESOURCE_IRRIGATED.AREA_ID||'%'
+			</if>
+
+			<if test="code != null and code!=''">AND CODE like '%'||to_char(#{code})||'%'
+			</if>
+			<if test="name != null and name!=''">AND NAME like '%'||to_char(#{name})||'%'
+			</if>
+			<if test="leftX != null and leftX!=''">AND LEFTX like '%'||to_char(#{leftX})||'%'
+			</if>
+			<if test="leftY != null and leftY!=''">AND LEFTY like '%'||to_char(#{leftY})||'%'
+			</if>
+			<if test="rightX != null and rightX!=''">AND RIGHTX like '%'||to_char(#{rightX})||'%'
+			</if>
+			<if test="rightY != null and rightY!=''">AND RIGHTY like '%'||to_char(#{rightY})||'%'
+			</if>
+			<if test="areaId != null and areaId!=''">AND AREA_ID in (select area_id FROM sys_area START WITH area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+			</if>
+			<if test="scale != null and scale!=''">AND SCALE like '%'||to_char(#{scale})||'%'
+			</if>
+			<if test="wateruserType != null and wateruserType!=''">AND WATERUSERTYPE like
+				'%'||to_char(#{wateruserType})||'%'
+			</if>
+			<if test="waterType != null and waterType!=''">AND WATERTYPE like '%'||to_char(#{waterType})||'%'
+			</if>
+			<if test="build != null and build!=''">AND BUILD like '%'||to_char(#{build})||'%'
+			</if>
+			<if test="work != null and work!=''">AND WORK like '%'||to_char(#{work})||'%'
+			</if>
+			<if test="extent != null and extent!=''">AND EXTENT like '%'||to_char(#{extent})||'%'
+			</if>
+			<if test="designExtent != null and designExtent!=''">AND DESIGNEXTENT like '%'||to_char(#{designExtent})||'%'
+			</if>
+			<if test="sumExtent != null and sumExtent!=''">AND SUMEXTENT like '%'||to_char(#{sumExtent})||'%'
+			</if>
+			<if test="validExtent != null and validExtent!=''">AND VALIDEXTENT like '%'||to_char(#{validExtent})||'%'
+			</if>
+			<if test="starttime != null and starttime!=''">AND STARTTIME like '%'||to_char(#{starttime})||'%'
+			</if>
+			<if test="buildtime != null and buildtime!=''">AND BUILDTIME like '%'||to_char(#{buildtime})||'%'
+			</if>
+			<if test="reamrk != null and reamrk!=''">AND REAMRK like '%'||to_char(#{reamrk})||'%'
+			</if>
+			<if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+			</if>
+		</where>
+	</select>
+
+	<insert id="save"
+		parameterType="com.khidi.manager.basicinfo.entity.ResourceIrrigatedEntity">
+		insert into RESOURCE_IRRIGATED
+		(
+		CODE ,
+		NAME ,
+		LEFTX ,
+		LEFTY ,
+		RIGHTX ,
+		RIGHTY ,
+		AREA_ID ,
+		SCALE ,
+		WATERUSERTYPE ,
+		WATERTYPE ,
+		BUILD ,
+		WORK ,
+		EXTENT ,
+		DESIGNEXTENT ,
+		SUMEXTENT ,
+		VALIDEXTENT ,
+		STARTTIME ,
+		BUILDTIME ,
+		REAMRK ,
+		ID
+		)
+		values
+		(
+		#{code,jdbcType = VARCHAR},
+		#{name,jdbcType = VARCHAR},
+		#{leftX,jdbcType = VARCHAR},
+		#{leftY,jdbcType = VARCHAR},
+		#{rightX,jdbcType = VARCHAR},
+		#{rightY,jdbcType = VARCHAR},
+		#{areaId,jdbcType = VARCHAR},
+		#{scale,jdbcType = VARCHAR},
+		#{wateruserType,jdbcType = VARCHAR},
+		#{waterType,jdbcType = VARCHAR},
+		#{build,jdbcType = VARCHAR},
+		#{work,jdbcType = VARCHAR},
+		#{extent,jdbcType = VARCHAR},
+		#{designExtent,jdbcType = VARCHAR},
+		#{sumExtent,jdbcType = VARCHAR},
+		#{validExtent,jdbcType = VARCHAR},
+		#{starttime,jdbcType=DATE},
+		#{buildtime,jdbcType=DATE},
+		#{reamrk,jdbcType = VARCHAR},
+		#{id}
+		)
+	</insert>
+
+	<update id="update"
+		parameterType="com.khidi.manager.basicinfo.entity.ResourceIrrigatedEntity">
+		update RESOURCE_IRRIGATED
+		<set>
+			<if test="code != null">
+				CODE = #{code} ,
+			</if>
+			<if test="name != null">
+				NAME = #{name} ,
+			</if>
+			<if test="leftX != null">
+				LEFTX = #{leftX} ,
+			</if>
+			<if test="leftY != null">
+				LEFTY = #{leftY} ,
+			</if>
+			<if test="rightX != null">
+				RIGHTX = #{rightX} ,
+			</if>
+			<if test="rightY != null">
+				RIGHTY = #{rightY} ,
+			</if>
+			<if test="areaId != null">
+				AREA_ID = #{areaId} ,
+			</if>
+			<if test="scale != null">
+				SCALE = #{scale} ,
+			</if>
+			<if test="wateruserType != null">
+				WATERUSERTYPE = #{wateruserType} ,
+			</if>
+			<if test="waterType != null">
+				WATERTYPE = #{waterType} ,
+			</if>
+			<if test="build != null">
+				BUILD = #{build} ,
+			</if>
+			<if test="work != null">
+				WORK = #{work} ,
+			</if>
+			<if test="extent != null">
+				EXTENT = #{extent} ,
+			</if>
+			<if test="designExtent != null">
+				DESIGNEXTENT = #{designExtent} ,
+			</if>
+			<if test="sumExtent != null">
+				SUMEXTENT = #{sumExtent} ,
+			</if>
+			<if test="validExtent != null">
+				VALIDEXTENT = #{validExtent} ,
+			</if>
+			<if test="starttime != null">
+				STARTTIME = #{starttime} ,
+			</if>
+			<if test="buildtime != null">
+				BUILDTIME = #{buildtime} ,
+			</if>
+			<if test="reamrk != null">
+				REAMRK = #{reamrk}
+			</if>
+		</set>
+		where ID = #{id}
+	</update>
+
+	<delete id="delete">
+		delete from RESOURCE_IRRIGATED where ID = #{id}
+	</delete>
+</mapper>

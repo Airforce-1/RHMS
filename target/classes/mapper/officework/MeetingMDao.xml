@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.officework.dao.MeetingMDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap type="com.khidi.manager.officework.entity.MeetingMEntity"
+		id="meetingMMap">
+		<result property="id" column="ID" />
+		<result property="title" column="TITLE" />
+		<result property="presenters" column="PRESENTERS" />
+		<result property="stime" column="STIME" />
+		<result property="etime" column="ETIME" />
+		<result property="mtype" column="MTYPE" />
+		<result property="mtypeName" column="MTYPENAME" />
+		<result property="mposition" column="MPOSITION" />
+		<result property="state" column="STATE" />
+		<result property="attState1" column="ATTSTATE1" />
+	</resultMap>
+
+	<select id="queryObject" resultType="com.khidi.manager.officework.entity.MeetingMEntity">
+		select
+		a.ID,a.TITLE,a.PRESENTERS,a.STIME,a.ETIME,a.MTYPE,a.MPOSITION,a.STATE,a.ATTSTATE1,b.DICTNAME
+		AS MTYPENAME from MEETING_M a LEFT JOIN SYS_DICT b ON a.MTYPE =
+		b.DICTVALUE
+		where a.ID = #{id} AND b.DICTTYPE = '会议类型'
+	</select>
+
+
+	<select id="queryList" resultType="com.khidi.manager.officework.entity.MeetingMEntity">
+		<choose>
+			<when test="limit != null and offset !=null and page!=null">
+				select
+				x.ID,x.TITLE,x.PRESENTERS,x.STIME,x.ETIME,x.MTYPE,x.MPOSITION,x.STATE,x.ATTSTATE1,b.DICTNAME
+				AS MTYPENAME from (
+				SELECT * FROM
+				(
+				SELECT a.*, ROWNUM RN
+				FROM (select *
+				from MEETING_M
+				<where>
+					<if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+					</if>
+					<if test="title != null and title!=''">AND TITLE like '%'||to_char(#{title})||'%'
+					</if>
+					<if test="presenters != null and presenters!=''">AND PRESENTERS like '%'||to_char(#{presenters})||'%'
+					</if>
+					<if test="stime != null and stime!=''">AND STIME like '%'||to_char(#{stime})||'%'
+					</if>
+					<if test="etime != null and etime!=''">AND ETIME like '%'||to_char(#{etime})||'%'
+					</if>
+					<if test="mtype != null and mtype!=''">AND MTYPE like '%'||to_char(#{mtype})||'%'
+					</if>
+					<if test="mposition != null and mposition!=''">AND MPOSITION like '%'||to_char(#{mposition})||'%'
+					</if>
+				</where>
+				<choose>
+					<when test="sidx != null and sidx.trim() != ''">
+						order by ${sidx} ${order}
+					</when>
+					<otherwise>
+						order by createtime desc
+					</otherwise>
+				</choose>
+				)a
+				WHERE ROWNUM &lt;= #{limit} * #{page}
+				)
+				WHERE RN > #{offset}
+				) x LEFT
+				JOIN SYS_DICT b ON x.MTYPE = b.DICTVALUE WHERE b.DICTTYPE = '会议类型'
+			</when>
+			<otherwise>
+				select
+				x.ID,x.TITLE,x.PRESENTERS,x.STIME,x.ETIME,x.MTYPE,x.MPOSITION,x.STATE,x.ATTSTATE1,b.DICTNAME
+				AS MTYPENAME from MEETING_M x LEFT JOIN SYS_DICT b ON x.MTYPE =
+				b.DICTVALUE
+				where b.DICTTYPE = '会议类型'
+			</otherwise>
+		</choose>
+	</select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<select id="queryTotal" resultType="int">
+		select count(*) from MEETING_M
+		<where>
+			<if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+			</if>
+			<if test="title != null and title!=''">AND TITLE like '%'||to_char(#{title})||'%'
+			</if>
+			<if test="presenters != null and presenters!=''">AND PRESENTERS like '%'||to_char(#{presenters})||'%'
+			</if>
+			<if test="stime != null and stime!=''">AND STIME like '%'||to_char(#{stime})||'%'
+			</if>
+			<if test="etime != null and etime!=''">AND ETIME like '%'||to_char(#{etime})||'%'
+			</if>
+			<if test="mtype != null and mtype!=''">AND MTYPE like '%'||to_char(#{mtype})||'%'
+			</if>
+			<if test="mposition != null and mposition!=''">AND MPOSITION like '%'||to_char(#{mposition})||'%'
+			</if>
+		</where>
+	</select>
+
+	<insert id="save" parameterType="com.khidi.manager.officework.entity.MeetingMEntity">
+		insert into MEETING_M
+		(
+		ID ,
+		TITLE
+		,
+		PRESENTERS ,
+		STIME ,
+		ETIME ,
+		MTYPE ,
+		MPOSITION ,
+		STATE ,
+		ATTSTATE1
+		)
+		values
+		(
+		#{id,jdbcType = VARCHAR},
+		#{title,jdbcType = VARCHAR},
+		#{presenters,jdbcType = VARCHAR},
+		#{stime,jdbcType = VARCHAR},
+		#{etime,jdbcType = VARCHAR},
+		#{mtype,jdbcType = VARCHAR},
+		#{mposition,jdbcType = VARCHAR},
+		#{state,jdbcType = VARCHAR},
+		#{attState1,jdbcType = VARCHAR}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.khidi.manager.officework.entity.MeetingMEntity">
+		update MEETING_M
+		<set>
+			<if test="title != null">
+				TITLE = #{title} ,
+			</if>
+			<if test="presenters != null">
+				PRESENTERS = #{presenters} ,
+			</if>
+			<if test="stime != null">
+				STIME = #{stime} ,
+			</if>
+			<if test="etime != null">
+				ETIME = #{etime} ,
+			</if>
+			<if test="mtype != null">
+				MTYPE = #{mtype} ,
+			</if>
+			<if test="mposition != null">
+				MPOSITION = #{mposition},
+			</if>
+			<if test="state != null">
+				STATE = #{state},
+			</if>
+			<if test="attState1 != null">
+				ATTSTATE1 = #{attState1}
+			</if>
+		</set>
+		where ID = #{id}
+	</update>
+
+	<delete id="delete">
+		delete from MEETING_M where ID = #{id}
+	</delete>
+</mapper>

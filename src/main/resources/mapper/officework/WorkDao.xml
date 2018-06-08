@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.officework.dao.WorkDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.officework.vo.UserVO" id="workMap">
+        <result property="userId" column="USER_ID"/>
+        <result property="name" column="NAME"/>
+        <result property="roleName" column="ROLE_NAME"/>
+        <result property="mobile" column="MOBILE"/>
+        <result property="deptName" column="DEPTNAME"/>
+    </resultMap>
+
+    <select id="UserListByRoleLevel" resultType="com.khidi.manager.officework.vo.UserVO">
+		select a.user_id,a.name,b.role_name,a.mobile from sys_user a, sys_role b, sys_user_role c
+where a.user_id = c.user_id and b.role_id = c.role_id and   b.role_level = '${_parameter}'
+	</select>
+
+
+
+    <select id="UserListByDeptLevel" resultType="com.khidi.manager.officework.vo.UserVO">
+        select m.*,n.role_name from
+(select c.*,s.role_id from
+(select a.user_id,a.name,d.name as deptname,a.mobile from sys_user a,sys_dept d where a.dept_id = d.dept_id and d.dept_level = '${_parameter}')c left join sys_user_role s on
+c.user_id = s.user_id)m left join  sys_role n on
+m.role_id = n.role_id
+    </select>
+</mapper>

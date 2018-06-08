@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.sys.dao.FileuploadDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.sys.entity.FileUploadEntity" id="fileuploadMap">
+        <result property="id" column="ID"/>
+        <result property="fileName" column="FILENAME"/>
+        <result property="fileSize" column="FILESIZE"/>
+        <result property="filePath" column="FILEPATH"/>
+        <result property="fileAbsolutePath" column="FILEABSOLUTEPATH"/>
+        <result property="fileType" column="FILETYPE"/>
+        <result property="opType" column="OPTYPE"/>
+    </resultMap>
+
+    <select id="queryObject" resultType="com.khidi.manager.sys.entity.FileUploadEntity">
+		select * from FILEUPLOAD where ID = #{id}
+	</select>
+
+
+    <select id="queryList" resultType="com.khidi.manager.sys.entity.FileUploadEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN
+                FROM (select * from FILEUPLOAD
+                <where>
+                    <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                    </if>
+                    <if test="fileName != null and fileName!=''">AND FILENAME like '%'||to_char(#{fileName})||'%'
+                    </if>
+                    <if test="fileSize != null and fileSize!=''">AND FILESIZE like '%'||to_char(#{fileSize})||'%'
+                    </if>
+                    <if test="filePath != null and filePath!=''">AND FILEPATH like '%'||to_char(#{filePath})||'%'
+                    </if>
+                    <if test="fileAbsolutePath != null and fileAbsolutePath!=''">AND FILEABSOLUTEPATH like
+                        '%'||to_char(#{fileAbsolutePath})||'%'
+                    </if>
+                    <if test="fileType != null and fileType!=''">AND FILETYPE like '%'||to_char(#{fileType})||'%'
+                    </if>
+                    <if test="opType != null and opType!=''">AND OPTYPE like '%'||to_char(#{opType})||'%'
+                    </if>
+                </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by create_time desc
+                    </otherwise>
+                </choose>
+                )a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from FILEUPLOAD
+            </otherwise>
+        </choose>
+    </select>
+
+
+    <select id="queryTotal" resultType="int">
+        select count(*) from FILEUPLOAD
+        <where>
+            <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+            </if>
+            <if test="fileName != null and fileName!=''">AND FILENAME like '%'||to_char(#{fileName})||'%'
+            </if>
+            <if test="fileSize != null and fileSize!=''">AND FILESIZE like '%'||to_char(#{fileSize})||'%'
+            </if>
+            <if test="filePath != null and filePath!=''">AND FILEPATH like '%'||to_char(#{filePath})||'%'
+            </if>
+            <if test="fileAbsolutePath != null and fileAbsolutePath!=''">AND FILEABSOLUTEPATH like
+                '%'||to_char(#{fileAbsolutePath})||'%'
+            </if>
+            <if test="fileType != null and fileType!=''">AND FILETYPE like '%'||to_char(#{fileType})||'%'
+            </if>
+            <if test="opType != null and opType!=''">AND OPTYPE like '%'||to_char(#{opType})||'%'
+            </if>
+        </where>
+    </select>
+
+    <insert id="save" parameterType="com.khidi.manager.sys.entity.FileUploadEntity">
+		insert into FILEUPLOAD
+		(
+			ID , 
+			FILENAME , 
+			FILESIZE , 
+			FILEPATH , 
+			FILEABSOLUTEPATH , 
+			FILETYPE,
+			OPTYPE
+		)
+		values
+		(
+			#{id,jdbcType = VARCHAR}, 
+			#{fileName,jdbcType = VARCHAR},
+			#{fileSize,jdbcType = VARCHAR},
+			#{filePath,jdbcType = VARCHAR},
+			#{fileAbsolutePath,jdbcType = VARCHAR},
+			#{fileType,jdbcType = VARCHAR},
+			#{opType,jdbcType = VARCHAR}
+		)
+	</insert>
+
+    <update id="update" parameterType="com.khidi.manager.sys.entity.FileUploadEntity">
+        update FILEUPLOAD
+        <set>
+            <if test="fileName != null">
+                FILENAME = #{fileName} ,
+            </if>
+            <if test="fileSize != null">
+                FILESIZE = #{fileSize} ,
+            </if>
+            <if test="filePath != null">
+                FILEPATH = #{filePath} ,
+            </if>
+            <if test="fileAbsolutePath != null">
+                fileAbsolutePath = #{fileabsolutepath} ,
+            </if>
+            <if test="fileType != null">
+                FILETYPE = #{fileType} ,
+            </if>
+            <if test="opType != null">
+                OPTYPE = #{opType} ,
+            </if>
+        </set>
+        where ID = #{id}
+    </update>
+
+    <delete id="delete">
+		delete from FILEUPLOAD where ID = #{id}
+	</delete>
+</mapper>

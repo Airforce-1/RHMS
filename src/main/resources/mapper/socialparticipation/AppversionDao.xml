@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.socialparticipation.dao.AppversionDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap
+		type="com.khidi.manager.socialparticipation.entity.AppversionEntity"
+		id="appversionMap">
+		<result property="id" column="ID" />
+		<result property="appType1" column="APPTYPE1" />
+		<result property="appType2" column="APPTYPE2" />
+		<result property="appName" column="APPNAME" />
+		<result property="appVersion" column="APPVERSION" />
+		<result property="appPath" column="APPPATH" />
+		<result property="appDesc" column="APPDESC" />
+		<result property="releaseTime" column="RELEASETIME" />
+		<result property="attachId" column="ATTACHID" />
+	</resultMap>
+
+	<select id="queryObject"
+		resultType="com.khidi.manager.socialparticipation.entity.AppversionEntity">
+		select * from APPVERSION where ID = #{id}
+	</select>
+
+
+	<select id="queryList"
+		resultType="com.khidi.manager.socialparticipation.entity.AppversionEntity">
+		<choose>
+			<when test="limit != null and offset !=null and page!=null">
+				select * FROM (
+				SELECT * FROM
+				(
+				SELECT a.*, ROWNUM RN
+				FROM (select * from APPVERSION
+				<where>
+					<if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+					</if>
+					<if test="appType1 != null and appType1!=''">AND APPTYPE1 like '%'||to_char(#{appType1})||'%'
+					</if>
+					<if test="appType2 != null and appType2!=''">AND APPTYPE2 like '%'||to_char(#{appType2})||'%'
+					</if>
+					<if test="appName != null and appName!=''">AND APPNAME like '%'||to_char(#{appName})||'%'
+					</if>
+					<if test="appVersion != null and appVersion!=''">AND APPVERSION like '%'||to_char(#{appVersion})||'%'
+					</if>
+					<if test="appPath != null and appPath!=''">AND APPPATH like '%'||to_char(#{appPath})||'%'
+					</if>
+					<if test="appDesc != null and appDesc!=''">AND APPDESC like '%'||to_char(#{appDesc})||'%'
+					</if>
+				</where>
+				<choose>
+					<when test="sidx != null and sidx.trim() != ''">
+						order by ${sidx} ${order}
+					</when>
+					<otherwise>
+						order by createtime desc
+					</otherwise>
+				</choose>
+				)a
+				WHERE ROWNUM &lt;= #{limit} * #{page}
+				)
+				WHERE RN > #{offset}
+				)
+			</when>
+			<otherwise>
+				select * from APPVERSION
+			</otherwise>
+		</choose>
+	</select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<select id="queryTotal" resultType="int">
+		select count(*) from APPVERSION
+		<where>
+			<if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+			</if>
+			<if test="appType1 != null and appType1!=''">AND APPTYPE1 like '%'||to_char(#{appType1})||'%'
+			</if>
+			<if test="appType2 != null and appType2!=''">AND APPTYPE2 like '%'||to_char(#{appType2})||'%'
+			</if>
+			<if test="appname != null and appname!=''">AND APPNAME like '%'||to_char(#{appName})||'%'
+			</if>
+			<if test="appVersion != null and appVersion!=''">AND APPVERSION like '%'||to_char(#{appVersion})||'%'
+			</if>
+			<if test="appPath != null and appPath!=''">AND APPPATH like '%'||to_char(#{appPath})||'%'
+			</if>
+			<if test="appDesc != null and appDesc!=''">AND APPDESC like '%'||to_char(#{appDesc})||'%'
+			</if>
+		</where>
+	</select>
+
+	<insert id="save"
+		parameterType="com.khidi.manager.socialparticipation.entity.AppversionEntity">
+		insert into APPVERSION
+		(
+		ID ,
+		APPTYPE1 ,
+		APPTYPE2 ,
+		APPNAME ,
+		APPVERSION ,
+		APPPATH ,
+		APPDESC ,
+		RELEASETIME,
+		ATTACHID
+		)
+		values
+		(
+		#{id,jdbcType = VARCHAR},
+		#{appType1,jdbcType = VARCHAR},
+		#{appType2,jdbcType = VARCHAR},
+		#{appName,jdbcType = VARCHAR},
+		#{appVersion,jdbcType = VARCHAR},
+		#{appPath,jdbcType = VARCHAR},
+		#{appDesc,jdbcType = VARCHAR},
+		#{releaseTime,jdbcType = VARCHAR},
+		#{attachId,jdbcType = VARCHAR}
+		)
+	</insert>
+
+	<update id="update"
+		parameterType="com.khidi.manager.socialparticipation.entity.AppversionEntity">
+		update APPVERSION
+		<set>
+			<if test="appType1 != null">
+				APPTYPE1 = #{appType1} ,
+			</if>
+			<if test="appType2 != null">
+				APPTYPE2 = #{appType2} ,
+			</if>
+			<if test="appName != null">
+				APPNAME = #{appName} ,
+			</if>
+			<if test="appVersion != null">
+				APPVERSION = #{appVersion} ,
+			</if>
+			<if test="appPath != null">
+				APPPATH = #{appPath} ,
+			</if>
+			<if test="appDesc != null">
+				APPDESC = #{appDesc}
+			</if>
+
+			<if test="releaseTime != null">
+				RELEASETIME = #{"releaseTime != null"}
+			</if>
+			
+			<if test="attachId != null">
+				ATTACHID = #{"attachId != null"}
+			</if>
+		</set>
+		where ID = #{id}
+	</update>
+
+	<delete id="delete">
+		delete from APPVERSION where ID = #{id}
+	</delete>
+</mapper>

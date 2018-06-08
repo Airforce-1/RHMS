@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.officework.dao.CheckrouteDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.officework.entity.CheckrouteEntity" id="checkrouteMap">
+        <result property="id" column="ID"/>
+        <result property="code" column="CODE"/>
+        <result property="name" column="NAME"/>
+        <result property="areaid" column="AREAID"/>
+        <result property="resourcetype" column="RESOURCETYPE"/>
+        <result property="resourceid" column="RESOURCEID"/>
+        <result property="startpoint" column="STARTPOINT"/>
+        <result property="endpoint" column="ENDPOINT"/>
+        <result property="length" column="LENGTH"/>
+        <result property="status" column="STATUS"/>
+        <result property="createtime" column="CREATETIME"/>
+		<result property="routeMap" column="ROUTE_MAP"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.khidi.manager.officework.entity.CheckrouteEntity">
+		select * from CHECKROUTE where ID = #{id}
+	</select>
+
+
+    <select id="queryList" resultType="com.khidi.manager.officework.entity.CheckrouteEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN
+                FROM (select * from CHECKROUTE
+                <where>
+                                            <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                        </if>
+                                            <if test="code != null and code!=''">AND CODE like '%'||to_char(#{code})||'%'
+                        </if>
+                                            <if test="name != null and name!=''">AND NAME like '%'||to_char(#{name})||'%'
+                        </if>
+					<if test="areaId != null and areaId!=''">AND AREA_ID in (select area_id FROM sys_area START WITH
+						area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+					</if>
+                                            <if test="resourcetype != null and resourcetype!=''">AND RESOURCETYPE like '%'||to_char(#{resourcetype})||'%'
+                        </if>
+                                            <if test="resourceid != null and resourcename!=''">AND RESOURCEID like '%'||to_char(#{resourceid})||'%'
+                        </if>
+                                            <if test="startpoint != null and startpoint!=''">AND STARTPOINT like '%'||to_char(#{startpoint})||'%'
+                        </if>
+                                            <if test="endpoint != null and endpoint!=''">AND ENDPOINT like '%'||to_char(#{endpoint})||'%'
+                        </if>
+                                            <if test="length != null and length!=''">AND LENGTH like '%'||to_char(#{length})||'%'
+                        </if>
+                                            <if test="status != null and status!=''">AND STATUS like '%'||to_char(#{status})||'%'
+                        </if>
+                                            <if test="createtime != null and createtime!=''">AND CREATETIME like '%'||to_char(#{createtime})||'%'
+                        </if>
+                                    </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by createtime desc
+                    </otherwise>
+                </choose>
+                )a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from CHECKROUTE
+				<where>
+					<if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+					</if>
+					<if test="code != null and code!=''">AND CODE like '%'||to_char(#{code})||'%'
+					</if>
+					<if test="name != null and name!=''">AND NAME like '%'||to_char(#{name})||'%'
+					</if>
+					<if test="areaId != null and areaId!=''">AND AREA_ID in (select area_id FROM sys_area START WITH
+						area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+					</if>
+					<if test="resourcetype != null and resourcetype!=''">AND RESOURCETYPE like '%'||to_char(#{resourcetype})||'%'
+					</if>
+					<if test="resourceid != null and resourcename!=''">AND RESOURCEID like '%'||to_char(#{resourceid})||'%'
+					</if>
+					<if test="startpoint != null and startpoint!=''">AND STARTPOINT like '%'||to_char(#{startpoint})||'%'
+					</if>
+					<if test="endpoint != null and endpoint!=''">AND ENDPOINT like '%'||to_char(#{endpoint})||'%'
+					</if>
+					<if test="length != null and length!=''">AND LENGTH like '%'||to_char(#{length})||'%'
+					</if>
+					<if test="status != null and status!=''">AND STATUS like '%'||to_char(#{status})||'%'
+					</if>
+					<if test="createtime != null and createtime!=''">AND CREATETIME like '%'||to_char(#{createtime})||'%'
+					</if>
+				</where>
+            </otherwise>
+        </choose>
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from CHECKROUTE
+        <where>
+			                <if test="id != null and id!=''">AND  ID like '%'||to_char(#{id})||'%'
+                </if>
+			                <if test="code != null and code!=''">AND  CODE like '%'||to_char(#{code})||'%'
+                </if>
+			                <if test="name != null and name!=''">AND  NAME like '%'||to_char(#{name})||'%'
+                </if>
+			                <if test="areaid != null and areaid!=''">AND  AREAID like '%'||to_char(#{areaid})||'%'
+                </if>
+			                <if test="resourcetype != null and resourcetype!=''">AND  RESOURCETYPE like '%'||to_char(#{resourcetype})||'%'
+                </if>
+			                <if test="resourceid != null and resourceid!=''">AND  RESOURCEID like '%'||to_char(#{resourceid})||'%'
+                </if>
+			                <if test="startpoint != null and startpoint!=''">AND  STARTPOINT like '%'||to_char(#{startpoint})||'%'
+                </if>
+			                <if test="endpoint != null and endpoint!=''">AND  ENDPOINT like '%'||to_char(#{endpoint})||'%'
+                </if>
+			                <if test="length != null and length!=''">AND  LENGTH like '%'||to_char(#{length})||'%'
+                </if>
+			                <if test="status != null and status!=''">AND  STATUS like '%'||to_char(#{status})||'%'
+                </if>
+			                <if test="createtime != null and createtime!=''">AND  CREATETIME like '%'||to_char(#{createtime})||'%'
+                </if>
+			        </where>
+	</select>
+	 
+	<insert id="save" parameterType="com.khidi.manager.officework.entity.CheckrouteEntity">
+		insert into CHECKROUTE
+		(
+			ID , 
+			CODE , 
+			NAME , 
+			AREAID , 
+			RESOURCETYPE , 
+			RESOURCEID ,
+			STARTPOINT , 
+			ENDPOINT , 
+			LENGTH , 
+			STATUS , 
+			CREATETIME
+		)
+		values
+		(
+			#{id,jdbcType = VARCHAR}, 
+			#{code,jdbcType = VARCHAR}, 
+			#{name,jdbcType = VARCHAR}, 
+			#{areaid,jdbcType = VARCHAR}, 
+			#{resourcetype,jdbcType = VARCHAR}, 
+			#{resourceid,jdbcType = VARCHAR},
+			#{startpoint,jdbcType = VARCHAR}, 
+			#{endpoint,jdbcType = VARCHAR}, 
+			#{length,jdbcType = VARCHAR}, 
+			#{status,jdbcType = VARCHAR}, 
+			#{createtime,jdbcType = VARCHAR}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.khidi.manager.officework.entity.CheckrouteEntity">
+		update CHECKROUTE 
+		<set>
+			<if test="code != null">
+				CODE = #{code}  , </if>
+			<if test="name != null">
+				NAME = #{name}  , </if>
+			<if test="areaid != null">
+				AREAID = #{areaid}  , </if>
+			<if test="resourcetype != null">
+				RESOURCETYPE = #{resourcetype}  , </if>
+			<if test="resourceid != null">
+				RESOURCEID = #{resourceid}  , </if>
+			<if test="startpoint != null">
+				STARTPOINT = #{startpoint}  , </if>
+			<if test="endpoint != null">
+				ENDPOINT = #{endpoint}  , </if>
+			<if test="length != null">
+				LENGTH = #{length}  , </if>
+			<if test="status != null">
+				STATUS = #{status}  , </if>
+			<if test="createtime != null">
+				CREATETIME = #{createtime}  </if>
+			<if test="routeMap != null">
+				ROUTE_MAP = #{routeMap}  </if>
+		</set>
+		where ID = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from CHECKROUTE where ID = #{id}
+	</delete>
+</mapper>

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.sys.dao.SysMenuDao">
+
+	<select id="queryObject" resultType="com.khidi.manager.sys.entity.SysMenuEntity">
+		select * from sys_menu where menuid = #{value}
+	</select>
+
+
+	<select id="queryParentIdIsCorrent" parameterType="com.khidi.manager.sys.entity.SysMenuEntity" resultType="String">
+		select menuid from (select menuid from sys_menu START WITH menuid= #{menuId} CONNECT BY prior menuid = parentid) b
+		where b.menuid = #{parentId}
+	</select>
+	
+	<insert id="save" parameterType="com.khidi.manager.sys.entity.SysMenuEntity">
+		insert into sys_menu
+		(
+			menuid,
+			parentid,
+			name,
+			url,
+			perms,
+			type,
+			icon,
+			ordernum
+		)
+		values
+		(
+			#{menuId}, 
+			#{parentId}, 
+			#{name}, 
+			#{url,jdbcType=VARCHAR},
+			#{perms,jdbcType=VARCHAR},
+			#{type}, 
+			#{icon,jdbcType=VARCHAR},
+			#{orderNum,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<select id="queryListParentId" resultType="com.khidi.manager.sys.entity.SysMenuEntity">
+		select * from sys_menu where parentid = '${_parameter}' order by ordernum asc
+	</select>
+	
+	<select id="queryNotButtonList" resultType="com.khidi.manager.sys.entity.SysMenuEntity">
+		select * from sys_menu where type != 2 order by ordernum asc
+	</select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+	<select id="queryList" resultType="com.khidi.manager.sys.entity.SysMenuEntity">
+		SELECT m.*,
+		(case when exists(select 1 from sys_menu where m.menuid = parentid) then 1 else 0 end ) AS isParent
+		FROM sys_menu m
+	<where>
+		<if test="name != null and name!=''">AND name like '%'||to_char(#{name})||'%'
+		</if>
+		<if test="parentId != null and parentId!=''">AND parentId = #{parentId}
+		</if>
+	</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by m.${sidx} ${order}
+			</when>
+			<otherwise>
+				order by m.ordernum asc
+			</otherwise>
+		</choose>
+	</select>
+
+
+	<select id="querySonList" resultType="com.khidi.manager.sys.entity.SysMenuEntity">
+		SELECT m.*,
+		(case when exists(select 1 from sys_menu where m.menuid = parentid) then 1 else 0 end ) AS isParent
+		FROM sys_menu m  START WITH menuid=   '${_parameter}'  CONNECT BY prior menuid = parentid order by ordernum asc
+	</select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<!-- 查询用户的权限列表 --> 
+	<select id="queryUserList" resultType="com.khidi.manager.sys.entity.SysMenuEntity">
+		select distinct m.*,(select p.name from sys_menu p where p.menuid = m.parentid) as parentName
+			from sys_user_role ur
+			LEFT JOIN sys_role_menu rm on ur.role_id = rm.role_id 
+			LEFT JOIN sys_menu m on rm.menuid = m.menuid
+		where ur.user_id = #{userId} order by m.ordernum asc
+	</select>
+	
+	<select id="queryTotal" resultType="int">
+		select count(*) from sys_menu
+	</select>
+	 
+	<update id="update" parameterType="com.khidi.manager.sys.entity.SysMenuEntity">
+		update sys_menu 
+		<set> 
+			<if test="parentId != null">parentid = #{parentId}, </if>
+			<if test="name != null">name = #{name}, </if>
+			<if test="url != null">url = #{url}, </if>
+			<if test="perms != null">perms = #{perms}, </if>
+			<if test="type != null">type = #{type}, </if>
+			<if test="icon != null">icon = #{icon}, </if>
+			<if test="orderNum != null">ordernum = #{orderNum}</if>
+		</set>
+		where menuid = #{menuId}
+	</update>
+	
+	<delete id="delete">
+		delete from sys_menu where menuid =	#{menuId}
+		<!--这里还要删除菜单关联资源-->
+	</delete>
+	
+</mapper>

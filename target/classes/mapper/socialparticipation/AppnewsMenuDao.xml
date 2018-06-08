@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.socialparticipation.dao.AppnewsMenuDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.socialparticipation.entity.AppnewsMenuEntity" id="appnewsMenuMap">
+        <result property="appinfoid" column="APPINFOID"/>
+        <result property="appmenuid" column="APPMENUID"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.khidi.manager.socialparticipation.entity.AppnewsMenuEntity">
+		select * from APPNEWS_MENU where ID = #{id}
+	</select>
+
+
+    <select id="queryList" resultType="com.khidi.manager.socialparticipation.entity.AppnewsMenuEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN
+                FROM (select * from APPNEWS_MENU
+                <where>
+                                            <if test="appinfoid != null and appinfoid!=''">AND APPINFOID like '%'||to_char(#{appinfoid})||'%'
+                        </if>
+                                            <if test="appmenuid != null and appmenuid!=''">AND APPMENUID like '%'||to_char(#{appmenuid})||'%'
+                        </if>
+                                    </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by create_time desc
+                    </otherwise>
+                </choose>
+                )a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from APPNEWS_MENU
+            </otherwise>
+        </choose>
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from APPNEWS_MENU
+        <where>
+			                <if test="appinfoid != null and appinfoid!=''">AND  APPINFOID like '%'||to_char(#{appinfoid})||'%'
+                </if>
+			                <if test="appmenuid != null and appmenuid!=''">AND  APPMENUID like '%'||to_char(#{appmenuid})||'%'
+                </if>
+			        </where>
+	</select>
+	 
+	<insert id="save" parameterType="com.khidi.manager.socialparticipation.entity.AppnewsMenuEntity">
+		insert into APPNEWS_MENU
+		(
+			APPINFOID , 
+			APPMENUID 
+		)
+		values
+		(
+			#{appinfoid,jdbcType = VARCHAR}, 
+			#{appmenuid,jdbcType = VARCHAR}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.khidi.manager.socialparticipation.entity.AppnewsMenuEntity">
+		update APPNEWS_MENU 
+		<set>
+			<if test="appmenuid != null">
+				APPMENUID = #{appmenuid}  </if>
+		</set>
+		where APPINFOID = #{appinfoid} AND APPMENUID = #{appmenuid}
+	</update>
+	
+	<delete id="delete">
+		delete from APPNEWS_MENU where APPINFOID = #{id}
+	</delete>
+</mapper>

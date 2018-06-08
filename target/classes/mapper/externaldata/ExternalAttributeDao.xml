@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.externaldata.dao.ExternalAttributeDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.externaldata.entity.ExternalAttributeEntity" id="externalAttributeMap">
+        <result property="id" column="ID"/>
+        <result property="linkId" column="LINK_ID"/>
+        <result property="destAttr" column="DEST_ATTR"/>
+        <result property="destType" column="DEST_TYPE"/>
+        <result property="originAttr" column="ORIGIN_ATTR"/>
+        <result property="originType" column="ORIGIN_TYPE"/>
+        <result property="createTime" column="CREATE_TIME"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.khidi.manager.externaldata.entity.ExternalAttributeEntity">
+		select * from EXTERNAL_ATTRIBUTE where ID = #{id}
+	</select>
+
+
+    <select id="queryList" resultType="com.khidi.manager.externaldata.entity.ExternalAttributeEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN
+                FROM (select EXTERNAL_ATTRIBUTE.*,(select DESCRIBE from EXTERNAL_LINK where EXTERNAL_ATTRIBUTE.LINK_ID = EXTERNAL_LINK.id)as linkName from EXTERNAL_ATTRIBUTE
+                <where>
+                                            <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                        </if>
+                                            <if test="linkId != null and linkId!=''">AND LINK_ID like '%'||to_char(#{linkId})||'%'
+                        </if>
+                                            <if test="destAttr != null and destAttr!=''">AND DEST_ATTR like '%'||to_char(#{destAttr})||'%'
+                        </if>
+                                            <if test="destType != null and destType!=''">AND DEST_TYPE like '%'||to_char(#{destType})||'%'
+                        </if>
+                                            <if test="originAttr != null and originAttr!=''">AND ORIGIN_ATTR like '%'||to_char(#{originAttr})||'%'
+                        </if>
+                                            <if test="originType != null and originType!=''">AND ORIGIN_TYPE like '%'||to_char(#{originType})||'%'
+                        </if>
+                                            <if test="createTime != null and createTime!=''">AND CREATE_TIME like '%'||to_char(#{createTime})||'%'
+                        </if>
+                                    </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by create_time desc
+                    </otherwise>
+                </choose>
+                )a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from EXTERNAL_ATTRIBUTE
+                <where>
+                    <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                    </if>
+                    <if test="linkId != null and linkId!=''">AND LINK_ID like '%'||to_char(#{linkId})||'%'
+                    </if>
+                    <if test="destAttr != null and destAttr!=''">AND DEST_ATTR like '%'||to_char(#{destAttr})||'%'
+                    </if>
+                    <if test="destType != null and destType!=''">AND DEST_TYPE like '%'||to_char(#{destType})||'%'
+                    </if>
+                    <if test="originAttr != null and originAttr!=''">AND ORIGIN_ATTR like '%'||to_char(#{originAttr})||'%'
+                    </if>
+                    <if test="originType != null and originType!=''">AND ORIGIN_TYPE like '%'||to_char(#{originType})||'%'
+                    </if>
+                </where>
+            </otherwise>
+        </choose>
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from EXTERNAL_ATTRIBUTE
+        <where>
+			                <if test="id != null and id!=''">AND  ID like '%'||to_char(#{id})||'%'
+                </if>
+			                <if test="linkId != null and linkId!=''">AND  LINK_ID like '%'||to_char(#{linkId})||'%'
+                </if>
+			                <if test="destAttr != null and destAttr!=''">AND  DEST_ATTR like '%'||to_char(#{destAttr})||'%'
+                </if>
+			                <if test="destType != null and destType!=''">AND  DEST_TYPE like '%'||to_char(#{destType})||'%'
+                </if>
+			                <if test="originAttr != null and originAttr!=''">AND  ORIGIN_ATTR like '%'||to_char(#{originAttr})||'%'
+                </if>
+			                <if test="originType != null and originType!=''">AND  ORIGIN_TYPE like '%'||to_char(#{originType})||'%'
+                </if>
+			                <if test="createTime != null and createTime!=''">AND  CREATE_TIME like '%'||to_char(#{createTime})||'%'
+                </if>
+			        </where>
+	</select>
+	 
+	<insert id="save" parameterType="com.khidi.manager.externaldata.entity.ExternalAttributeEntity">
+		insert into EXTERNAL_ATTRIBUTE
+		(
+			ID , 
+			LINK_ID , 
+			DEST_ATTR , 
+			DEST_TYPE , 
+			ORIGIN_ATTR , 
+			ORIGIN_TYPE,
+			ATTR_DESC
+		)
+		values
+		(
+			#{id,jdbcType = VARCHAR}, 
+			#{linkId,jdbcType = VARCHAR}, 
+			#{destAttr,jdbcType = VARCHAR}, 
+			#{destType,jdbcType = VARCHAR}, 
+			#{originAttr,jdbcType = VARCHAR}, 
+			#{originType,jdbcType = VARCHAR},
+			#{attrDesc,jdbcType = VARCHAR}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.khidi.manager.externaldata.entity.ExternalAttributeEntity">
+		update EXTERNAL_ATTRIBUTE 
+		<set>
+			<if test="linkId != null">
+				LINK_ID = #{linkId}  , </if>
+			<if test="destAttr != null">
+				DEST_ATTR = #{destAttr}  , </if>
+			<if test="destType != null">
+				DEST_TYPE = #{destType}  , </if>
+			<if test="originAttr != null">
+				ORIGIN_ATTR = #{originAttr}  , </if>
+			<if test="originType != null">
+				ORIGIN_TYPE = #{originType}  , </if>
+            <if test="attrDesc != null">
+                ATTR_DESC = #{attrDesc}  , </if>
+		</set>
+		where ID = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from EXTERNAL_ATTRIBUTE where ID = #{id}
+	</delete>
+</mapper>

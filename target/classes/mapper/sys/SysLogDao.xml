@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.sys.dao.SysLogDao">
+
+	<select id="queryObject" resultType="com.khidi.manager.sys.entity.SysLogEntity">
+		select * from sys_log where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.khidi.manager.sys.entity.SysLogEntity">
+		<choose>
+			<when test="limit != null and offset !=null and page!=null">
+				select * FROM (
+				SELECT * FROM
+				(
+				SELECT a.*, ROWNUM RN
+				FROM (select * from SYS_LOG
+				<where>
+					<if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+					</if>
+					<if test="username != null and username!=''">AND USERNAME like '%'||to_char(#{username})||'%'
+					</if>
+					<if test="operation != null and operation!=''">AND OPERATION like '%'||to_char(#{operation})||'%'
+					</if>
+					<if test="method != null and method!=''">AND METHOD like '%'||to_char(#{method})||'%'
+					</if>
+					<if test="params != null and params!=''">AND PARAMS like '%'||to_char(#{params})||'%'
+					</if>
+					<if test="time != null and time!=''">AND TIME like '%'||to_char(#{time})||'%'
+					</if>
+					<if test="ip != null and ip!=''">AND IP like '%'||to_char(#{ip})||'%'
+					</if>
+					<if test="createTime != null and createTime!=''">AND CREATE_TIME like '%'||to_char(#{createTime})||'%'
+					</if>
+				</where>
+				<choose>
+					<when test="sidx != null and sidx.trim() != ''">
+						order by ${sidx} ${order}
+					</when>
+					<otherwise>
+						order by create_time desc
+					</otherwise>
+				</choose>
+				) a
+				WHERE ROWNUM &lt;= #{limit} * #{page}
+				)
+				WHERE RN > #{offset}
+				)
+			</when>
+			<otherwise>
+				select * from SYS_LOG order by create_time desc
+			</otherwise>
+		</choose>
+
+	</select>
+
+
+
+
+	<select id="queryTotal" resultType="int">
+		select count(*) from SYS_LOG
+		<where>
+			<if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+			</if>
+			<if test="username != null and username!=''">AND USERNAME like '%'||to_char(#{username})||'%'
+			</if>
+			<if test="operation != null and operation!=''">AND OPERATION like '%'||to_char(#{operation})||'%'
+			</if>
+			<if test="method != null and method!=''">AND METHOD like '%'||to_char(#{method})||'%'
+			</if>
+			<if test="params != null and params!=''">AND PARAMS like '%'||to_char(#{params})||'%'
+			</if>
+			<if test="time != null and time!=''">AND TIME like '%'||to_char(#{time})||'%'
+			</if>
+			<if test="ip != null and ip!=''">AND IP like '%'||to_char(#{ip})||'%'
+			</if>
+			<if test="createTime != null and createTime!=''">AND CREATE_TIME like '%'||to_char(#{createTime})||'%'
+			</if>
+		</where>
+	</select>
+
+
+	<insert id="save" parameterType="com.khidi.manager.sys.entity.SysLogEntity" useGeneratedKeys="false" keyProperty="id">
+		insert into sys_log
+		(
+			id,
+			username,
+			operation,
+			method,
+			params,
+			time,
+			ip
+		)
+		values
+		(
+			#{id},
+			#{username}, 
+			#{operation}, 
+			#{method}, 
+			#{params}, 
+			#{time},
+			#{ip}
+		)
+	</insert>
+	
+	<delete id="delete">
+		delete from sys_log where id = #{value}
+	</delete>
+
+</mapper>

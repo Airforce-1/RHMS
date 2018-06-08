@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.basicinfo.dao.HydropowerstationDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap type="com.khidi.manager.basicinfo.entity.HydropowerstationEntity"
+		id="hydropowerstationMap">
+		<result property="id" column="ID" />
+		<result property="name" column="NAME" />
+	</resultMap>
+
+	<select id="queryObject"
+		resultType="com.khidi.manager.basicinfo.entity.HydropowerstationEntity">
+		select * from hydropowerstation
+		where ID = #{id}
+	</select>
+
+
+	<select id="queryList"
+		resultType="com.khidi.manager.basicinfo.entity.HydropowerstationEntity">
+		<choose>
+			<when test="limit != null and offset !=null and page!=null">
+				select d.* FROM (
+				SELECT c.* FROM
+				(
+				SELECT a.*, ROWNUM RN
+				FROM (select *
+				from hydropowerstation
+				<where>
+					<if test="id != null and id !='' ">AND id like '%'||to_char(#{id})||'%'
+					</if>
+					<if test="y != null and y !='' ">AND y like '%'||to_char(#{y})||'%'
+					</if>
+					<if test="type != null and type !='' ">AND type like '%'||to_char(#{type})||'%'
+					</if>
+					<if test="code != null and code !='' ">AND code like '%'||to_char(#{code})||'%'
+					</if>
+					<if test="name != null and name !='' ">AND name like '%'||to_char(#{name})||'%'
+					</if>
+					<if test="x != null and x !='' ">AND x like '%'||to_char(#{x})||'%'
+					</if>
+					<if test="buildSituation != null and buildSituation !='' ">AND build_Situation like
+						'%'||to_char(#{buildSituation})||'%'
+					</if>
+					<if test="buildTime != null and buildTime !='' ">AND build_Time like '%'||to_char(#{buildTime})||'%'
+					</if>
+					<if test="buildLevel != null and buildLevel !='' ">AND build_Level LIKE
+						'%'||to_char(#{buildLevel})||'%'
+					</if>
+					<if test="grade != null and grade !='' ">AND grade LIKE '%'||to_char(#{grade})||'%'
+					</if>
+					<if test="installedCapacity != null and installedCapacity !='' ">AND installed_Capacity LIKE
+						'%'||to_char(#{installedCapacity})||'%'
+					</if>
+					<if test="power != null and power !='' ">AND power like '%'||to_char(#{power})||'%'
+					</if>
+					<if test="waterHead != null and waterHead !='' ">AND water_Head like '%'||to_char(#{waterHead})||'%'
+					</if>
+					<if test="unitNumber != null and unitNumber !='' ">AND unit_Number like '%'||to_char(#{unitNumber})||'%'
+					</if>
+					<if test="manager != null and manager !='' ">AND manager like
+						'%'||to_char(#{manager})||'%'
+					</if>
+					<if test="resourceType != null and resourceType !='' ">AND resource_Type like
+						'%'||to_char(#{resourceType})||'%'
+					</if>
+					<if test="resourceId != null and resourceId !='' ">AND resource_Id like '%'||to_char(#{resourceId})||'%'
+					</if>
+					<if test="areaId != null and areaId !='' ">AND area_Id in (select area_id FROM sys_area START WITH
+						area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+					</if>
+					<if test="createTime != null and createTime !='' ">AND create_Time like '%'||to_char(#{createTime})||'%'
+					</if>
+					<if test="resourceName != null and resourceName!=''">AND resource_Id in (select id from river where name
+						like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_river where name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from lake where name
+						like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_lake where name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from canal where name
+						like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_canal where name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from reservoir where
+						name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_reservoir where name like
+						'%'||to_char(#{resourceName})||'%')
+					</if>
+				</where>
+				<choose>
+					<when test="sidx != null and sidx.trim() != ''">
+						order by ${sidx} ${order}
+					</when>
+					<otherwise>
+						order by create_time desc
+					</otherwise>
+				</choose>
+				) a
+				WHERE ROWNUM &lt;= #{limit} * #{page}
+				) c
+				WHERE RN > #{offset}
+				) d
+			</when>
+			<otherwise>
+				select * from hydropowerstation
+				<where>
+					<if test="id != null and id !='' ">AND id like '%'||to_char(#{id})||'%'
+					</if>
+					<if test="y != null and y !='' ">AND y like '%'||to_char(#{y})||'%'
+					</if>
+					<if test="type != null and type !='' ">AND type like '%'||to_char(#{type})||'%'
+					</if>
+					<if test="code != null and code !='' ">AND code like '%'||to_char(#{code})||'%'
+					</if>
+					<if test="name != null and name !='' ">AND name like '%'||to_char(#{name})||'%'
+					</if>
+					<if test="x != null and x !='' ">AND x like '%'||to_char(#{x})||'%'
+					</if>
+					<if test="buildSituation != null and buildSituation !='' ">AND build_Situation like
+						'%'||to_char(#{buildSituation})||'%'
+					</if>
+					<if test="buildTime != null and buildTime !='' ">AND build_Time like '%'||to_char(#{buildTime})||'%'
+					</if>
+					<if test="buildLevel != null and buildLevel !='' ">AND build_Level LIKE
+						'%'||to_char(#{buildLevel})||'%'
+					</if>
+					<if test="grade != null and grade !='' ">AND grade LIKE '%'||to_char(#{grade})||'%'
+					</if>
+					<if test="installedCapacity != null and installedCapacity !='' ">AND installed_Capacity LIKE
+						'%'||to_char(#{installedCapacity})||'%'
+					</if>
+					<if test="power != null and power !='' ">AND power like '%'||to_char(#{power})||'%'
+					</if>
+					<if test="waterHead != null and waterHead !='' ">AND water_Head like '%'||to_char(#{waterHead})||'%'
+					</if>
+					<if test="unitNumber != null and unitNumber !='' ">AND unit_Number like '%'||to_char(#{unitNumber})||'%'
+					</if>
+					<if test="manager != null and manager !='' ">AND manager like
+						'%'||to_char(#{manager})||'%'
+					</if>
+					<if test="resourceType != null and resourceType !='' ">AND resource_Type like
+						'%'||to_char(#{resourceType})||'%'
+					</if>
+					<if test="resourceId != null and resourceId !='' ">AND resource_Id like '%'||to_char(#{resourceId})||'%'
+					</if>
+					<if test="areaId != null and areaId !='' ">AND area_Id in (select area_id FROM sys_area START WITH
+						area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+					</if>
+					<if test="createTime != null and createTime !='' ">AND create_Time like '%'||to_char(#{createTime})||'%'
+					</if>
+					<if test="resourceName != null and resourceName!=''">AND resource_Id in (select id from river where name
+						like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_river where name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from lake where name
+						like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_lake where name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from canal where name
+						like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_canal where name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from reservoir where
+						name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_reservoir where name like
+						'%'||to_char(#{resourceName})||'%')
+					</if>
+				</where>
+			</otherwise>
+		</choose>
+
+	</select>
+
+
+	<select id="queryTotal" resultType="int">
+		select count(*) from hydropowerstation
+		<where>
+			<if test="id != null and id !='' ">AND id like '%'||to_char(#{id})||'%'
+			</if>
+			<if test="y != null and y !='' ">AND y like '%'||to_char(#{y})||'%'
+			</if>
+			<if test="type != null and type !='' ">AND type like '%'||to_char(#{type})||'%'
+			</if>
+			<if test="code != null and code !='' ">AND code like '%'||to_char(#{code})||'%'
+			</if>
+			<if test="name != null and name !='' ">AND name like '%'||to_char(#{name})||'%'
+			</if>
+			<if test="x != null and x !='' ">AND x like '%'||to_char(#{x})||'%'
+			</if>
+			<if test="buildSituation != null and buildSituation !='' ">AND build_Situation like
+				'%'||to_char(#{buildSituation})||'%'
+			</if>
+			<if test="buildTime != null and buildTime !='' ">AND build_Time like '%'||to_char(#{buildTime})||'%'
+			</if>
+			<if test="buildLevel != null and buildLevel !='' ">AND build_Level LIKE
+				'%'||to_char(#{buildLevel})||'%'
+			</if>
+			<if test="grade != null and grade !='' ">AND grade LIKE '%'||to_char(#{grade})||'%'
+			</if>
+			<if test="installedCapacity != null and installedCapacity !='' ">AND installed_Capacity LIKE
+				'%'||to_char(#{installedCapacity})||'%'
+			</if>
+			<if test="power != null and power !='' ">AND power like '%'||to_char(#{power})||'%'
+			</if>
+			<if test="waterHead != null and waterHead !='' ">AND water_Head like '%'||to_char(#{waterHead})||'%'
+			</if>
+			<if test="unitNumber != null and unitNumber !='' ">AND unit_Number like '%'||to_char(#{unitNumber})||'%'
+			</if>
+			<if test="manager != null and manager !='' ">AND manager like
+				'%'||to_char(#{manager})||'%'
+			</if>
+			<if test="resourceType != null and resourceType !='' ">AND resource_Type like '%'||to_char(#{resourceType})||'%'
+			</if>
+			<if test="resourceId != null and resourceId !='' ">AND resource_Id like '%'||to_char(#{resourceId})||'%'
+			</if>
+			<if test="areaId != null and areaId !='' ">AND area_Id in (select area_id FROM sys_area START WITH
+				area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+			</if>
+			<if test="createTime != null and createTime !='' ">AND create_Time like '%'||to_char(#{createTime})||'%'
+			</if>
+			<if test="resourceName != null and resourceName!=''">AND resource_Id in (select id from river where name
+						like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_river where name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from lake where name
+						like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_lake where name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from canal where name
+						like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_canal where name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from reservoir where
+						name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_reservoir where name like
+						'%'||to_char(#{resourceName})||'%')
+					</if>
+		</where>
+	</select>
+
+	<insert id="save"
+		parameterType="com.khidi.manager.basicinfo.entity.HydropowerstationEntity">
+		insert into hydropowerstation
+		(
+		ID ,
+		Y ,
+		type ,
+		CODE ,
+		NAME ,
+		X ,
+		build_Situation ,
+		build_time ,
+		build_Level ,
+		grade ,
+		installed_Capacity ,
+		power ,
+		water_Head ,
+		unit_Number ,
+		manager ,
+		resource_Type,
+		resource_Id,
+		area_Id,
+		create_Time
+		)
+		values
+		(
+		#{id,jdbcType =
+		VARCHAR},
+		#{y,jdbcType = VARCHAR},
+		#{type,jdbcType = VARCHAR},
+		#{code,jdbcType = VARCHAR},
+		#{name,jdbcType = VARCHAR},
+		#{x,jdbcType =
+		VARCHAR},
+		#{buildSituation,jdbcType = VARCHAR},
+		#{buildTime,jdbcType =
+		DATE},
+		#{buildLevel,jdbcType = VARCHAR},
+		#{grade,jdbcType = VARCHAR},
+		#{installedCapacity,jdbcType = VARCHAR},
+		#{power,jdbcType =
+		VARCHAR},
+		#{waterHead,jdbcType = VARCHAR},
+		#{unitNumber,jdbcType = DATE},
+		#{manager,jdbcType = VARCHAR},
+		#{resourceType,jdbcType = VARCHAR},
+		#{resourceId,jdbcType = VARCHAR},
+		#{areaId,jdbcType = VARCHAR},
+		#{createTime,jdbcType = VARCHAR}
+		)
+	</insert>
+
+	<update id="update"
+		parameterType="com.khidi.manager.basicinfo.entity.HydropowerstationEntity">
+		update hydropowerstation
+		<set>
+			<if test="id != null">id = #{id},
+			</if>
+			<if test="y != null">y = #{y},
+			</if>
+			<if test="type != null">type = #{type},
+			</if>
+			<if test="code != null">code = #{code},
+			</if>
+			<if test="name != null">name = #{name},
+			</if>
+			<if test="x != null">x = #{x},
+			</if>
+			<if test="buildSituation != null">build_Situation = #{buildSituation},
+			</if>
+			<if test="buildTime != null">build_Time = #{buildTime},
+			</if>
+			<if test="buildLevel != null">build_Level = #{buildLevel},
+			</if>
+			<if test="grade != null">grade = #{grade},
+			</if>
+			<if test="installedCapacity != null">installed_Capacity = #{installedCapacity},
+			</if>
+			<if test="power != null">power = #{power},
+			</if>
+			<if test="waterHead != null">water_Head = #{waterHead},
+			</if>
+			<if test="unitNumber != null">unit_Number = #{unitNumber},
+			</if>
+			<if test="manager != null">manager = #{manager},
+			</if>
+			<if test="resourceType != null">resource_Type = #{resourceType},
+			</if>
+			<if test="resourceId != null">resource_Id = #{resourceId},
+			</if>
+			<if test="areaId != null">area_Id = #{areaId},
+			</if>
+			<if test="createTime != null">create_Time = #{createTime},
+			</if>
+		</set>
+		where ID = #{id}
+	</update>
+
+	<delete id="delete">
+		delete from hydropowerstation where ID = #{id}
+	</delete>
+</mapper>

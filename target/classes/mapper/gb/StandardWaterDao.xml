@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.gb.dao.StandardWaterDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.gb.entity.StandardWaterEntity" id="standardWaterMap">
+        <result property="id" column="ID"/>
+        <result property="item" column="ITEM"/>
+        <result property="riverOne" column="RIVER_ONE"/>
+        <result property="riverTwo" column="RIVER_TWO"/>
+        <result property="riverThree" column="RIVER_THREE"/>
+        <result property="riverFour" column="RIVER_FOUR"/>
+        <result property="riverFive" column="RIVER_FIVE"/>
+        <result property="lakeOne" column="LAKE_ONE"/>
+        <result property="lakeTwo" column="LAKE_TWO"/>
+        <result property="lakeThree" column="LAKE_THREE"/>
+        <result property="lakeFour" column="LAKE_FOUR"/>
+        <result property="lakeFive" column="LAKE_FIVE"/>
+    </resultMap>
+
+
+	<resultMap type="com.khidi.manager.gb.vo.DataByLevelVo" id="DataByLevelVoMap">
+		<result property="level" column="level"/>
+		<result property="codLimit" column="codLimit"/>
+		<result property="nhLimit" column="nhLimit"/>
+		<result property="pLimit" column="pLimit"/>
+	</resultMap>
+
+	<select id="queryObject" resultType="com.khidi.manager.gb.entity.StandardWaterEntity">
+		select * from STANDARD_WATER where ID = #{id}
+	</select>
+
+
+
+	<select id="getDataByLevel" resultType="com.khidi.manager.gb.vo.DataByLevelVo" statementType="STATEMENT">
+		select distinct (select ${_parameter} from standard_water where item = '氨氮') as nhLimit,
+		(select ${_parameter} from standard_water where item = '总磷') as pLimit,
+		(select ${_parameter} from standard_water where item = '化学需氧量（COD）') as codLimit
+		from  standard_water
+	</select>
+
+
+
+	<select id="getCodLevelByValue" resultType="int">
+		select distinct CASE WHEN ${_parameter} &lt;= (SELECT RIVER_ONE FROM standard_water WHERE ITEM='化学需氧量（COD）') THEN '1'
+		WHEN ${_parameter} &lt;= (SELECT RIVER_TWO FROM standard_water WHERE ITEM='化学需氧量（COD）') AND ${_parameter} > (SELECT RIVER_ONE FROM standard_water WHERE ITEM='化学需氧量（COD）') THEN '2'
+		WHEN ${_parameter} &lt;= (SELECT RIVER_THREE FROM standard_water WHERE ITEM='化学需氧量（COD）') AND ${_parameter} > (SELECT RIVER_TWO FROM standard_water WHERE ITEM='化学需氧量（COD）') THEN '3'
+		WHEN ${_parameter} &lt;= (SELECT RIVER_FOUR FROM standard_water WHERE ITEM='化学需氧量（COD）') AND ${_parameter} > (SELECT RIVER_THREE FROM standard_water WHERE ITEM='化学需氧量（COD）') THEN '4'
+		WHEN ${_parameter} &lt;= (SELECT RIVER_FIVE FROM standard_water WHERE ITEM='化学需氧量（COD）') AND ${_parameter} > (SELECT RIVER_FOUR FROM standard_water WHERE ITEM='化学需氧量（COD）') THEN '5'
+		ELSE '6' END
+		FROM standard_water
+	</select>
+
+	<select id="getPLevelByValue" resultType="int">
+		select distinct CASE WHEN ${_parameter} &lt;= (SELECT RIVER_ONE FROM standard_water WHERE ITEM='总磷') THEN '1'
+		WHEN  ${_parameter} &lt;= (SELECT RIVER_TWO FROM standard_water WHERE ITEM='总磷') AND ${_parameter} > (SELECT RIVER_ONE FROM standard_water WHERE ITEM='总磷') THEN '2'
+		WHEN  ${_parameter} &lt;= (SELECT RIVER_THREE FROM standard_water WHERE ITEM='总磷') AND ${_parameter} > (SELECT RIVER_TWO FROM standard_water WHERE ITEM='总磷') THEN '3'
+		WHEN  ${_parameter} &lt;= (SELECT RIVER_FOUR FROM standard_water WHERE ITEM='总磷') AND ${_parameter} > (SELECT RIVER_THREE FROM standard_water WHERE ITEM='总磷') THEN '4'
+		WHEN  ${_parameter} &lt;= (SELECT RIVER_FIVE FROM standard_water WHERE ITEM='总磷') AND ${_parameter} > (SELECT RIVER_FOUR FROM standard_water WHERE ITEM='总磷') THEN '5'
+		ELSE '6' END
+		FROM standard_water
+	</select>
+
+	<select id="getNHLevelByValue" resultType="int">
+		select distinct CASE WHEN ${_parameter} &lt;= (SELECT RIVER_ONE FROM standard_water WHERE ITEM='氨氮') THEN '1'
+		WHEN ${_parameter} &lt;= (SELECT RIVER_TWO FROM standard_water WHERE ITEM='氨氮') AND ${_parameter} > (SELECT RIVER_ONE FROM standard_water WHERE ITEM='氨氮') THEN '2'
+		WHEN ${_parameter} &lt;= (SELECT RIVER_THREE FROM standard_water WHERE ITEM='氨氮') AND ${_parameter} > (SELECT RIVER_TWO FROM standard_water WHERE ITEM='氨氮') THEN '3'
+		WHEN ${_parameter} &lt;= (SELECT RIVER_FOUR FROM standard_water WHERE ITEM='氨氮') AND ${_parameter} > (SELECT RIVER_THREE FROM standard_water WHERE ITEM='氨氮') THEN '4'
+		WHEN ${_parameter} &lt;= (SELECT RIVER_FIVE FROM standard_water WHERE ITEM='氨氮') AND ${_parameter} > (SELECT RIVER_FOUR FROM standard_water WHERE ITEM='氨氮') THEN '5'
+		ELSE '6' END
+		FROM standard_water
+	</select>
+
+
+
+
+    <select id="queryList" resultType="com.khidi.manager.gb.entity.StandardWaterEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN
+                FROM (select * from STANDARD_WATER
+                <where>
+                                            <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                        </if>
+                                            <if test="item != null and item!=''">AND ITEM like '%'||to_char(#{item})||'%'
+                        </if>
+                                            <if test="riverOne != null and riverOne!=''">AND RIVER_ONE like '%'||to_char(#{riverOne})||'%'
+                        </if>
+                                            <if test="riverTwo != null and riverTwo!=''">AND RIVER_TWO like '%'||to_char(#{riverTwo})||'%'
+                        </if>
+                                            <if test="riverThree != null and riverThree!=''">AND RIVER_THREE like '%'||to_char(#{riverThree})||'%'
+                        </if>
+                                            <if test="riverFour != null and riverFour!=''">AND RIVER_FOUR like '%'||to_char(#{riverFour})||'%'
+                        </if>
+                                            <if test="riverFive != null and riverFive!=''">AND RIVER_FIVE like '%'||to_char(#{riverFive})||'%'
+                        </if>
+                                            <if test="lakeOne != null and lakeOne!=''">AND LAKE_ONE like '%'||to_char(#{lakeOne})||'%'
+                        </if>
+                                            <if test="lakeTwo != null and lakeTwo!=''">AND LAKE_TWO like '%'||to_char(#{lakeTwo})||'%'
+                        </if>
+                                            <if test="lakeThree != null and lakeThree!=''">AND LAKE_THREE like '%'||to_char(#{lakeThree})||'%'
+                        </if>
+                                            <if test="lakeFour != null and lakeFour!=''">AND LAKE_FOUR like '%'||to_char(#{lakeFour})||'%'
+                        </if>
+                                            <if test="lakeFive != null and lakeFive!=''">AND LAKE_FIVE like '%'||to_char(#{lakeFive})||'%'
+                        </if>
+                                    </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by createtime desc
+                    </otherwise>
+                </choose>
+                )a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from STANDARD_WATER
+            </otherwise>
+        </choose>
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from STANDARD_WATER
+        <where>
+			                <if test="id != null and id!=''">AND  ID like '%'||to_char(#{id})||'%'
+                </if>
+			                <if test="item != null and item!=''">AND  ITEM like '%'||to_char(#{item})||'%'
+                </if>
+			                <if test="riverOne != null and riverOne!=''">AND  RIVER_ONE like '%'||to_char(#{riverOne})||'%'
+                </if>
+			                <if test="riverTwo != null and riverTwo!=''">AND  RIVER_TWO like '%'||to_char(#{riverTwo})||'%'
+                </if>
+			                <if test="riverThree != null and riverThree!=''">AND  RIVER_THREE like '%'||to_char(#{riverThree})||'%'
+                </if>
+			                <if test="riverFour != null and riverFour!=''">AND  RIVER_FOUR like '%'||to_char(#{riverFour})||'%'
+                </if>
+			                <if test="riverFive != null and riverFive!=''">AND  RIVER_FIVE like '%'||to_char(#{riverFive})||'%'
+                </if>
+			                <if test="lakeOne != null and lakeOne!=''">AND  LAKE_ONE like '%'||to_char(#{lakeOne})||'%'
+                </if>
+			                <if test="lakeTwo != null and lakeTwo!=''">AND  LAKE_TWO like '%'||to_char(#{lakeTwo})||'%'
+                </if>
+			                <if test="lakeThree != null and lakeThree!=''">AND  LAKE_THREE like '%'||to_char(#{lakeThree})||'%'
+                </if>
+			                <if test="lakeFour != null and lakeFour!=''">AND  LAKE_FOUR like '%'||to_char(#{lakeFour})||'%'
+                </if>
+			                <if test="lakeFive != null and lakeFive!=''">AND  LAKE_FIVE like '%'||to_char(#{lakeFive})||'%'
+                </if>
+			        </where>
+	</select>
+	 
+	<insert id="save" parameterType="com.khidi.manager.gb.entity.StandardWaterEntity">
+		insert into STANDARD_WATER
+		(
+			ID , 
+			ITEM , 
+			RIVER_ONE , 
+			RIVER_TWO , 
+			RIVER_THREE , 
+			RIVER_FOUR , 
+			RIVER_FIVE , 
+			LAKE_ONE , 
+			LAKE_TWO , 
+			LAKE_THREE , 
+			LAKE_FOUR , 
+			LAKE_FIVE 
+		)
+		values
+		(
+			#{id,jdbcType = VARCHAR}, 
+			#{item,jdbcType = VARCHAR}, 
+			#{riverOne,jdbcType = VARCHAR}, 
+			#{riverTwo,jdbcType = VARCHAR}, 
+			#{riverThree,jdbcType = VARCHAR}, 
+			#{riverFour,jdbcType = VARCHAR}, 
+			#{riverFive,jdbcType = VARCHAR}, 
+			#{lakeOne,jdbcType = VARCHAR}, 
+			#{lakeTwo,jdbcType = VARCHAR}, 
+			#{lakeThree,jdbcType = VARCHAR}, 
+			#{lakeFour,jdbcType = VARCHAR}, 
+			#{lakeFive,jdbcType = VARCHAR}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.khidi.manager.gb.entity.StandardWaterEntity">
+		update STANDARD_WATER 
+		<set>
+			<if test="item != null">
+				ITEM = #{item}  , </if>
+			<if test="riverOne != null">
+				RIVER_ONE = #{riverOne}  , </if>
+			<if test="riverTwo != null">
+				RIVER_TWO = #{riverTwo}  , </if>
+			<if test="riverThree != null">
+				RIVER_THREE = #{riverThree}  , </if>
+			<if test="riverFour != null">
+				RIVER_FOUR = #{riverFour}  , </if>
+			<if test="riverFive != null">
+				RIVER_FIVE = #{riverFive}  , </if>
+			<if test="lakeOne != null">
+				LAKE_ONE = #{lakeOne}  , </if>
+			<if test="lakeTwo != null">
+				LAKE_TWO = #{lakeTwo}  , </if>
+			<if test="lakeThree != null">
+				LAKE_THREE = #{lakeThree}  , </if>
+			<if test="lakeFour != null">
+				LAKE_FOUR = #{lakeFour}  , </if>
+			<if test="lakeFive != null">
+				LAKE_FIVE = #{lakeFive}  </if>
+		</set>
+		where ID = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from STANDARD_WATER where ID = #{id}
+	</delete>
+</mapper>

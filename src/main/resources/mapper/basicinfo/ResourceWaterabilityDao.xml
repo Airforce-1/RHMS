@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.basicinfo.dao.ResourceWaterabilityDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.basicinfo.entity.ResourceWaterabilityEntity" id="resourceWaterabilityMap">
+        <result property="id" column="ID"/>
+        <result property="code" column="CODE"/>
+        <result property="type" column="TYPE"/>
+        <result property="areaId" column="AREA_ID"/>
+        <result property="manager" column="MANAGER"/>
+        <result property="name" column="NAME"/>
+        <result property="area" column="AREA"/>
+        <result property="owner" column="OWNER"/>
+        <result property="phone" column="PHONE"/>
+        <result property="leftX" column="LEFTX"/>
+        <result property="leftY" column="LEFTY"/>
+        <result property="rightX" column="RIGHTX"/>
+        <result property="rightY" column="RIGHTY"/>
+        <result property="introduce" column="INTRODUCE"/>
+        <result property="attachment" column="ATTACHMENT"/>
+        <result property="pointSet" column="POINTSET"/>
+    </resultMap>
+
+    <select id="queryObject" resultType="com.khidi.manager.basicinfo.entity.ResourceWaterabilityEntity">
+		select * from RESOURCE_WATERABILITY where ID = #{id}
+	</select>
+
+
+    <select id="queryList" resultType="com.khidi.manager.basicinfo.entity.ResourceWaterabilityEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN
+                FROM (select * from RESOURCE_WATERABILITY
+                <where>
+                    <!--通过角色带有的行政区划权限来过滤资源（行政区划）-->
+                    <if test="roleId != null">
+                        (SELECT XMLAGG(XMLELEMENT(E,AREAIDS
+                        ||',')).EXTRACT('//text()').getclobval() AS AREAIDS
+                        FROM sys_role_resource
+                        WHERE roleid IN (${roleId})) LIKE '%'||RESOURCE_WATERABILITY.AREA_ID||'%'
+                    </if>
+                    <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                    </if>
+                    <if test="code != null and code!=''">AND CODE like '%'||to_char(#{code})||'%'
+                    </if>
+                    <if test="type != null and type!=''">AND TYPE = #{type}
+                    </if>
+                    <if test="areaId != null and areaId!=''">AND AREA_ID in (select area_id FROM sys_area START WITH
+                        area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+                    </if>
+                    <if test="manager != null and manager!=''">AND MANAGER like '%'||to_char(#{manager})||'%'
+                    </if>
+                    <if test="name != null and name!=''">AND NAME like '%'||to_char(#{name})||'%'
+                    </if>
+                    <if test="area != null and area!=''">AND AREA like '%'||to_char(#{area})||'%'
+                    </if>
+                    <if test="owner != null and owner!=''">AND OWNER like '%'||to_char(#{owner})||'%'
+                    </if>
+                    <if test="phone != null and phone!=''">AND PHONE like '%'||to_char(#{phone})||'%'
+                    </if>
+                    <if test="leftX != null and leftX!=''">AND LEFTX like '%'||to_char(#{leftX})||'%'
+                    </if>
+                    <if test="leftY != null and leftY!=''">AND LEFTY like '%'||to_char(#{leftY})||'%'
+                    </if>
+                    <if test="rightX != null and rightX!=''">AND RIGHTX like '%'||to_char(#{rightX})||'%'
+                    </if>
+                    <if test="rightY != null and rightY!=''">AND RIGHTY like '%'||to_char(#{rightY})||'%'
+                    </if>
+                    <if test="introduce != null and introduce!=''">AND INTRODUCE like '%'||to_char(#{introduce})||'%'
+                    </if>
+                    <if test="attachment != null and attachment!=''">AND ATTACHMENT like
+                        '%'||to_char(#{attachment})||'%'
+                    </if>
+                </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by createtime desc
+                    </otherwise>
+                </choose>
+                )a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from RESOURCE_WATERABILITY
+            </otherwise>
+        </choose>
+    </select>
+
+
+    <select id="queryTotal" resultType="int">
+        select count(*) from RESOURCE_WATERABILITY
+        <where>
+            <!--通过角色带有的行政区划权限来过滤资源（行政区划）-->
+            <if test="roleId != null">
+                (SELECT XMLAGG(XMLELEMENT(E,AREAIDS
+                ||',')).EXTRACT('//text()').getclobval() AS AREAIDS
+                FROM sys_role_resource
+                WHERE roleid IN (${roleId})) LIKE '%'||RESOURCE_WATERABILITY.AREA_ID||'%'
+            </if>
+            <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+            </if>
+            <if test="code != null and code!=''">AND CODE like '%'||to_char(#{code})||'%'
+            </if>
+            <if test="type != null and type!=''">AND TYPE like '%'||to_char(#{type})||'%'
+            </if>
+            <if test="areaId != null and areaId!=''">AND AREA_ID in (select area_id FROM sys_area START WITH
+                area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+            </if>
+            <if test="manager != null and manager!=''">AND MANAGER like '%'||to_char(#{manager})||'%'
+            </if>
+            <if test="name != null and name!=''">AND NAME like '%'||to_char(#{name})||'%'
+            </if>
+            <if test="area != null and area!=''">AND AREA like '%'||to_char(#{area})||'%'
+            </if>
+            <if test="owner != null and owner!=''">AND OWNER like '%'||to_char(#{owner})||'%'
+            </if>
+            <if test="phone != null and phone!=''">AND PHONE like '%'||to_char(#{phone})||'%'
+            </if>
+            <if test="leftX != null and leftX!=''">AND LEFTX like '%'||to_char(#{leftX})||'%'
+            </if>
+            <if test="leftY != null and leftY!=''">AND LEFTY like '%'||to_char(#{leftY})||'%'
+            </if>
+            <if test="rightX != null and rightX!=''">AND RIGHTX like '%'||to_char(#{rightX})||'%'
+            </if>
+            <if test="rightY != null and rightY!=''">AND RIGHTY like '%'||to_char(#{rightY})||'%'
+            </if>
+            <if test="introduce != null and introduce!=''">AND INTRODUCE like '%'||to_char(#{introduce})||'%'
+            </if>
+            <if test="attachment != null and attachment!=''">AND ATTACHMENT like '%'||to_char(#{attachment})||'%'
+            </if>
+        </where>
+    </select>
+
+    <insert id="save" parameterType="com.khidi.manager.basicinfo.entity.ResourceWaterabilityEntity">
+		insert into RESOURCE_WATERABILITY
+		(
+			ID , 
+			CODE , 
+			TYPE , 
+			AREA_ID , 
+			MANAGER , 
+			NAME , 
+			AREA , 
+			OWNER , 
+			PHONE , 
+			LEFTX , 
+			LEFTY , 
+			RIGHTX , 
+			RIGHTY , 
+			INTRODUCE , 
+			ATTACHMENT
+		)
+		values
+		(
+			#{id,jdbcType=VARCHAR},
+			#{code,jdbcType=VARCHAR},
+			#{type,jdbcType=VARCHAR},
+			#{areaId,jdbcType=VARCHAR},
+			#{manager,jdbcType=VARCHAR},
+			#{name,jdbcType=VARCHAR},
+			#{area,jdbcType=VARCHAR},
+			#{owner,jdbcType=VARCHAR},
+			#{phone,jdbcType=VARCHAR},
+			#{leftX,jdbcType=VARCHAR},
+			#{leftY,jdbcType=VARCHAR},
+			#{rightX,jdbcType=VARCHAR},
+			#{rightY,jdbcType=VARCHAR},
+			#{introduce,jdbcType=VARCHAR},
+			#{attachment,jdbcType=VARCHAR}
+		)
+	</insert>
+
+    <update id="update" parameterType="com.khidi.manager.basicinfo.entity.ResourceWaterabilityEntity">
+        update RESOURCE_WATERABILITY
+        <set>
+            <if test="code != null">
+                CODE = #{code} ,
+            </if>
+            <if test="type != null">
+                TYPE = #{type} ,
+            </if>
+            <if test="areaId != null">
+                AREA_ID = #{areaId} ,
+            </if>
+            <if test="manager != null">
+                MANAGER = #{manager} ,
+            </if>
+            <if test="name != null">
+                NAME = #{name} ,
+            </if>
+            <if test="area != null">
+                AREA = #{area} ,
+            </if>
+            <if test="owner != null">
+                OWNER = #{owner} ,
+            </if>
+            <if test="phone != null">
+                PHONE = #{phone} ,
+            </if>
+            <if test="leftX != null">
+                LEFTX = #{leftX} ,
+            </if>
+            <if test="leftY != null">
+                LEFTY = #{leftY} ,
+            </if>
+            <if test="rightX != null">
+                RIGHTX = #{rightX} ,
+            </if>
+            <if test="rightY != null">
+                RIGHTY = #{rightY} ,
+            </if>
+            <if test="introduce != null">
+                INTRODUCE = #{introduce} ,
+            </if>
+            <if test="attachment != null">
+                ATTACHMENT = #{attachment}
+            </if>
+        </set>
+        where ID = #{id}
+    </update>
+
+    <delete id="delete">
+		delete from RESOURCE_WATERABILITY where ID = #{id}
+	</delete>
+</mapper>

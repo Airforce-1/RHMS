@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.event.dao.AppeventFbDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.event.entity.AppeventFbEntity" id="appeventFbMap">
+        <result property="id" column="ID"/>
+        <result property="eid" column="EID"/>
+        <result property="fbuserid" column="FBUSERID"/>
+        <result property="fbdeptid" column="FBDEPTID"/>
+        <result property="fbtime" column="FBTIME"/>
+        <result property="fbcontent" column="FBCONTENT"/>
+        <result property="eflowid" column="EFLOWID"/>
+        <result property="delind" column="DELIND"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.khidi.manager.event.entity.AppeventFbEntity">
+		select * from APPEVENT_FB where ID = #{id}
+	</select>
+
+
+    <select id="queryList" resultType="com.khidi.manager.event.entity.AppeventFbEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN
+                FROM (select * from APPEVENT_FB
+                <where>
+                                            <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                        </if>
+                                            <if test="eid != null and eid!=''">AND EID like '%'||to_char(#{eid})||'%'
+                        </if>
+                                            <if test="fbuserid != null and fbuserid!=''">AND FBUSERID like '%'||to_char(#{fbuserid})||'%'
+                        </if>
+                                            <if test="fbdeptid != null and fbdeptid!=''">AND FBDEPTID like '%'||to_char(#{fbdeptid})||'%'
+                        </if>
+                                            <if test="fbtime != null and fbtime!=''">AND FBTIME like '%'||to_char(#{fbtime})||'%'
+                        </if>
+                                            <if test="fbcontent != null and fbcontent!=''">AND FBCONTENT like '%'||to_char(#{fbcontent})||'%'
+                        </if>
+                                            <if test="eflowid != null and eflowid!=''">AND EFLOWID like '%'||to_char(#{eflowid})||'%'
+                        </if>
+                                            <if test="delind != null and delind!=''">AND DELIND like '%'||to_char(#{delind})||'%'
+                        </if>
+                                    </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by createtime desc
+                    </otherwise>
+                </choose>
+                )a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from APPEVENT_FB
+            </otherwise>
+        </choose>
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from APPEVENT_FB
+        <where>
+			                <if test="id != null and id!=''">AND  ID like '%'||to_char(#{id})||'%'
+                </if>
+			                <if test="eid != null and eid!=''">AND  EID like '%'||to_char(#{eid})||'%'
+                </if>
+			                <if test="fbuserid != null and fbuserid!=''">AND  FBUSERID like '%'||to_char(#{fbuserid})||'%'
+                </if>
+			                <if test="fbdeptid != null and fbdeptid!=''">AND  FBDEPTID like '%'||to_char(#{fbdeptid})||'%'
+                </if>
+			                <if test="fbtime != null and fbtime!=''">AND  FBTIME like '%'||to_char(#{fbtime})||'%'
+                </if>
+			                <if test="fbcontent != null and fbcontent!=''">AND  FBCONTENT like '%'||to_char(#{fbcontent})||'%'
+                </if>
+			                <if test="eflowid != null and eflowid!=''">AND  EFLOWID like '%'||to_char(#{eflowid})||'%'
+                </if>
+			                <if test="delind != null and delind!=''">AND  DELIND like '%'||to_char(#{delind})||'%'
+                </if>
+			        </where>
+	</select>
+	 
+	<insert id="save" parameterType="com.khidi.manager.event.entity.AppeventFbEntity">
+		insert into APPEVENT_FB
+		(
+			ID , 
+			EID , 
+			FBUSERID , 
+			FBDEPTID , 
+			FBTIME , 
+			FBCONTENT , 
+			EFLOWID , 
+			DELIND 
+		)
+		values
+		(
+			#{id,jdbcType = VARCHAR}, 
+			#{eid,jdbcType = VARCHAR}, 
+			#{fbuserid,jdbcType = VARCHAR}, 
+			#{fbdeptid,jdbcType = VARCHAR}, 
+			#{fbtime,jdbcType = VARCHAR}, 
+			#{fbcontent,jdbcType = VARCHAR}, 
+			#{eflowid,jdbcType = VARCHAR}, 
+			#{delind,jdbcType = VARCHAR}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.khidi.manager.event.entity.AppeventFbEntity">
+		update APPEVENT_FB 
+		<set>
+			<if test="eid != null">
+				EID = #{eid}  , </if>
+			<if test="fbuserid != null">
+				FBUSERID = #{fbuserid}  , </if>
+			<if test="fbdeptid != null">
+				FBDEPTID = #{fbdeptid}  , </if>
+			<if test="fbtime != null">
+				FBTIME = #{fbtime}  , </if>
+			<if test="fbcontent != null">
+				FBCONTENT = #{fbcontent}  , </if>
+			<if test="eflowid != null">
+				EFLOWID = #{eflowid}  , </if>
+			<if test="delind != null">
+				DELIND = #{delind}  </if>
+		</set>
+		where ID = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from APPEVENT_FB where ID = #{id}
+	</delete>
+</mapper>

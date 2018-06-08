@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.externaldata.dao.EcoCompensationDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.externaldata.entity.EcoCompensationEntity" id="ecoCompensationMap">
+        <result property="id" column="ID"/>
+        <result property="aimType" column="AIM_TYPE"/>
+        <result property="currentType" column="CURRENT_TYPE"/>
+        <result property="factor" column="FACTOR"/>
+        <result property="codOut" column="COD_OUT"/>
+        <result property="nhOut" column="NH_OUT"/>
+        <result property="pOut" column="P_OUT"/>
+        <result property="ecoCompensation" column="ECO_COMPENSATION"/>
+        <result property="cod" column="COD"/>
+        <result property="nh" column="NH"/>
+        <result property="p" column="P"/>
+        <result property="monitorTime" column="MONITOR_TIME"/>
+		<result property="areaName" column="AREA_NAME"/>
+		<result property="riverName" column="RIVER_NAME"/>
+		<result property="stationName" column="STATION_NAME"/>
+		<result property="stationId" column="STATION_ID"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.khidi.manager.externaldata.entity.EcoCompensationEntity">
+		select * from EXTERNAL_ECO_COMPENSATION where ID = #{id}
+	</select>
+
+
+    <select id="queryList" resultType="com.khidi.manager.externaldata.entity.EcoCompensationEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN
+                FROM (select * from EXTERNAL_ECO_COMPENSATION
+                <where>
+                                            <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                        </if>
+                                            <if test="aimType != null and aimType!=''">AND AIM_TYPE like '%'||to_char(#{aimType})||'%'
+                        </if>
+                                            <if test="currentType != null and currentType!=''">AND CURRENT_TYPE like '%'||to_char(#{currentType})||'%'
+                        </if>
+                                            <if test="factor != null and factor!=''">AND FACTOR like '%'||to_char(#{factor})||'%'
+                        </if>
+                                            <if test="codOut != null and codOut!=''">AND COD_OUT like '%'||to_char(#{codOut})||'%'
+                        </if>
+                                            <if test="nhOut != null and nhOut!=''">AND NH_OUT like '%'||to_char(#{nhOut})||'%'
+                        </if>
+                                            <if test="pOut != null and pOut!=''">AND P_OUT like '%'||to_char(#{pOut})||'%'
+                        </if>
+                                            <if test="ecoCompensation != null and ecoCompensation!=''">AND ECO_COMPENSATION like '%'||to_char(#{ecoCompensation})||'%'
+                        </if>
+                                            <if test="cod != null and cod!=''">AND COD like '%'||to_char(#{cod})||'%'
+                        </if>
+                                            <if test="nh != null and nh!=''">AND NH like '%'||to_char(#{nh})||'%'
+                        </if>
+                                            <if test="p != null and p!=''">AND P like '%'||to_char(#{p})||'%'
+                        </if>
+                                            <if test="monitorTime != null and monitorTime!=''">AND MONITOR_TIME like '%'||to_char(#{monitorTime})||'%'
+                        </if>
+                                    </where>
+                )a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from EXTERNAL_ECO_COMPENSATION
+            </otherwise>
+        </choose>
+    </select>
+
+
+	<select id="queryListByStationId" resultType="com.khidi.manager.externaldata.entity.EcoCompensationEntity">
+		SELECT a.*, rownum FROM external_eco_compensation a where a.station_id = #{stationId} and rownum &lt;3 order by a.create_time desc
+	</select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<select id="queryTotal" resultType="int">
+		select count(*) from EXTERNAL_ECO_COMPENSATION
+        <where>
+			                <if test="id != null and id!=''">AND  ID like '%'||to_char(#{id})||'%'
+                </if>
+			                <if test="aimType != null and aimType!=''">AND  AIM_TYPE like '%'||to_char(#{aimType})||'%'
+                </if>
+			                <if test="currentType != null and currentType!=''">AND  CURRENT_TYPE like '%'||to_char(#{currentType})||'%'
+                </if>
+			                <if test="factor != null and factor!=''">AND  FACTOR like '%'||to_char(#{factor})||'%'
+                </if>
+			                <if test="codOut != null and codOut!=''">AND  COD_OUT like '%'||to_char(#{codOut})||'%'
+                </if>
+			                <if test="nhOut != null and nhOut!=''">AND  NH_OUT like '%'||to_char(#{nhOut})||'%'
+                </if>
+			                <if test="pOut != null and pOut!=''">AND  P_OUT like '%'||to_char(#{pOut})||'%'
+                </if>
+			                <if test="ecoCompensation != null and ecoCompensation!=''">AND  ECO_COMPENSATION like '%'||to_char(#{ecoCompensation})||'%'
+                </if>
+			                <if test="cod != null and cod!=''">AND  COD like '%'||to_char(#{cod})||'%'
+                </if>
+			                <if test="nh != null and nh!=''">AND  NH like '%'||to_char(#{nh})||'%'
+                </if>
+			                <if test="p != null and p!=''">AND  P like '%'||to_char(#{p})||'%'
+                </if>
+			                <if test="monitorTime != null and monitorTime!=''">AND  MONITOR_TIME like '%'||to_char(#{monitorTime})||'%'
+                </if>
+			        </where>
+	</select>
+	 
+	<insert id="save" parameterType="com.khidi.manager.externaldata.entity.EcoCompensationEntity">
+		insert into EXTERNAL_ECO_COMPENSATION
+		(
+			ID ,
+			STATION_ID,
+			AIM_TYPE , 
+			CURRENT_TYPE , 
+			FACTOR , 
+			COD_OUT , 
+			NH_OUT , 
+			P_OUT , 
+			ECO_COMPENSATION , 
+			COD , 
+			NH , 
+			P , 
+			MONITOR_TIME,
+			AREA_NAME,
+			STATION_NAME,
+			RIVER_NAME
+		)
+		values
+		(
+			#{id,jdbcType = VARCHAR},
+			#{stationId,jdbcType = VARCHAR},
+			#{aimType,jdbcType = VARCHAR}, 
+			#{currentType,jdbcType = VARCHAR}, 
+			#{factor,jdbcType = VARCHAR}, 
+			#{codOut,jdbcType = VARCHAR}, 
+			#{nhOut,jdbcType = VARCHAR}, 
+			#{pOut,jdbcType = VARCHAR}, 
+			#{ecoCompensation,jdbcType = VARCHAR}, 
+			#{cod,jdbcType = VARCHAR}, 
+			#{nh,jdbcType = VARCHAR}, 
+			#{p,jdbcType = VARCHAR}, 
+			#{monitorTime,jdbcType = VARCHAR},
+			#{areaName,jdbcType = VARCHAR},
+			#{stationName,jdbcType = VARCHAR},
+			#{riverName,jdbcType = VARCHAR}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.khidi.manager.externaldata.entity.EcoCompensationEntity">
+		update EXTERNAL_ECO_COMPENSATION
+		<set>
+			<if test="aimType != null">
+				AIM_TYPE = #{aimType}  , </if>
+			<if test="currentType != null">
+				CURRENT_TYPE = #{currentType}  , </if>
+			<if test="factor != null">
+				FACTOR = #{factor}  , </if>
+			<if test="codOut != null">
+				COD_OUT = #{codOut}  , </if>
+			<if test="nhOut != null">
+				NH_OUT = #{nhOut}  , </if>
+			<if test="pOut != null">
+				P_OUT = #{pOut}  , </if>
+			<if test="ecoCompensation != null">
+				ECO_COMPENSATION = #{ecoCompensation}  , </if>
+			<if test="cod != null">
+				COD = #{cod}  , </if>
+			<if test="nh != null">
+				NH = #{nh}  , </if>
+			<if test="p != null">
+				P = #{p}  , </if>
+			<if test="monitorTime != null">
+				MONITOR_TIME = #{monitorTime}  </if>
+		</set>
+		where ID = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from EXTERNAL_ECO_COMPENSATION where ID = #{id}
+	</delete>
+</mapper>

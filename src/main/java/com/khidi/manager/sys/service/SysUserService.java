@@ -1,0 +1,86 @@
+package com.khidi.manager.sys.service;
+
+import com.khidi.manager.sys.entity.SysUserEntity;
+
+import java.util.List;
+import java.util.Map;
+
+
+/**
+ * 系统用户
+ * 
+ * @author chenshun
+ * @email sunlightcs@gmail.com
+ * @date 2016年9月18日 上午9:43:39
+ */
+public interface SysUserService {
+
+	/**
+	 * 查询用户的所有权限
+	 * @param userId  用户ID
+	 */
+	List<String> queryAllPerms(String userId);
+	
+	/**
+	 * 查询用户的所有菜单ID
+	 */
+	List<String> queryAllMenuId(String userId);
+
+	/**
+	 * 根据用户名，查询系统用户
+	 */
+	SysUserEntity queryByUserName(String username);
+	
+	/**
+	 * 根据用户ID，查询用户
+	 * @param userId
+	 * @return
+	 */
+	SysUserEntity queryObject(String userId);
+	
+	/**
+	 * 查询用户列表
+	 */
+	List<SysUserEntity> queryList(Map<String, Object> map);
+	
+	/**
+	 * 查询总数
+	 */
+	int queryTotal(Map<String, Object> map);
+	
+	/**
+	 * 保存用户
+	 */
+	void save(SysUserEntity user);
+	
+	/**
+	 * 修改用户
+	 */
+	void update(SysUserEntity user);
+	
+	/**
+	 * 删除用户
+	 */
+	void delete(String userIds);
+	
+	/**
+	 * 修改密码
+	 * @param userId       用户ID
+	 * @param password     原密码
+	 * @param newPassword  新密码
+	 */
+	int updatePassword(String userId, String password, String newPassword);
+
+
+
+	List<SysUserEntity> getUserListByDeptId(String DeptId);
+
+	/**
+	 * 根据角色返回关联用户和不关联用户list
+	 * @param map
+	 * @return
+	 */
+
+	List<SysUserEntity> queryUserList4RoleRelate(Map<String, Object> map);
+	int queryTotal4RoleRelate(Map<String, Object> map);
+}

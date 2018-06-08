@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.maintask.dao.StTargetDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.maintask.entity.StTargetEntity" id="stTargetMap">
+        <result property="id" column="ID"/>
+        <result property="targetcode" column="TARGETCODE"/>
+        <result property="targetname" column="TARGETNAME"/>
+        <result property="indicators" column="INDICATORS"/>
+        <result property="laketype" column="LAKETYPE"/>
+        <result property="lakeid" column="LAKEID"/>
+        <result property="lakebelongto" column="LAKEBELONGTO"/>
+        <result property="areacode" column="AREACODE"/>
+        <result property="stime" column="STIME"/>
+        <result property="targetperiod" column="TARGETPERIOD"/>
+        <result property="qtdept" column="QTDEPT"/>
+        <result property="xddept" column="XDDEPT"/>
+        <result property="targettype" column="TARGETTYPE"/>
+        <result property="targetsource" column="TARGETSOURCE"/>
+        <result property="zbtype" column="ZBTYPE"/>
+        <result property="nowindicators" column="NOWINDICATORS"/>
+        <result property="expectedindicators" column="EXPECTEDINDICATORS"/>
+        <result property="detailaddress" column="DETAILADDRESS"/>
+        <result property="memo" column="MEMO"/>
+        <result property="targetglobaltype" column="TARGETGLOBALTYPE"/>
+        <result property="progress" column="PROGRESS"/>
+    </resultMap>
+
+    <select id="queryObject" resultType="com.khidi.manager.maintask.entity.StTargetEntity">
+		select * from ST_TARGET where ID  = #{id}
+	</select>
+
+    <select id="queryTargetdetailByTargetId" resultType="com.khidi.manager.maintask.entity.StTargetdetailEntity">
+        select * from ST_TARGETDETAIL where TARGETID = #{id}
+    </select>
+
+    <select id="queryList" resultType="com.khidi.manager.maintask.entity.StTargetEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (SELECT a.*, ROWNUM RN ,
+                (Select b.name FROM SYS_AREA b WHERE b.AREA_ID = a.AREACODE)areaName,
+                (Select c.name FROM SYS_DEPT c WHERE c.DEPT_ID = a.XDDEPT)xddeptName,
+                (Select c.name FROM SYS_DEPT c WHERE c.DEPT_ID = a.QTDEPT)qtdeptName,
+                (Select d.DICTNAME FROM SYS_DICT d WHERE d.DICTVALUE = a.LAKETYPE AND d.DICTTYPE = '河湖类型')lakeTypeName,
+                (Select d.DICTNAME FROM SYS_DICT d WHERE d.DICTVALUE = a.Targettype AND d.DICTTYPE = '目标类型')targettypeName,
+                (Select d.DICTNAME FROM SYS_DICT d WHERE d.DICTVALUE = a.Targettype AND d.DICTTYPE = '任务来源')targetsourceName,
+                (Select d.DICTNAME FROM SYS_DICT d WHERE d.DICTVALUE = a.Zbtype AND d.DICTTYPE = '指标类型')zbtypeName,
+                (CASE   a.LAKETYPE
+                WHEN '1' THEN (SELECT NAME FROM river  WHERE river.id = a.lakeID)
+                WHEN '2' THEN (SELECT NAME FROM part_river WHERE part_river.id = a.lakeID)
+                WHEN '3' THEN (SELECT NAME FROM canal  WHERE canal.id = a.lakeID)
+                WHEN '4' THEN (SELECT NAME FROM part_canal WHERE part_canal.id = a.lakeID)
+                WHEN '5' THEN (SELECT NAME FROM lake WHERE lake.id = a.lakeID)
+                WHEN '6' THEN (SELECT NAME FROM part_lake WHERE part_lake.id =a.lakeID)
+                WHEN '7' THEN (SELECT NAME FROM reservoir WHERE reservoir.id = a.lakeID)
+                ELSE (SELECT NAME FROM part_reservoir WHERE part_reservoir.id = a.lakeID) END ) AS lakeName
+                FROM (select * from ST_TARGET
+                <where>
+                    (qtdept = #{curdept} or xddept = #{curdept})
+                    <if test="lakeName != null and lakeName!=''">
+                        and lakeId IN(
+                        select id from river where name like  '%' ||TO_CHAR(#{lakeName}) ||'%'  union
+                        select id from part_river where name like   '%' ||TO_CHAR(#{lakeName}) ||'%' union
+                        select id from lake where name like  '%' ||TO_CHAR(#{lakeName}) ||'%' union
+                        select id from part_lake where name like '%' ||TO_CHAR(#{lakeName}) ||'%' union
+                        select id from reservoir where name like   '%' ||TO_CHAR(#{lakeName}) ||'%' union
+                        select id from part_reservoir where name like   '%' ||TO_CHAR(#{lakeName}) ||'%' union
+                        select id from canal where name like   '%' ||TO_CHAR(#{lakeName}) ||'%' union
+                        select id from part_canal where name like  '%' ||TO_CHAR(#{lakeName}) ||'%')
+                    </if>
+                    <if test="progress != null and progress!=''">AND PROGRESS like '%'||to_char(#{progress})||'%'
+                    </if>
+                    <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                    </if>
+                    <if test="targetcode != null and targetcode!=''">AND TARGETCODE like
+                        '%'||to_char(#{targetcode})||'%'
+                    </if>
+                    <if test="targetname != null and targetname!=''">AND TARGETNAME like
+                        '%'||to_char(#{targetname})||'%'
+                    </if>
+                    <if test="indicators != null and indicators!=''">AND INDICATORS like
+                        '%'||to_char(#{indicators})||'%'
+                    </if>
+                    <if test="laketype != null and laketype!=''">AND LAKETYPE like '%'||to_char(#{laketype})||'%'
+                    </if>
+                    <if test="lakeid != null and lakeid!=''">AND LAKEID like '%'||to_char(#{lakeid})||'%'
+                    </if>
+                    <if test="lakebelongto != null and lakebelongto!=''">AND LAKEBELONGTO like
+                        '%'||to_char(#{lakebelongto})||'%'
+                    </if>
+                    <if test="areacode != null and areacode!=''">AND AREACODE like '%'||to_char(#{areacode})||'%'
+                    </if>
+                    <if test="stime != null and stime!=''">AND STIME like '%'||to_char(#{stime})||'%'
+                    </if>
+                    <if test="targetperiod != null and targetperiod!=''">AND TARGETPERIOD like
+                        '%'||to_char(#{targetperiod})||'%'
+                    </if>
+                    <if test="qtdept != null and qtdept!=''">AND QTDEPT like '%'||to_char(#{qtdept})||'%'
+                    </if>
+                    <if test="xddept != null and xddept!=''">AND XDDEPT like '%'||to_char(#{xddept})||'%'
+                    </if>
+                    <if test="targettype != null and targettype!=''">AND TARGETTYPE like
+                        '%'||to_char(#{targettype})||'%'
+                    </if>
+                    <if test="targetsource != null and targetsource!=''">AND TARGETSOURCE like
+                        '%'||to_char(#{targetsource})||'%'
+                    </if>
+                    <if test="zbtype != null and zbtype!=''">AND ZBTYPE like '%'||to_char(#{zbtype})||'%'
+                    </if>
+                    <if test="nowindicators != null and nowindicators!=''">AND NOWINDICATORS like
+                        '%'||to_char(#{nowindicators})||'%'
+                    </if>
+                    <if test="expectedindicators != null and expectedindicators!=''">AND EXPECTEDINDICATORS like
+                        '%'||to_char(#{expectedindicators})||'%'
+                    </if>
+                    <if test="detailaddress != null and detailaddress!=''">AND DETAILADDRESS like
+                        '%'||to_char(#{detailaddress})||'%'
+                    </if>
+                    <if test="memo != null and memo!=''">AND MEMO like '%'||to_char(#{memo})||'%'
+                    </if>
+                    <if test="targetglobaltype != null and targetglobaltype!=''">AND TARGETGLOBALTYPE like
+                        '%'||to_char(#{targetglobaltype})||'%'
+                    </if>
+                </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by createtime desc
+                    </otherwise>
+                </choose>
+                )a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from ST_TARGET
+            </otherwise>
+        </choose>
+    </select>
+
+
+
+
+    <select id="queryTotal" resultType="int">
+        select count(*) from ST_TARGET
+        <where>
+            <if test="progress != null and progress!=''">AND PROGRESS like '%'||to_char(#{progress})||'%'
+            </if>
+            <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+            </if>
+            <if test="targetcode != null and targetcode!=''">AND TARGETCODE like '%'||to_char(#{targetcode})||'%'
+            </if>
+            <if test="targetname != null and targetname!=''">AND TARGETNAME like '%'||to_char(#{targetname})||'%'
+            </if>
+            <if test="indicators != null and indicators!=''">AND INDICATORS like '%'||to_char(#{indicators})||'%'
+            </if>
+            <if test="laketype != null and laketype!=''">AND LAKETYPE like '%'||to_char(#{laketype})||'%'
+            </if>
+            <if test="lakeid != null and lakeid!=''">AND LAKEID like '%'||to_char(#{lakeid})||'%'
+            </if>
+            <if test="lakebelongto != null and lakebelongto!=''">AND LAKEBELONGTO like
+                '%'||to_char(#{lakebelongto})||'%'
+            </if>
+            <if test="areacode != null and areacode!=''">AND AREACODE like '%'||to_char(#{areacode})||'%'
+            </if>
+            <if test="stime != null and stime!=''">AND STIME like '%'||to_char(#{stime})||'%'
+            </if>
+            <if test="targetperiod != null and targetperiod!=''">AND TARGETPERIOD like
+                '%'||to_char(#{targetperiod})||'%'
+            </if>
+            <if test="qtdept != null and qtdept!=''">AND QTDEPT like '%'||to_char(#{qtdept})||'%'
+            </if>
+            <if test="xddept != null and xddept!=''">AND XDDEPT like '%'||to_char(#{xddept})||'%'
+            </if>
+            <if test="targettype != null and targettype!=''">AND TARGETTYPE like '%'||to_char(#{targettype})||'%'
+            </if>
+            <if test="targetsource != null and targetsource!=''">AND TARGETSOURCE like
+                '%'||to_char(#{targetsource})||'%'
+            </if>
+            <if test="zbtype != null and zbtype!=''">AND ZBTYPE like '%'||to_char(#{zbtype})||'%'
+            </if>
+            <if test="nowindicators != null and nowindicators!=''">AND NOWINDICATORS like
+                '%'||to_char(#{nowindicators})||'%'
+            </if>
+            <if test="expectedindicators != null and expectedindicators!=''">AND EXPECTEDINDICATORS like
+                '%'||to_char(#{expectedindicators})||'%'
+            </if>
+            <if test="detailaddress != null and detailaddress!=''">AND DETAILADDRESS like
+                '%'||to_char(#{detailaddress})||'%'
+            </if>
+            <if test="memo != null and memo!=''">AND MEMO like '%'||to_char(#{memo})||'%'
+            </if>
+            <if test="targetglobaltype != null and targetglobaltype!=''">AND TARGETGLOBALTYPE like
+                '%'||to_char(#{targetglobaltype})||'%'
+            </if>
+        </where>
+    </select>
+
+    <insert id="save" parameterType="com.khidi.manager.maintask.entity.StTargetEntity">
+		insert into ST_TARGET
+		(
+		    PROGRESS ,
+			ID , 
+			TARGETCODE , 
+			TARGETNAME , 
+			INDICATORS , 
+			LAKETYPE , 
+			LAKEID , 
+			LAKEBELONGTO , 
+			AREACODE , 
+			STIME , 
+			TARGETPERIOD , 
+			QTDEPT , 
+			XDDEPT , 
+			TARGETTYPE , 
+			TARGETSOURCE , 
+			ZBTYPE , 
+			NOWINDICATORS , 
+			EXPECTEDINDICATORS , 
+			DETAILADDRESS , 
+			MEMO , 
+			TARGETGLOBALTYPE
+		)
+		values
+		(
+		    #{progress,jdbcType = VARCHAR},
+			#{id,jdbcType = VARCHAR}, 
+			#{targetcode,jdbcType = VARCHAR}, 
+			#{targetname,jdbcType = VARCHAR}, 
+			#{indicators,jdbcType = VARCHAR}, 
+			#{laketype,jdbcType = VARCHAR}, 
+			#{lakeid,jdbcType = VARCHAR}, 
+			#{lakebelongto,jdbcType = VARCHAR}, 
+			#{areacode,jdbcType = VARCHAR},
+			to_date(substr(#{stime,jdbcType = DATE},1,10),'yyyy-MM-dd'),
+			#{targetperiod,jdbcType = VARCHAR}, 
+			#{qtdept,jdbcType = VARCHAR}, 
+			#{xddept,jdbcType = VARCHAR}, 
+			#{targettype,jdbcType = VARCHAR}, 
+			#{targetsource,jdbcType = VARCHAR}, 
+			#{zbtype,jdbcType = VARCHAR}, 
+			#{nowindicators,jdbcType = VARCHAR}, 
+			#{expectedindicators,jdbcType = VARCHAR}, 
+			#{detailaddress,jdbcType = VARCHAR}, 
+			#{memo,jdbcType = VARCHAR}, 
+			#{targetglobaltype,jdbcType = VARCHAR}
+		)
+	</insert>
+
+    <update id="update" parameterType="com.khidi.manager.maintask.entity.StTargetEntity">
+        update ST_TARGET
+        <set>
+            <if test="progress != null">
+                PROGRESS = #{progress} ,
+            </if>
+            <if test="targetcode != null">
+                TARGETCODE = #{targetcode} ,
+            </if>
+            <if test="targetname != null">
+                TARGETNAME = #{targetname} ,
+            </if>
+            <if test="indicators != null">
+                INDICATORS = #{indicators} ,
+            </if>
+            <if test="laketype != null">
+                LAKETYPE = #{laketype} ,
+            </if>
+            <if test="lakeid != null">
+                LAKEID = #{lakeid} ,
+            </if>
+            <if test="lakebelongto != null">
+                LAKEBELONGTO = #{lakebelongto} ,
+            </if>
+            <if test="areacode != null">
+                AREACODE = #{areacode} ,
+            </if>
+            <if test="stime != null">
+                STIME = to_date(substr(#{stime,jdbcType = DATE},1,10),'yyyy-MM-dd') ,
+            </if>
+            <if test="targetperiod != null">
+                TARGETPERIOD = #{targetperiod} ,
+            </if>
+            <if test="qtdept != null">
+                QTDEPT = #{qtdept} ,
+            </if>
+            <if test="xddept != null">
+                XDDEPT = #{xddept} ,
+            </if>
+            <if test="targettype != null">
+                TARGETTYPE = #{targettype} ,
+            </if>
+            <if test="targetsource != null">
+                TARGETSOURCE = #{targetsource} ,
+            </if>
+            <if test="zbtype != null">
+                ZBTYPE = #{zbtype} ,
+            </if>
+            <if test="nowindicators != null">
+                NOWINDICATORS = #{nowindicators} ,
+            </if>
+            <if test="expectedindicators != null">
+                EXPECTEDINDICATORS = #{expectedindicators} ,
+            </if>
+            <if test="detailaddress != null">
+                DETAILADDRESS = #{detailaddress} ,
+            </if>
+            <if test="memo != null">
+                MEMO = #{memo} ,
+            </if>
+            <if test="targetglobaltype != null">
+                TARGETGLOBALTYPE = #{targetglobaltype} ,
+            </if>
+        </set>
+        where ID = #{id}
+    </update>
+
+    <delete id="delete">
+		delete from ST_TARGET where ID = #{id}
+	</delete>
+</mapper>

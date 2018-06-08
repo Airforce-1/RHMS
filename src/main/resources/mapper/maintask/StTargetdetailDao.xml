@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.maintask.dao.StTargetdetailDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.maintask.entity.StTargetdetailEntity" id="stTargetdetailMap">
+        <result property="id" column="ID"/>
+        <result property="targetid" column="TARGETID"/>
+        <result property="indicators" column="INDICATORS"/>
+        <result property="nowindicators" column="NOWINDICATORS"/>
+        <result property="expectedindicators" column="EXPECTEDINDICATORS"/>
+        <result property="phaseone" column="PHASEONE"/>
+        <result property="phasetwo" column="PHASETWO"/>
+        <result property="phasethree" column="PHASETHREE"/>
+        <result property="phasefour" column="PHASEFOUR"/>
+        <result property="phasefive" column="PHASEFIVE"/>
+        <result property="respdept" column="RESPDEPT"/>
+        <result property="respuser" column="RESPUSER"/>
+        <result property="tel" column="TEL"/>
+        <result property="memo" column="MEMO"/>
+        <result property="progress" column="PROGRESS"/>
+        <result property="targetglobaltype" column="TARGETGLOBALTYPE"/>
+        <result property="attachid" column="ATTACHID"/>
+        <result property="acceptdeptid" column="ACCEPTDEPTID"/>
+        <result property="acceptflag" column="ACCEPTFLAG"/>
+        <result property="acceptuserid" column="ACCEPTUSERID"/>
+        <result property="accepttime" column="ACCEPTTIME"/>
+        <result property="todeptid" column="TODEPTID"/>
+        <result property="transmituserid" column="TRANSMITUSERID"/>
+        <result property="transmittime" column="TRANSMITTIME"/>
+        <result property="transmitDeptid" column="TRANSMIT_DEPTID"/>
+    </resultMap>
+
+
+
+    <select id="queryPower" resultType="int">
+        select count(*) from ST_TARGETDETAIL_TRANSMIT where TARGETDETAILID = #{targetdetailid} AND
+        todeptid  = (select dept_id from sys_user where user_id = #{userid})
+    </select>
+
+    <select id="queryNewToDept" resultType="String">
+        select todeptid from(
+        select * from (select * from ST_TARGETDETAIL_TRANSMIT t where  TARGETDETAILID =  #{targetdetailid})a order by a.zftime desc
+        ) a  where rownum &lt;= 1 order by rownum desc
+    </select>
+
+    <select id="queryObject" resultType="com.khidi.manager.maintask.entity.StTargetdetailEntity">
+		select a.*,
+		  (select e.TARGETNAME FROM ST_TARGET e where e.ID = a.TARGETID) as targetname,
+                (Select b.name FROM SYS_DEPT b WHERE b.DEPT_ID = (select e.QTDEPT FROM ST_TARGET e where e.ID = a.TARGETID)) as qtDept,
+                (Select b.name FROM SYS_DEPT b WHERE b.DEPT_ID = (select e.XDDEPT FROM ST_TARGET e where e.ID = a.TARGETID)) as xdDept,
+                (select e.STIME FROM ST_TARGET e where e.ID = a.TARGETID) as sTime,
+                (select e.TARGETPERIOD FROM ST_TARGET e where e.ID = a.TARGETID) as targetperiod,
+                (select e.TARGETSOURCE FROM ST_TARGET e where e.ID = a.TARGETID) as targetSource,
+                (select e.TARGETTYPE FROM ST_TARGET e where e.ID = a.TARGETID) as targetType,
+                (select e.ZBTYPE FROM ST_TARGET e where e.ID = a.TARGETID) as zbtype,
+                (select e.LAKETYPE FROM ST_TARGET e where e.ID = a.TARGETID) as  lakeType,
+                (Select d.DICTNAME FROM SYS_DICT d WHERE d.DICTTYPE = '河湖类型' AND d.DICTVALUE = (
+                select e.LAKETYPE FROM ST_TARGET e where e.ID = a.TARGETID)) as lakeTypeName,
+                (select e.LAKEID FROM ST_TARGET e where e.ID = a.TARGETID) as lakeId,
+                (Select b.name FROM SYS_DEPT b WHERE b.DEPT_ID = a.acceptdeptid)acceptdeptName,
+                (Select b.name FROM SYS_DEPT b WHERE b.DEPT_ID = a.respdept)respdeptName,
+                (Select c.name FROM SYS_USER c WHERE c.USER_ID = a.respuser)respuserName
+		from ST_TARGETDETAIL a where ID = #{id}
+	</select>
+
+
+    <select id="queryTargetdetailTransmitByTargetedtailId" resultType="com.khidi.manager.maintask.entity.StTargetdetailTransmitEntity">
+        select * from ST_TARGETDETAIL_TRANSMIT where TARGETDETAILID = #{id}
+    </select>
+
+    <select id="queryList" resultType="com.khidi.manager.maintask.entity.StTargetdetailEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN,
+                (select e.TARGETNAME FROM ST_TARGET e where e.ID = a.TARGETID) as targetname,
+                (Select b.name FROM SYS_DEPT b WHERE b.DEPT_ID = (select e.QTDEPT FROM ST_TARGET e where e.ID = a.TARGETID)) as qtDept,
+                (Select b.name FROM SYS_DEPT b WHERE b.DEPT_ID = (select e.XDDEPT FROM ST_TARGET e where e.ID = a.TARGETID)) as xdDept,
+                (select e.STIME FROM ST_TARGET e where e.ID = a.TARGETID) as sTime,
+                (select e.TARGETPERIOD FROM ST_TARGET e where e.ID = a.TARGETID) as targetperiod,
+                (select e.ZBTYPE FROM ST_TARGET e where e.ID = a.TARGETID) as zbtype,
+                (select e.TARGETSOURCE FROM ST_TARGET e where e.ID = a.TARGETID) as targetSource,
+                (select e.TARGETTYPE FROM ST_TARGET e where e.ID = a.TARGETID) as  targetType,
+                (Select d.DICTNAME FROM SYS_DICT d WHERE d.DICTTYPE = '河湖类型' AND d.DICTVALUE = (
+                select e.LAKETYPE FROM ST_TARGET e where e.ID = a.TARGETID)) as lakeTypeName,
+                (Select b.name FROM SYS_DEPT b WHERE b.DEPT_ID = a.respdept)respdeptName,
+                (Select b.name FROM SYS_DEPT b WHERE b.DEPT_ID = a.acceptdeptid)acceptdeptName,
+                (Select c.name FROM SYS_USER c WHERE c.USER_ID = a.respuser)respuserName,
+                (CASE   a.lakeType
+                WHEN '1' THEN (SELECT NAME FROM river  WHERE river.id = a.lakeID)
+                WHEN '2' THEN (SELECT NAME FROM part_river WHERE part_river.id = a.lakeID)
+                WHEN '3' THEN (SELECT NAME FROM canal  WHERE canal.id = a.lakeID)
+                WHEN '4' THEN (SELECT NAME FROM part_canal WHERE part_canal.id = a.lakeID)
+                WHEN '5' THEN (SELECT NAME FROM lake WHERE lake.id = a.lakeID)
+                WHEN '6' THEN (SELECT NAME FROM part_lake WHERE part_lake.id =a.lakeID)
+                WHEN '7' THEN (SELECT NAME FROM reservoir WHERE reservoir.id = a.lakeID)
+                ELSE (SELECT NAME FROM part_reservoir WHERE part_reservoir.id = a.lakeID) END ) AS lakeName
+                FROM (select s.*,t.lakeType as lakeType,t.lakeId as lakeId from ST_TARGETDETAIL s ,ST_TARGET t
+                <where>
+                    (s.RESPDEPT = #{curdept} OR s.acceptdeptid = #{curdept} OR s.TODEPTID =#{curdept} OR  s.TRANSMIT_DEPTID = #{curdept}  OR t.QTDEPT = #{curdept}
+                    OR t.XDDEPT =#{curdept})
+                    AND s.TARGETID = t.id
+                    <if test="lakeName != null and lakeName!=''">
+                    and t.lakeId IN(
+                    select id from river where name like  '%' ||TO_CHAR(#{lakeName}) ||'%'  union
+                    select id from part_river where name like   '%' ||TO_CHAR(#{lakeName}) ||'%' union
+                    select id from lake where name like  '%' ||TO_CHAR(#{lakeName}) ||'%' union
+                    select id from part_lake where name like '%' ||TO_CHAR(#{lakeName}) ||'%' union
+                    select id from reservoir where name like   '%' ||TO_CHAR(#{lakeName}) ||'%' union
+                    select id from part_reservoir where name like   '%' ||TO_CHAR(#{lakeName}) ||'%' union
+                    select id from canal where name like   '%' ||TO_CHAR(#{lakeName}) ||'%' union
+                    select id from part_canal where name like  '%' ||TO_CHAR(#{lakeName}) ||'%')
+                    </if>
+                    <if test="targetName != null and targetName!=''">
+                        AND t.targetName like '%'||to_char(#{targetName})||'%'
+                    </if>
+                    <if test="lakeType != null and lakeType!=''">
+                        AND t.lakeType like '%'||to_char(#{lakeType})||'%'
+                    </if>
+                    <if test="targettype != null and targettype!=''">
+                        AND t.targettype like '%'||to_char(#{targettype})||'%'
+                    </if>
+                    <if test="id != null and id!=''">AND s.ID like '%'||to_char(#{id})||'%'
+                    </if>
+                    <if test="targetid != null and targetid!=''">AND s.TARGETID like '%'||to_char(#{targetid})||'%'
+                    </if>
+                    <if test="indicators != null and indicators!=''">AND s.INDICATORS like
+                        '%'||to_char(#{indicators})||'%'
+                    </if>
+                    <if test="nowindicators != null and nowindicators!=''">AND s.NOWINDICATORS like
+                        '%'||to_char(#{nowindicators})||'%'
+                    </if>
+                    <if test="expectedindicators != null and expectedindicators!=''">AND s.EXPECTEDINDICATORS like
+                        '%'||to_char(#{expectedindicators})||'%'
+                    </if>
+                    <if test="phaseone != null and phaseone!=''">AND s.PHASEONE like '%'||to_char(#{phaseone})||'%'
+                    </if>
+                    <if test="phasetwo != null and phasetwo!=''">AND s.PHASETWO like '%'||to_char(#{phasetwo})||'%'
+                    </if>
+                    <if test="phasethree != null and phasethree!=''">AND s.PHASETHREE like
+                        '%'||to_char(#{phasethree})||'%'
+                    </if>
+                    <if test="phasefour != null and phasefour!=''">AND s.PHASEFOUR like '%'||to_char(#{phasefour})||'%'
+                    </if>
+                    <if test="phasefive != null and phasefive!=''">AND s.PHASEFIVE like '%'||to_char(#{phasefive})||'%'
+                    </if>
+                    <if test="respdept != null and respdept!=''">AND s.RESPDEPT like '%'||to_char(#{respdept})||'%'
+                    </if>
+                    <if test="respuser != null and respuser!=''">AND s.RESPUSER like '%'||to_char(#{respuser})||'%'
+                    </if>
+                    <if test="tel != null and tel!=''">AND s.TEL like '%'||to_char(#{tel})||'%'
+                    </if>
+                    <if test="memo != null and memo!=''">AND s.MEMO like '%'||to_char(#{memo})||'%'
+                    </if>
+                    <if test="progress != null and progress!=''">AND s.PROGRESS like '%'||to_char(#{progress})||'%'
+                    </if>
+                    <if test="targetglobaltype != null and targetglobaltype!=''">AND s.TARGETGLOBALTYPE like
+                        '%'||to_char(#{targetglobaltype})||'%'
+                    </if>
+                    <if test="attachid != null and attachid!=''">AND s.ATTACHID like '%'||to_char(#{attachid})||'%'
+                    </if>
+                    <if test="acceptdeptid != null and acceptdeptid!=''">AND s.ACCEPTDEPTID like
+                        '%'||to_char(#{acceptdeptid})||'%'
+                    </if>
+                    <if test="acceptflag != null and acceptflag!=''">AND s.ACCEPTFLAG like
+                        '%'||to_char(#{acceptflag})||'%'
+                    </if>
+                    <if test="acceptuserid != null and acceptuserid!=''">AND s.ACCEPTUSERID like
+                        '%'||to_char(#{acceptuserid})||'%'
+                    </if>
+                    <if test="accepttime != null and accepttime!=''">AND s.ACCEPTTIME like
+                        '%'||to_char(#{accepttime})||'%'
+                    </if>
+                    <if test="todeptid != null and todeptid!=''">AND s.TODEPTID like '%'||to_char(#{todeptid})||'%'
+                    </if>
+                    <if test="transmituserid != null and transmituserid!=''">AND s.TRANSMITUSERID like
+                        '%'||to_char(#{transmituserid})||'%'
+                    </if>
+                    <if test="transmittime != null and transmittime!=''">AND s.TRANSMITTIME like
+                        '%'||to_char(#{transmittime})||'%'
+                    </if>
+                    <if test="transmitDeptid != null and transmitDeptid!=''">AND s.TRANSMIT_DEPTID like
+                        '%'||to_char(#{transmitDeptid})||'%'
+                    </if>
+                </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by s.createtime desc
+                    </otherwise>
+                </choose>
+                )a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from ST_TARGETDETAIL
+            </otherwise>
+        </choose>
+    </select>
+
+
+    <select id="queryTotal" resultType="int">
+        select count(*) from ST_TARGETDETAIL
+        <where>
+            <if test="transmitDeptid != null and transmitDeptid!=''">AND TRANSMIT_DEPTID like '%'||to_char(#{transmitDeptid})||'%'
+            </if>
+            <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+            </if>
+            <if test="targetid != null and targetid!=''">AND TARGETID like '%'||to_char(#{targetid})||'%'
+            </if>
+            <if test="indicators != null and indicators!=''">AND INDICATORS like '%'||to_char(#{indicators})||'%'
+            </if>
+            <if test="nowindicators != null and nowindicators!=''">AND NOWINDICATORS like
+                '%'||to_char(#{nowindicators})||'%'
+            </if>
+            <if test="expectedindicators != null and expectedindicators!=''">AND EXPECTEDINDICATORS like
+                '%'||to_char(#{expectedindicators})||'%'
+            </if>
+            <if test="phaseone != null and phaseone!=''">AND PHASEONE like '%'||to_char(#{phaseone})||'%'
+            </if>
+            <if test="phasetwo != null and phasetwo!=''">AND PHASETWO like '%'||to_char(#{phasetwo})||'%'
+            </if>
+            <if test="phasethree != null and phasethree!=''">AND PHASETHREE like '%'||to_char(#{phasethree})||'%'
+            </if>
+            <if test="phasefour != null and phasefour!=''">AND PHASEFOUR like '%'||to_char(#{phasefour})||'%'
+            </if>
+            <if test="phasefive != null and phasefive!=''">AND PHASEFIVE like '%'||to_char(#{phasefive})||'%'
+            </if>
+            <if test="respdept != null and respdept!=''">AND RESPDEPT like '%'||to_char(#{respdept})||'%'
+            </if>
+            <if test="respuser != null and respuser!=''">AND RESPUSER like '%'||to_char(#{respuser})||'%'
+            </if>
+            <if test="tel != null and tel!=''">AND TEL like '%'||to_char(#{tel})||'%'
+            </if>
+            <if test="memo != null and memo!=''">AND MEMO like '%'||to_char(#{memo})||'%'
+            </if>
+            <if test="progress != null and progress!=''">AND PROGRESS like '%'||to_char(#{progress})||'%'
+            </if>
+            <if test="targetglobaltype != null and targetglobaltype!=''">AND TARGETGLOBALTYPE like
+                '%'||to_char(#{targetglobaltype})||'%'
+            </if>
+            <if test="attachid != null and attachid!=''">AND ATTACHID like '%'||to_char(#{attachid})||'%'
+            </if>
+            <if test="acceptdeptid != null and acceptdeptid!=''">AND ACCEPTDEPTID like
+                '%'||to_char(#{acceptdeptid})||'%'
+            </if>
+            <if test="acceptflag != null and acceptflag!=''">AND ACCEPTFLAG like '%'||to_char(#{acceptflag})||'%'
+            </if>
+            <if test="acceptuserid != null and acceptuserid!=''">AND ACCEPTUSERID like
+                '%'||to_char(#{acceptuserid})||'%'
+            </if>
+            <if test="accepttime != null and accepttime!=''">AND ACCEPTTIME like '%'||to_char(#{accepttime})||'%'
+            </if>
+            <if test="todeptid != null and todeptid!=''">AND TODEPTID like '%'||to_char(#{todeptid})||'%'
+            </if>
+            <if test="transmituserid != null and transmituserid!=''">AND TRANSMITUSERID like
+                '%'||to_char(#{transmituserid})||'%'
+            </if>
+            <if test="transmittime != null and transmittime!=''">AND TRANSMITTIME like
+                '%'||to_char(#{transmittime})||'%'
+            </if>
+        </where>
+    </select>
+
+    <insert id="save" parameterType="com.khidi.manager.maintask.entity.StTargetdetailEntity">
+		insert into ST_TARGETDETAIL
+		(
+			ID , 
+			TARGETID , 
+			INDICATORS , 
+			NOWINDICATORS , 
+			EXPECTEDINDICATORS , 
+			PHASEONE , 
+			PHASETWO , 
+			PHASETHREE , 
+			PHASEFOUR , 
+			PHASEFIVE , 
+			RESPDEPT , 
+			RESPUSER , 
+			TEL , 
+			MEMO ,
+			TARGETGLOBALTYPE
+		)
+		values
+		(
+			#{id,jdbcType = VARCHAR}, 
+			#{targetid,jdbcType = VARCHAR}, 
+			#{indicators,jdbcType = VARCHAR}, 
+			#{nowindicators,jdbcType = VARCHAR}, 
+			#{expectedindicators,jdbcType = VARCHAR}, 
+			#{phaseone,jdbcType = VARCHAR}, 
+			#{phasetwo,jdbcType = VARCHAR}, 
+			#{phasethree,jdbcType = VARCHAR}, 
+			#{phasefour,jdbcType = VARCHAR}, 
+			#{phasefive,jdbcType = VARCHAR}, 
+			#{respdept,jdbcType = VARCHAR}, 
+			#{respuser,jdbcType = VARCHAR}, 
+			#{tel,jdbcType = VARCHAR}, 
+			#{memo,jdbcType = VARCHAR},
+			#{targetglobaltype,jdbcType = VARCHAR}
+		)
+	</insert>
+
+    <update id="update" parameterType="com.khidi.manager.maintask.entity.StTargetdetailEntity">
+        update ST_TARGETDETAIL
+        <set>
+            <if test="transmitDeptid != null">
+                TRANSMIT_DEPTID = #{transmitDeptid} ,
+            </if>
+            <if test="targetid != null">
+                TARGETID = #{targetid} ,
+            </if>
+            <if test="indicators != null">
+                INDICATORS = #{indicators} ,
+            </if>
+            <if test="nowindicators != null">
+                NOWINDICATORS = #{nowindicators} ,
+            </if>
+            <if test="expectedindicators != null">
+                EXPECTEDINDICATORS = #{expectedindicators} ,
+            </if>
+            <if test="phaseone != null">
+                PHASEONE = #{phaseone} ,
+            </if>
+            <if test="phasetwo != null">
+                PHASETWO = #{phasetwo} ,
+            </if>
+            <if test="phasethree != null">
+                PHASETHREE = #{phasethree} ,
+            </if>
+            <if test="phasefour != null">
+                PHASEFOUR = #{phasefour} ,
+            </if>
+            <if test="phasefive != null">
+                PHASEFIVE = #{phasefive} ,
+            </if>
+            <if test="respdept != null">
+                RESPDEPT = #{respdept} ,
+            </if>
+            <if test="respuser != null">
+                RESPUSER = #{respuser} ,
+            </if>
+            <if test="tel != null">
+                TEL = #{tel} ,
+            </if>
+            <if test="memo != null">
+                MEMO = #{memo} ,
+            </if>
+            <if test="progress != null">
+                PROGRESS = #{progress} ,
+            </if>
+            <if test="targetglobaltype != null">
+                TARGETGLOBALTYPE = #{targetglobaltype} ,
+            </if>
+            <if test="attachid != null">
+                ATTACHID = #{attachid} ,
+            </if>
+            <if test="acceptdeptid != null">
+                ACCEPTDEPTID = #{acceptdeptid} ,
+            </if>
+            <if test="acceptflag != null">
+                ACCEPTFLAG = #{acceptflag} ,
+            </if>
+            <if test="acceptuserid != null">
+                ACCEPTUSERID = #{acceptuserid} ,
+            </if>
+            <if test="accepttime != null">
+                ACCEPTTIME = #{accepttime} ,
+            </if>
+            <if test="todeptid != null">
+                TODEPTID = #{todeptid} ,
+            </if>
+            <if test="transmituserid != null">
+                TRANSMITUSERID = #{transmituserid} ,
+            </if>
+            <if test="transmittime != null">
+                TRANSMITTIME = #{transmittime}
+            </if>
+        </set>
+        where ID = #{id}
+    </update>
+
+    <delete id="delete">
+		delete from ST_TARGETDETAIL where ID = #{id}
+	</delete>
+</mapper>

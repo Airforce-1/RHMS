@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.basicinfo.dao.ResourceBridgeDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap type="com.khidi.manager.basicinfo.entity.ResourceBridgeEntity"
+		id="resourceBridgeMap">
+		<result property="id" column="ID" />
+		<result property="code" column="CODE" />
+		<result property="name" column="NAME" />
+		<result property="bridgeStart" column="BRIDGESTART" />
+		<result property="bridgeEnd" column="BRIDGEEND" />
+		<result property="startX" column="STARTX" />
+		<result property="startY" column="STARTY" />
+		<result property="endX" column="ENDX" />
+		<result property="endY" column="ENDY" />
+		<result property="areaId" column="AREA_ID" />
+		<result property="bridgeLength" column="BRIDGELENGTH" />
+		<result property="resourceType" column="RESOURCETYPE" />
+		<result property="resourceId" column="RESOURCE_ID" />
+		<result property="stationBuild" column="STATIONBUILD" />
+		<result property="stationSituation" column="STATIONSITUATION" />
+		<result property="stationStarttime" column="STATIONSTARTTIME" />
+		<result property="stationBuildtime" column="STATIONBUILDTIME" />
+		<result property="remark" column="REMARK" />
+	</resultMap>
+
+	<select id="queryObject"
+		resultType="com.khidi.manager.basicinfo.entity.ResourceBridgeEntity">
+		select * from RESOURCE_BRIDGE where ID = #{id}
+	</select>
+
+
+	<select id="queryList"
+		resultType="com.khidi.manager.basicinfo.entity.ResourceBridgeEntity">
+		<choose>
+			<when test="limit != null and offset !=null and page!=null">
+				select * FROM (
+				SELECT * FROM
+				(
+				SELECT a.*, ROWNUM RN
+				FROM (select *
+				from RESOURCE_BRIDGE
+				<where>
+					<!--根据角色编码集合过滤资源权限 -->
+					<if test="roleId != null">
+						(SELECT XMLAGG(XMLELEMENT(E,PARTRIVERIDS,riverids,lakeids,partlakeids,canalids,partcanalids,reservoirids,partreservoirids
+						||',')).EXTRACT('//text()').getclobval()
+						FROM sys_role_resource
+						WHERE roleid IN (${roleId}))   LIKE '%'|| RESOURCE_BRIDGE.RESOURCE_ID  ||'%'
+					</if>
+					<if test="resourceName != null and resourceName!=''">
+						AND  resource_id IN
+						(SELECT id FROM river WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+						UNION
+						SELECT id FROM lake WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+						UNION
+						SELECT id FROM part_river WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+						UNION
+						SELECT id FROM part_lake WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+						UNION
+						SELECT id FROM canal WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+						UNION
+						SELECT id FROM part_canal WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+						UNION
+						SELECT id FROM reservoir WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+						UNION
+						SELECT id FROM part_reservoir WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+						)
+					</if>
+					<if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+					</if>
+					<if test="code != null and code!=''">AND CODE like '%'||to_char(#{code})||'%'
+					</if>
+					<if test="name != null and name!=''">AND NAME like '%'||to_char(#{name})||'%'
+					</if>
+					<if test="bridgeStart != null and bridgeStart!=''">AND BRIDGESTART like '%'||to_char(#{bridgeStart})||'%'
+					</if>
+					<if test="bridgeEnd != null and bridgeEnd!=''">AND BRIDGEEND like '%'||to_char(#{bridgeEnd})||'%'
+					</if>
+					<if test="startX != null and startX!=''">AND STARTX like '%'||to_char(#{startX})||'%'
+					</if>
+					<if test="startY != null and startY!=''">AND STARTY like '%'||to_char(#{startY})||'%'
+					</if>
+					<if test="endX != null and endX!=''">AND ENDX like '%'||to_char(#{endX})||'%'
+					</if>
+					<if test="endY != null and endY!=''">AND ENDY like '%'||to_char(#{endY})||'%'
+					</if>
+					<if test="areaId != null and areaId!=''">AND AREA_ID in (select area_id FROM sys_area START WITH area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+					</if>
+					<if test="bridgeLength != null and bridgeLength!=''">AND BRIDGELENGTH like
+						'%'||to_char(#{bridgeLength})||'%'
+					</if>
+					<if test="resourceType != null and resourceType!=''">AND RESOURCETYPE like
+						'%'||to_char(#{resourceType})||'%'
+					</if>
+					<if test="resourceId != null and resourceId!=''">AND RESOURCE_ID like '%'||to_char(#{resourceId})||'%'
+					</if>
+					<if test="stationBuild != null and stationBuild!=''">AND STATIONBUILD like
+						'%'||to_char(#{stationBuild})||'%'
+					</if>
+					<if test="stationSituation != null and stationSituation!=''">AND STATIONSITUATION like
+						'%'||to_char(#{stationSituation})||'%'
+					</if>
+					<if test="stationStarttime != null and stationStarttime!=''">AND STATIONSTARTTIME like
+						'%'||to_char(#{stationStarttime})||'%'
+					</if>
+					<if test="stationBuildtime != null and stationBuildtime!=''">AND STATIONBUILDTIME like
+						'%'||to_char(#{stationBuildtime})||'%'
+					</if>
+					<if test="remark != null and remark!=''">AND REMARK like '%'||to_char(#{remark})||'%'
+					</if>
+				</where>
+				<choose>
+					<when test="sidx != null and sidx.trim() != ''">
+						order by ${sidx} ${order}
+					</when>
+					<otherwise>
+						order by createtime desc
+					</otherwise>
+				</choose>
+				)a
+				WHERE ROWNUM &lt;= #{limit} * #{page}
+				)
+				WHERE RN > #{offset}
+				)
+			</when>
+			<otherwise>
+				select * from RESOURCE_BRIDGE
+			</otherwise>
+		</choose>
+	</select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<select id="queryTotal" resultType="int">
+		select count(*) from RESOURCE_BRIDGE
+		<where>
+			<!--根据角色编码集合过滤资源权限 -->
+			<if test="roleId != null">
+				(SELECT XMLAGG(XMLELEMENT(E,PARTRIVERIDS,riverids,lakeids,partlakeids,canalids,partcanalids,reservoirids,partreservoirids
+				||',')).EXTRACT('//text()').getclobval()
+				FROM sys_role_resource
+				WHERE roleid IN (${roleId}))   LIKE '%'|| RESOURCE_BRIDGE.RESOURCE_ID  ||'%'
+			</if>
+			<if test="resourceName != null and resourceName!=''">
+				AND resource_id IN
+				(SELECT id FROM river WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				UNION
+				SELECT id FROM lake WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				UNION
+				SELECT id FROM part_river WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				UNION
+				SELECT id FROM part_lake WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				UNION
+				SELECT id FROM canal WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				UNION
+				SELECT id FROM part_canal WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				UNION
+				SELECT id FROM reservoir WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				UNION
+				SELECT id FROM part_reservoir WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				)
+			</if>
+			<if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+			</if>
+			<if test="code != null and code!=''">AND CODE like '%'||to_char(#{code})||'%'
+			</if>
+			<if test="name != null and name!=''">AND NAME like '%'||to_char(#{name})||'%'
+			</if>
+			<if test="bridgeStart != null and bridgeStart!=''">AND BRIDGESTART like '%'||to_char(#{bridgeStart})||'%'
+			</if>
+			<if test="bridgeEnd != null and bridgeEnd!=''">AND BRIDGEEND like '%'||to_char(#{bridgeEnd})||'%'
+			</if>
+			<if test="startX != null and startX!=''">AND STARTX like '%'||to_char(#{startX})||'%'
+			</if>
+			<if test="startY != null and startY!=''">AND STARTY like '%'||to_char(#{startY})||'%'
+			</if>
+			<if test="endX != null and endX!=''">AND ENDX like '%'||to_char(#{endX})||'%'
+			</if>
+			<if test="endY != null and endY!=''">AND ENDY like '%'||to_char(#{endY})||'%'
+			</if>
+			<if test="areaId != null and areaId!=''">AND AREA_ID in (select area_id FROM sys_area START WITH area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+			</if>
+			<if test="bridgeLength != null and bridgeLength!=''">AND BRIDGELENGTH like '%'||to_char(#{bridgeLength})||'%'
+			</if>
+			<if test="resourceType != null and resourceType!=''">AND RESOURCE_TYPE like '%'||to_char(#{resourceType})||'%'
+			</if>
+			<if test="resourceId != null and resourceId!=''">AND RESOURCE_ID like '%'||to_char(#{resourceId})||'%'
+			</if>
+			<if test="stationBuild != null and stationBuild!=''">AND STATIONBUILD like '%'||to_char(#{stationBuild})||'%'
+			</if>
+			<if test="stationSituation != null and stationSituation!=''">AND STATIONSITUATION like
+				'%'||to_char(#{stationSituation})||'%'
+			</if>
+			<if test="stationStarttime != null and stationStarttime!=''">AND STATIONSTARTTIME like
+				'%'||to_char(#{stationStarttime})||'%'
+			</if>
+			<if test="stationBuildtime != null and stationBuildtime!=''">AND STATIONBUILDTIME like
+				'%'||to_char(#{stationBuildtime})||'%'
+			</if>
+			<if test="remark != null and remark!=''">AND REMARK like '%'||to_char(#{remark})||'%'
+			</if>
+		</where>
+	</select>
+
+	<insert id="save"
+		parameterType="com.khidi.manager.basicinfo.entity.ResourceBridgeEntity">
+		insert into RESOURCE_BRIDGE
+		(
+		ID ,
+		CODE ,
+		NAME ,
+		BRIDGESTART
+		,
+		BRIDGEEND ,
+		STARTX ,
+		STARTY ,
+		ENDX ,
+		ENDY ,
+		AREA_ID ,
+		BRIDGELENGTH ,
+		RESOURCE_TYPE ,
+		RESOURCE_ID ,
+		STATIONBUILD ,
+		STATIONSITUATION ,
+		STATIONSTARTTIME ,
+		STATIONBUILDTIME ,
+		REMARK
+		)
+		values
+		(
+		#{id,jdbcType = VARCHAR},
+		#{code,jdbcType = VARCHAR},
+		#{name,jdbcType = VARCHAR},
+		#{bridgeStart,jdbcType = VARCHAR},
+		#{bridgeEnd,jdbcType = VARCHAR},
+		#{startX,jdbcType = VARCHAR},
+		#{startY,jdbcType = VARCHAR},
+		#{endX,jdbcType = VARCHAR},
+		#{endY,jdbcType = VARCHAR},
+		#{areaId,jdbcType = VARCHAR},
+		#{bridgeLength,jdbcType = VARCHAR},
+		#{resourceType,jdbcType = VARCHAR},
+		#{resourceId,jdbcType = VARCHAR},
+		#{stationBuild,jdbcType = VARCHAR},
+		#{stationSituation,jdbcType = VARCHAR},
+		#{stationStarttime,jdbcType = DATE},
+		#{stationBuildtime,jdbcType = DATE},
+		#{remark,jdbcType = VARCHAR}
+		)
+	</insert>
+
+	<update id="update"
+		parameterType="com.khidi.manager.basicinfo.entity.ResourceBridgeEntity">
+		update RESOURCE_BRIDGE
+		<set>
+			<if test="id != null">
+				ID = #{id} ,
+			</if>
+			<if test="code != null">
+				CODE = #{code} ,
+			</if>
+			<if test="name != null">
+				NAME = #{name} ,
+			</if>
+			<if test="bridgeStart != null">
+				BRIDGESTART = #{bridgeStart} ,
+			</if>
+			<if test="bridgeEnd != null">
+				BRIDGEEND = #{bridgeEnd} ,
+			</if>
+			<if test="startX != null">
+				STARTX = #{startX} ,
+			</if>
+			<if test="startY != null">
+				STARTY = #{startY} ,
+			</if>
+			<if test="endX != null">
+				ENDX = #{endX} ,
+			</if>
+			<if test="endY != null">
+				ENDY = #{endY} ,
+			</if>
+			<if test="areaId != null">
+				AREA_ID = #{areaId} ,
+			</if>
+			<if test="bridgeLength != null">
+				BRIDGELENGTH = #{bridgeLength} ,
+			</if>
+			<if test="resourceType != null">
+				RESOURCE_TYPE = #{resourceType} ,
+			</if>
+			<if test="resourceId != null">
+				RESOURCE_ID = #{resourceId} ,
+			</if>
+			<if test="stationBuild != null">
+				STATIONBUILD = #{stationBuild} ,
+			</if>
+			<if test="stationSituation != null">
+				STATIONSITUATION = #{stationSituation} ,
+			</if>
+			<if test="stationStarttime != null">
+				STATIONSTARTTIME = #{stationStarttime} ,
+			</if>
+			<if test="stationBuildtime != null">
+				STATIONBUILDTIME = #{stationBuildtime} ,
+			</if>
+			<if test="remark != null">
+				REMARK = #{remark}
+			</if>
+		</set>
+		where ID = #{id}
+	</update>
+
+	<delete id="delete">
+		delete from RESOURCE_BRIDGE where ID = #{id}
+	</delete>
+</mapper>

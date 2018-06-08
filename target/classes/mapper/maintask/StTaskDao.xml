@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.maintask.dao.StTaskDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.maintask.entity.StTaskEntity" id="stTaskMap">
+        <result property="completeperiod" column="COMPLETEPERIOD"/>
+        <result property="laketype" column="LAKETYPE"/>
+        <result property="lakeid" column="LAKEID"/>
+        <result property="areacode" column="AREACODE"/>
+        <result property="tasktype" column="TASKTYPE"/>
+        <result property="tasksource" column="TASKSOURCE"/>
+        <result property="indicatortype" column="INDICATORTYPE"/>
+        <result property="detailaddress" column="DETAILADDRESS"/>
+        <result property="memo" column="MEMO"/>
+        <result property="taskglobaltype" column="TASKGLOBALTYPE"/>
+        <result property="id" column="ID"/>
+        <result property="taskcode" column="TASKCODE"/>
+        <result property="taskname" column="TASKNAME"/>
+        <result property="maintask" column="MAINTASK"/>
+        <result property="qtdept" column="QTDEPT"/>
+        <result property="xddept" column="XDDEPT"/>
+        <result property="stime" column="STIME"/>
+        <result property="progress" column="PROGRESS"/>
+    </resultMap>
+
+    <select id="queryObject" resultType="com.khidi.manager.maintask.entity.StTaskEntity">
+		select a.* ,
+		(Select b.name FROM SYS_USER b WHERE b.USER_ID = a.hz) as hzName
+		from ST_TASK a where ID = #{id}
+	</select>
+
+    <select id="queryTaskDetailByTaskId" resultType="com.khidi.manager.maintask.entity.StTaskdetailEntity">
+        select a.*
+         from ST_TASKDETAIL a where a.TASKID = #{id}
+    </select>
+
+    <select id="queryList" resultType="com.khidi.manager.maintask.entity.StTaskEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN ,
+                (SELECT d.NAME FROM SYS_AREA d WHERE d.AREA_ID = a.AREACODE)as areaName,
+                (Select b.name FROM SYS_DEPT b WHERE b.DEPT_ID = a.QTDEPT)as qtDeptName,
+                (Select b.name FROM SYS_DEPT b WHERE b.DEPT_ID = a.XDDEPT)as xdDeptName,
+                (Select b.name FROM SYS_USER b WHERE b.USER_ID = a.hz) as hzName,
+                (Select c.DICTNAME FROM SYS_DICT c WHERE c.DICTVALUE = a.LAKETYPE AND c.DICTTYPE = '河湖类型')as lakeTypeName,
+                (CASE   a.LAKETYPE
+                WHEN '1' THEN (SELECT NAME FROM river  WHERE river.id = a.lakeID)
+                WHEN '2' THEN (SELECT NAME FROM part_river WHERE part_river.id = a.lakeID)
+                WHEN '3' THEN (SELECT NAME FROM canal  WHERE canal.id = a.lakeID)
+                WHEN '4' THEN (SELECT NAME FROM part_canal WHERE part_canal.id = a.lakeID)
+                WHEN '5' THEN (SELECT NAME FROM lake WHERE lake.id = a.lakeID)
+                WHEN '6' THEN (SELECT NAME FROM part_lake WHERE part_lake.id =a.lakeID)
+                WHEN '7' THEN (SELECT NAME FROM reservoir WHERE reservoir.id = a.lakeID)
+                ELSE (SELECT NAME FROM part_reservoir WHERE part_reservoir.id = a.lakeID) END ) AS lakeName
+                FROM (select * from ST_TASK
+                <where>
+                    (qtdept = #{curdept} or xddept = #{curdept})
+                    <if test="completeperiod != null and completeperiod!=''">AND COMPLETEPERIOD like
+                        '%'||to_char(#{completeperiod})||'%'
+                    </if>
+                    <if test="laketype != null and laketype!=''">AND LAKETYPE like '%'||to_char(#{laketype})||'%'
+                    </if>
+                    <if test="lakeid != null and lakeid!=''">AND LAKEID like '%'||to_char(#{lakeid})||'%'
+                    </if>
+                    <if test="hzName != null and hzName!=''">
+                        AND hz in (select user_id from SYS_USER where name like '%'||to_char(#{hzName})||'%')
+                    </if>
+                    <if test="areacode != null and areacode!=''">AND AREACODE like '%'||to_char(#{areacode})||'%'
+                    </if>
+                    <if test="tasktype != null and tasktype!=''">AND TASKTYPE like '%'||to_char(#{tasktype})||'%'
+                    </if>
+                    <if test="tasksource != null and tasksource!=''">AND TASKSOURCE like
+                        '%'||to_char(#{tasksource})||'%'
+                    </if>
+                    <if test="indicatortype != null and indicatortype!=''">AND INDICATORTYPE like
+                        '%'||to_char(#{indicatortype})||'%'
+                    </if>
+                    <if test="detailaddress != null and detailaddress!=''">AND DETAILADDRESS like
+                        '%'||to_char(#{detailaddress})||'%'
+                    </if>
+                    <if test="memo != null and memo!=''">AND MEMO like '%'||to_char(#{memo})||'%'
+                    </if>
+                    <if test="taskglobaltype != null and taskglobaltype!=''">AND TASKGLOBALTYPE like
+                        '%'||to_char(#{taskglobaltype})||'%'
+                    </if>
+                    <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                    </if>
+                    <if test="taskcode != null and taskcode!=''">AND TASKCODE like '%'||to_char(#{taskcode})||'%'
+                    </if>
+                    <if test="taskname != null and taskname!=''">AND TASKNAME like '%'||to_char(#{taskname})||'%'
+                    </if>
+                    <if test="maintask != null and maintask!=''">AND MAINTASK like '%'||to_char(#{maintask})||'%'
+                    </if>
+                    <if test="progress != null and progress!=''">AND PROGRESS like '%'||to_char(#{progress})||'%'
+                    </if>
+                    <if test="qtdept != null and qtdept!=''">AND QTDEPT like '%'||to_char(#{qtdept})||'%'
+                    </if>
+                    <if test="xddept != null and xddept!=''">AND XDDEPT like '%'||to_char(#{xddept})||'%'
+                    </if>
+                    <if test="stime != null and stime!=''">AND STIME like '%'||to_char(#{stime})||'%'
+                    </if>
+                </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by createtime desc
+                    </otherwise>
+                </choose>
+                )a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from ST_TASK
+            </otherwise>
+        </choose>
+    </select>
+
+
+    <select id="queryTotal" resultType="int">
+        select count(*) from ST_TASK
+        <where>
+            <if test="completeperiod != null and completeperiod!=''">AND COMPLETEPERIOD like
+                '%'||to_char(#{completeperiod})||'%'
+            </if>
+            <if test="laketype != null and laketype!=''">AND LAKETYPE like '%'||to_char(#{laketype})||'%'
+            </if>
+            <if test="lakeid != null and lakeid!=''">AND LAKEID like '%'||to_char(#{lakeid})||'%'
+            </if>
+            <if test="hz != null and hz!=''">AND HZ like '%'||to_char(#{hz})||'%'
+            </if>
+            <if test="areacode != null and areacode!=''">AND AREACODE like '%'||to_char(#{areacode})||'%'
+            </if>
+            <if test="tasktype != null and tasktype!=''">AND TASKTYPE like '%'||to_char(#{tasktype})||'%'
+            </if>
+            <if test="tasksource != null and tasksource!=''">AND TASKSOURCE like '%'||to_char(#{tasksource})||'%'
+            </if>
+            <if test="indicatortype != null and indicatortype!=''">AND INDICATORTYPE like
+                '%'||to_char(#{indicatortype})||'%'
+            </if>
+            <if test="detailaddress != null and detailaddress!=''">AND DETAILADDRESS like
+                '%'||to_char(#{detailaddress})||'%'
+            </if>
+            <if test="memo != null and memo!=''">AND MEMO like '%'||to_char(#{memo})||'%'
+            </if>
+            <if test="taskglobaltype != null and taskglobaltype!=''">AND TASKGLOBALTYPE like
+                '%'||to_char(#{taskglobaltype})||'%'
+            </if>
+            <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+            </if>
+            <if test="progress != null and progress!=''">AND PROGRESS like '%'||to_char(#{progress})||'%'
+            </if>
+            <if test="taskcode != null and taskcode!=''">AND TASKCODE like '%'||to_char(#{taskcode})||'%'
+            </if>
+            <if test="taskname != null and taskname!=''">AND TASKNAME like '%'||to_char(#{taskname})||'%'
+            </if>
+            <if test="maintask != null and maintask!=''">AND MAINTASK like '%'||to_char(#{maintask})||'%'
+            </if>
+            <if test="qtdept != null and qtdept!=''">AND QTDEPT like '%'||to_char(#{qtdept})||'%'
+            </if>
+            <if test="xddept != null and xddept!=''">AND XDDEPT like '%'||to_char(#{xddept})||'%'
+            </if>
+            <if test="stime != null and stime!=''">AND STIME like '%'||to_char(#{stime})||'%'
+            </if>
+        </where>
+    </select>
+
+    <insert id="save" parameterType="com.khidi.manager.maintask.entity.StTaskEntity">
+		insert into ST_TASK
+		(
+			COMPLETEPERIOD , 
+			LAKETYPE , 
+			LAKEID , 
+			HZ , 
+			AREACODE , 
+			TASKTYPE , 
+			TASKSOURCE , 
+			INDICATORTYPE , 
+			DETAILADDRESS , 
+			MEMO , 
+			TASKGLOBALTYPE ,
+			PROGRESS ,
+			ID , 
+			TASKCODE , 
+			TASKNAME , 
+			MAINTASK , 
+			QTDEPT , 
+			XDDEPT , 
+			STIME 
+		)
+		values
+		(
+			#{completeperiod,jdbcType = VARCHAR}, 
+			#{laketype,jdbcType = VARCHAR}, 
+			#{lakeid,jdbcType = VARCHAR}, 
+			#{hz,jdbcType = VARCHAR}, 
+			#{areacode,jdbcType = VARCHAR}, 
+			#{tasktype,jdbcType = VARCHAR}, 
+			#{tasksource,jdbcType = VARCHAR}, 
+			#{indicatortype,jdbcType = VARCHAR}, 
+			#{detailaddress,jdbcType = VARCHAR}, 
+			#{memo,jdbcType = VARCHAR}, 
+			#{taskglobaltype,jdbcType = VARCHAR},
+			#{progress,jdbcType = VARCHAR},
+			#{id,jdbcType = VARCHAR}, 
+			#{taskcode,jdbcType = VARCHAR}, 
+			#{taskname,jdbcType = VARCHAR}, 
+			#{maintask,jdbcType = VARCHAR}, 
+			#{qtdept,jdbcType = VARCHAR}, 
+			#{xddept,jdbcType = VARCHAR},
+			to_date(substr(#{stime,jdbcType = DATE},1,10),'yyyy-MM-dd')
+		)
+	</insert>
+
+    <update id="update" parameterType="com.khidi.manager.maintask.entity.StTaskEntity">
+        update ST_TASK
+        <set>
+            <if test="laketype != null">
+                LAKETYPE = #{laketype,jdbcType = VARCHAR} ,
+            </if>
+            <if test="lakeid != null">
+                LAKEID = #{lakeid,jdbcType = VARCHAR} ,
+            </if>
+            <if test="hz != null">
+                HZ = #{hz,jdbcType = VARCHAR} ,
+            </if>
+            <if test="areacode != null">
+                AREACODE = #{areacode,jdbcType = VARCHAR} ,
+            </if>
+            <if test="tasktype != null">
+                TASKTYPE = #{tasktype,jdbcType = VARCHAR} ,
+            </if>
+            <if test="tasksource != null">
+                TASKSOURCE = #{tasksource,jdbcType = VARCHAR} ,
+            </if>
+            <if test="indicatortype != null">
+                INDICATORTYPE = #{indicatortype,jdbcType = VARCHAR} ,
+            </if>
+            <if test="detailaddress != null">
+                DETAILADDRESS = #{detailaddress,jdbcType = VARCHAR} ,
+            </if>
+            <if test="memo != null">
+                MEMO = #{memo,jdbcType = VARCHAR} ,
+            </if>
+            <if test="taskglobaltype != null">
+                TASKGLOBALTYPE = #{taskglobaltype,jdbcType = VARCHAR} ,
+            </if>
+            <if test="progress != null">
+                PROGRESS = #{progress} ,
+            </if>
+            <if test="id != null">
+                COMPLETEPERIOD = #{completeperiod,jdbcType = VARCHAR} ,
+            </if>
+            <if test="taskcode != null">
+                TASKCODE = #{taskcode,jdbcType = VARCHAR} ,
+            </if>
+            <if test="taskname != null">
+                TASKNAME = #{taskname,jdbcType = VARCHAR} ,
+            </if>
+            <if test="maintask != null">
+                MAINTASK = #{maintask,jdbcType = VARCHAR} ,
+            </if>
+            <if test="qtdept != null">
+                QTDEPT = #{qtdept,jdbcType = VARCHAR} ,
+            </if>
+            <if test="xddept != null">
+                XDDEPT = #{xddept,jdbcType = VARCHAR} ,
+            </if>
+            <if test="stime != null">
+                STIME = to_date(substr(#{stime,jdbcType = DATE},1,10),'yyyy-MM-dd')
+            </if>
+        </set>
+        where ID = #{id}
+    </update>
+
+    <delete id="delete">
+		delete from ST_TASK where ID = #{id}
+	</delete>
+</mapper>

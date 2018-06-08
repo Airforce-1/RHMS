@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.monitoringnet.dao.DataAirDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.monitoringnet.entity.DataAirEntity" id="dataAirMap">
+        <result property="id" column="ID"/>
+        <result property="stationId" column="STATION_ID"/>
+        <result property="monitorTime" column="MONITOR_TIME"/>
+        <result property="aqi" column="AQI"/>
+        <result property="airLevel" column="AIR_LEVEL"/>
+        <result property="primaryPollutant" column="PRIMARY_POLLUTANT"/>
+        <result property="pm25" column="PM25"/>
+        <result property="pm10" column="PM10"/>
+        <result property="co" column="CO"/>
+        <result property="no2" column="NO2"/>
+        <result property="o31h" column="O31H"/>
+        <result property="o38h" column="O38H"/>
+        <result property="so2" column="SO2"/>
+        <result property="createTime" column="CREATE_TIME"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.khidi.manager.monitoringnet.entity.DataAirEntity">
+		select * from DATA_AIR where ID = #{id}
+	</select>
+
+	<select id="getAir4Gis" resultType="com.khidi.manager.monitoringnet.entity.DataAirEntity">
+		select a.* ,rownum from (select * from DATA_AIR where STATION_ID = #{stationId} order by MONITOR_TIME DESC)a where rownum = 1
+	</select>
+
+
+    <select id="queryList" resultType="com.khidi.manager.monitoringnet.entity.DataAirEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN
+                FROM (select * from DATA_AIR
+                <where>
+                                            <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                        </if>
+                                            <if test="stationId != null and stationId!=''">AND STATION_ID like '%'||to_char(#{stationId})||'%'
+                        </if>
+                                            <if test="monitorTime != null and monitorTime!=''">AND MONITOR_TIME like '%'||to_char(#{monitorTime})||'%'
+                        </if>
+											<if test="startTime != null">AND MONITOR_TIME  &gt;= #{startTime}
+						</if>
+											<if test="endTime != null">AND MONITOR_TIME &lt;= #{endTime}
+						</if>
+                                            <if test="aqi != null and aqi!=''">AND AQI like '%'||to_char(#{aqi})||'%'
+                        </if>
+                                            <if test="airLevel != null and airLevel!=''">AND AIR_LEVEL like '%'||to_char(#{airLevel})||'%'
+                        </if>
+                                            <if test="primaryPollutant != null and primaryPollutant!=''">AND PRIMARY_POLLUTANT like '%'||to_char(#{primaryPollutant})||'%'
+                        </if>
+                                            <if test="pm25 != null and pm25!=''">AND PM25 like '%'||to_char(#{pm25})||'%'
+                        </if>
+                                            <if test="pm10 != null and pm10!=''">AND PM10 like '%'||to_char(#{pm10})||'%'
+                        </if>
+                                            <if test="co != null and co!=''">AND CO like '%'||to_char(#{co})||'%'
+                        </if>
+                                            <if test="no2 != null and no2!=''">AND NO2 like '%'||to_char(#{no2})||'%'
+                        </if>
+                                            <if test="o31h != null and o31h!=''">AND O31H like '%'||to_char(#{o31h})||'%'
+                        </if>
+                                            <if test="o38h != null and o38h!=''">AND O38H like '%'||to_char(#{o38h})||'%'
+                        </if>
+                                            <if test="so2 != null and so2!=''">AND SO2 like '%'||to_char(#{so2})||'%'
+                        </if>
+                                            <if test="createTime != null and createTime!=''">AND CREATE_TIME like '%'||to_char(#{createTime})||'%'
+                        </if>
+                                    </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by MONITOR_TIME desc
+                    </otherwise>
+                </choose>
+                )a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from DATA_AIR
+            </otherwise>
+        </choose>
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from DATA_AIR
+        <where>
+			                <if test="id != null and id!=''">AND  ID like '%'||to_char(#{id})||'%'
+                </if>
+			                <if test="stationId != null and stationId!=''">AND  STATION_ID like '%'||to_char(#{stationId})||'%'
+                </if>
+			                <if test="monitorTime != null and monitorTime!=''">AND  MONITOR_TIME like '%'||to_char(#{monitorTime})||'%'
+                </if>
+			                <if test="aqi != null and aqi!=''">AND  AQI like '%'||to_char(#{aqi})||'%'
+                </if>
+			                <if test="airLevel != null and airLevel!=''">AND  AIR_LEVEL like '%'||to_char(#{airLevel})||'%'
+                </if>
+			                <if test="primaryPollutant != null and primaryPollutant!=''">AND  PRIMARY_POLLUTANT like '%'||to_char(#{primaryPollutant})||'%'
+                </if>
+			                <if test="pm25 != null and pm25!=''">AND  PM25 like '%'||to_char(#{pm25})||'%'
+                </if>
+			                <if test="pm10 != null and pm10!=''">AND  PM10 like '%'||to_char(#{pm10})||'%'
+                </if>
+			                <if test="co != null and co!=''">AND  CO like '%'||to_char(#{co})||'%'
+                </if>
+			                <if test="no2 != null and no2!=''">AND  NO2 like '%'||to_char(#{no2})||'%'
+                </if>
+			                <if test="o31h != null and o31h!=''">AND  O31H like '%'||to_char(#{o31h})||'%'
+                </if>
+			                <if test="o38h != null and o38h!=''">AND  O38H like '%'||to_char(#{o38h})||'%'
+                </if>
+			                <if test="so2 != null and so2!=''">AND  SO2 like '%'||to_char(#{so2})||'%'
+                </if>
+			                <if test="createTime != null and createTime!=''">AND  CREATE_TIME like '%'||to_char(#{createTime})||'%'
+                </if>
+			        </where>
+	</select>
+	 
+	<insert id="save" parameterType="com.khidi.manager.monitoringnet.entity.DataAirEntity">
+		insert into DATA_AIR
+		(
+			ID , 
+			STATION_ID , 
+			MONITOR_TIME , 
+			AQI , 
+			AIR_LEVEL , 
+			PRIMARY_POLLUTANT , 
+			PM25 , 
+			PM10 , 
+			CO , 
+			NO2 , 
+			O31H , 
+			O38H , 
+			SO2 , 
+			CREATE_TIME 
+		)
+		values
+		(
+			#{id,jdbcType = VARCHAR}, 
+			#{stationId,jdbcType = VARCHAR}, 
+			#{monitorTime,jdbcType = VARCHAR}, 
+			#{aqi,jdbcType = VARCHAR}, 
+			#{airLevel,jdbcType = VARCHAR}, 
+			#{primaryPollutant,jdbcType = VARCHAR}, 
+			#{pm25,jdbcType = VARCHAR}, 
+			#{pm10,jdbcType = VARCHAR}, 
+			#{co,jdbcType = VARCHAR}, 
+			#{no2,jdbcType = VARCHAR}, 
+			#{o31h,jdbcType = VARCHAR}, 
+			#{o38h,jdbcType = VARCHAR}, 
+			#{so2,jdbcType = VARCHAR}, 
+			#{createTime,jdbcType = VARCHAR}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.khidi.manager.monitoringnet.entity.DataAirEntity">
+		update DATA_AIR 
+		<set>
+			<if test="stationId != null">
+				STATION_ID = #{stationId}  , </if>
+			<if test="monitorTime != null">
+				MONITOR_TIME = #{monitorTime}  , </if>
+			<if test="aqi != null">
+				AQI = #{aqi}  , </if>
+			<if test="airLevel != null">
+				AIR_LEVEL = #{airLevel}  , </if>
+			<if test="primaryPollutant != null">
+				PRIMARY_POLLUTANT = #{primaryPollutant}  , </if>
+			<if test="pm25 != null">
+				PM25 = #{pm25}  , </if>
+			<if test="pm10 != null">
+				PM10 = #{pm10}  , </if>
+			<if test="co != null">
+				CO = #{co}  , </if>
+			<if test="no2 != null">
+				NO2 = #{no2}  , </if>
+			<if test="o31h != null">
+				O31H = #{o31h}  , </if>
+			<if test="o38h != null">
+				O38H = #{o38h}  , </if>
+			<if test="so2 != null">
+				SO2 = #{so2}  , </if>
+			<if test="createTime != null">
+				CREATE_TIME = #{createTime}  </if>
+		</set>
+		where ID = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from DATA_AIR where ID = #{id}
+	</delete>
+</mapper>

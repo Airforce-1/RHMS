@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.basicinfo.dao.LakeDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.basicinfo.entity.LakeEntity" id="lakeMap">
+        <result property="id" column="ID"/>
+        <result property="name" column="NAME"/>
+        <result property="code" column="CODE"/>
+        <result property="areaId" column="AREA_ID"/>
+        <result property="alias" column="ALIAS"/>
+        <result property="deep" column="DEEP"/>
+        <result property="location" column="LOCATION"/>
+        <result property="leftX" column="LEFTX"/>
+        <result property="rightX" column="RIGHTX"/>
+        <result property="rightY" column="RIGHTY"/>
+        <result property="leftY" column="LEFTY"/>
+        <result property="yearsArea" column="YEARSAREA"/>
+        <result property="yearsCapacity" column="YEARSCAPACITY"/>
+        <result property="lakeType" column="LAKETYPE"/>
+        <result property="yearsDeep" column="YEARSDEEP"/>
+        <result property="remark" column="REMARK"/>
+        <result property="header" column="HEADER"/>
+        <result property="coordinater" column="COORDINATER"/>
+        <result property="policeman" column="POLICEMAN"/>
+        <result property="checker" column="CHECKER"/>
+        <result property="superviser" column="SUPERVISER"/>
+        <result property="duty" column="DUTY"/>
+        <result property="aim" column="AIM"/>
+        <result property="headerremark" column="HEADERREMARK"/>
+        <result property="headerpost" column="HEADERPOST"/>
+        <result property="coordinaterpost" column="COORDINATERPOST"/>
+        <result property="checkerpost" column="CHECKERPOST"/>
+        <result property="superviserpost" column="SUPERVISERPOST"/>
+        <result property="featureId" column="FEATUREID"/>
+    </resultMap>
+
+    <select id="queryObject" resultType="com.khidi.manager.basicinfo.entity.LakeEntity">
+		select * from LAKE where ID = #{id}
+	</select>
+
+
+    <select id="queryList" resultType="com.khidi.manager.basicinfo.entity.LakeEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN
+                FROM (select * from LAKE
+                <where>
+                    <if test="roleId != null">
+                        ((SELECT XMLAGG(XMLELEMENT(E,LAKEIDS
+                        ||',')).EXTRACT('//text()').getclobval() AS LAKEIDS
+                        FROM sys_role_resource
+                        WHERE roleid IN (${roleId})) LIKE '%'||LAKE.ID||'%'
+                        or
+                        LAKE.ID in (select LAKEid from part_LAKE where (SELECT XMLAGG(XMLELEMENT(E,partLAKEIDS
+                        ||',')).EXTRACT('//text()').getclobval() AS partLAKEIDS
+                        FROM sys_role_resource
+                        WHERE roleid IN (${roleId})) like '%'||id||'%'))
+                    </if>
+                    <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                    </if>
+                    <if test="name != null and name!=''">AND NAME like '%'||to_char(#{name})||'%'
+                    </if>
+                    <if test="code != null and code!=''">AND CODE like '%'||to_char(#{code})||'%'
+                    </if>
+                    <if test="areaId != null and areaId!=''">AND AREA_ID in (select area_id FROM sys_area START WITH
+                        area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+                    </if>
+                    <if test="alias != null and alias!=''">AND ALIAS like '%'||to_char(#{alias})||'%'
+                    </if>
+                    <if test="deep != null and deep!=''">AND DEEP like '%'||to_char(#{deep})||'%'
+                    </if>
+                    <if test="location != null and location!=''">AND LOCATION like '%'||to_char(#{location})||'%'
+                    </if>
+                    <if test="leftX != null and leftX!=''">AND LEFTX like '%'||to_char(#{leftX})||'%'
+                    </if>
+                    <if test="rightX != null and rightX!=''">AND RIGHTX like '%'||to_char(#{rightX})||'%'
+                    </if>
+                    <if test="rightY != null and rightY!=''">AND RIGHTY like '%'||to_char(#{rightY})||'%'
+                    </if>
+                    <if test="leftY != null and leftY!=''">AND LEFTY like '%'||to_char(#{leftY})||'%'
+                    </if>
+                    <if test="yearsArea != null and yearsArea!=''">AND YEARSAREA like '%'||to_char(#{yearsArea})||'%'
+                    </if>
+                    <if test="yearsCapacity != null and yearsCapacity!=''">AND YEARSCAPACITY like
+                        '%'||to_char(#{yearsCapacity})||'%'
+                    </if>
+                    <if test="lakeType != null and lakeType!=''">AND LAKETYPE like '%'||to_char(#{lakeType})||'%'
+                    </if>
+                    <if test="yearsDeep != null and yearsDeep!=''">AND YEARSDEEP like '%'||to_char(#{yearsDeep})||'%'
+                    </if>
+                    <if test="remark != null and remark!=''">AND REMARK like '%'||to_char(#{remark})||'%'
+                    </if>
+                    <if test="featureId != null and featureId!=''">AND FEATUREID like '%'||to_char(#{featureId})||'%'
+                    </if>
+                </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by createtime desc
+                    </otherwise>
+                </choose>
+                ) a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from LAKE
+                <where>
+                    <if test="roleId != null">
+                        ((SELECT XMLAGG(XMLELEMENT(E,LAKEIDS
+                        ||',')).EXTRACT('//text()').getclobval() AS LAKEIDS
+                        FROM sys_role_resource
+                        WHERE roleid IN (${roleId})) LIKE '%'||LAKE.ID||'%'
+                        or
+                        LAKE.ID in (select LAKEid from part_LAKE where (SELECT XMLAGG(XMLELEMENT(E,partLAKEIDS
+                        ||',')).EXTRACT('//text()').getclobval() AS partLAKEIDS
+                        FROM sys_role_resource
+                        WHERE roleid IN (${roleId})) like '%'||id||'%'))
+                    </if>
+                    <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                    </if>
+                    <if test="name != null and name!=''">AND NAME like '%'||to_char(#{name})||'%'
+                    </if>
+                    <if test="code != null and code!=''">AND CODE like '%'||to_char(#{code})||'%'
+                    </if>
+                    <if test="areaId != null and areaId!=''">AND AREA_ID in (select area_id FROM sys_area START WITH
+                        area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+                    </if>
+                    <if test="alias != null and alias!=''">AND ALIAS like '%'||to_char(#{alias})||'%'
+                    </if>
+                    <if test="deep != null and deep!=''">AND DEEP like '%'||to_char(#{deep})||'%'
+                    </if>
+                    <if test="location != null and location!=''">AND LOCATION like '%'||to_char(#{location})||'%'
+                    </if>
+                    <if test="leftX != null and leftX!=''">AND LEFTX like '%'||to_char(#{leftX})||'%'
+                    </if>
+                    <if test="rightX != null and rightX!=''">AND RIGHTX like '%'||to_char(#{rightX})||'%'
+                    </if>
+                    <if test="rightY != null and rightY!=''">AND RIGHTY like '%'||to_char(#{rightY})||'%'
+                    </if>
+                    <if test="leftY != null and leftY!=''">AND LEFTY like '%'||to_char(#{leftY})||'%'
+                    </if>
+                    <if test="yearsArea != null and yearsArea!=''">AND YEARSAREA like '%'||to_char(#{yearsArea})||'%'
+                    </if>
+                    <if test="yearsCapacity != null and yearsCapacity!=''">AND YEARSCAPACITY like
+                        '%'||to_char(#{yearsCapacity})||'%'
+                    </if>
+                    <if test="lakeType != null and lakeType!=''">AND LAKETYPE like '%'||to_char(#{lakeType})||'%'
+                    </if>
+                    <if test="yearsDeep != null and yearsDeep!=''">AND YEARSDEEP like '%'||to_char(#{yearsDeep})||'%'
+                    </if>
+                    <if test="remark != null and remark!=''">AND REMARK like '%'||to_char(#{remark})||'%'
+                    </if>
+                    <if test="featureId != null and featureId!=''">AND FEATUREID like '%'||to_char(#{featureId})||'%'
+                    </if>
+                </where>
+            </otherwise>
+        </choose>
+
+    </select>
+
+
+    <select id="queryTotal" resultType="int">
+        select count(*) from LAKE
+        <where>
+            <if test="roleId != null">
+                ((SELECT XMLAGG(XMLELEMENT(E,LAKEIDS
+                ||',')).EXTRACT('//text()').getclobval() AS LAKEIDS
+                FROM sys_role_resource
+                WHERE roleid IN (${roleId})) LIKE '%'||LAKE.ID||'%'
+                or
+                LAKE.ID in (select LAKEid from part_LAKE where (SELECT XMLAGG(XMLELEMENT(E,partLAKEIDS
+                ||',')).EXTRACT('//text()').getclobval() AS partLAKEIDS
+                FROM sys_role_resource
+                WHERE roleid IN (${roleId})) like '%'||id||'%'))
+            </if>
+            <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+            </if>
+            <if test="name != null and name!=''">AND NAME like '%'||to_char(#{name})||'%'
+            </if>
+            <if test="code != null and code!=''">AND CODE like '%'||to_char(#{code})||'%'
+            </if>
+            <if test="areaId != null and areaId!=''">AND AREA_ID in (select area_id FROM sys_area START WITH
+                area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+            </if>
+            <if test="alias != null and alias!=''">AND ALIAS like '%'||to_char(#{alias})||'%'
+            </if>
+            <if test="deep != null and deep!=''">AND DEEP like '%'||to_char(#{deep})||'%'
+            </if>
+            <if test="location != null and location!=''">AND LOCATION like '%'||to_char(#{location})||'%'
+            </if>
+            <if test="leftX != null and leftX!=''">AND LEFTX like '%'||to_char(#{leftX})||'%'
+            </if>
+            <if test="rightX != null and rightX!=''">AND RIGHTX like '%'||to_char(#{rightX})||'%'
+            </if>
+            <if test="rightY != null and rightY!=''">AND RIGHTY like '%'||to_char(#{rightY})||'%'
+            </if>
+            <if test="leftY != null and leftY!=''">AND LEFTY like '%'||to_char(#{leftY})||'%'
+            </if>
+            <if test="yearsArea != null and yearsArea!=''">AND YEARSAREA like '%'||to_char(#{yearsArea})||'%'
+            </if>
+            <if test="yearsCapacity != null and yearsCapacity!=''">AND YEARSCAPACITY like
+                '%'||to_char(#{yearsCapacity})||'%'
+            </if>
+            <if test="lakeType != null and lakeType!=''">AND LAKETYPE like '%'||to_char(#{lakeType})||'%'
+            </if>
+            <if test="yearsDeep != null and yearsDeep!=''">AND YEARSDEEP like '%'||to_char(#{yearsDeep})||'%'
+            </if>
+            <if test="remark != null and remark!=''">AND REMARK like '%'||to_char(#{remark})||'%'
+            </if>
+            <if test="featureId != null and featureId!=''">AND FEATUREID like '%'||to_char(#{featureId})||'%'
+            </if>
+        </where>
+    </select>
+
+    <insert id="save" parameterType="com.khidi.manager.basicinfo.entity.LakeEntity">
+		insert into LAKE
+		(
+		    HEADER ,
+			COORDINATER ,
+			POLICEMAN ,
+			CHECKER ,
+			SUPERVISER ,
+			DUTY ,
+			AIM ,
+			HEADERREMARK ,
+			HEADERPOST ,
+			COORDINATERPOST ,
+			CHECKERPOST ,
+			SUPERVISERPOST ,
+			ID , 
+			NAME , 
+			CODE , 
+			AREA_ID , 
+			ALIAS , 
+			DEEP , 
+			LOCATION , 
+			LEFTX , 
+			RIGHTX , 
+			RIGHTY , 
+			LEFTY , 
+			YEARSAREA , 
+			YEARSCAPACITY , 
+			LAKETYPE , 
+			YEARSDEEP , 
+			REMARK,
+			FEATUREID
+		)
+		values
+		(
+		    #{header,jdbcType = VARCHAR},
+			#{coordinater,jdbcType = VARCHAR},
+			#{policeman,jdbcType = VARCHAR},
+			#{checker,jdbcType = VARCHAR},
+			#{superviser,jdbcType = VARCHAR},
+			#{duty,jdbcType = VARCHAR},
+			#{aim,jdbcType = VARCHAR},
+			#{headerremark,jdbcType = VARCHAR},
+			#{headerpost,jdbcType = VARCHAR},
+			#{coordinaterpost,jdbcType = VARCHAR},
+			#{checkerpost,jdbcType = VARCHAR},
+			#{superviserpost,jdbcType = VARCHAR},
+			#{id,jdbcType = VARCHAR}, 
+			#{name,jdbcType = VARCHAR}, 
+			#{code,jdbcType = VARCHAR}, 
+			#{areaId,jdbcType = VARCHAR}, 
+			#{alias,jdbcType = VARCHAR}, 
+			#{deep,jdbcType = VARCHAR}, 
+			#{location,jdbcType = VARCHAR}, 
+			#{leftX,jdbcType = VARCHAR}, 
+			#{rightX,jdbcType = VARCHAR}, 
+			#{rightY,jdbcType = VARCHAR}, 
+			#{leftY,jdbcType = VARCHAR}, 
+			#{yearsArea,jdbcType = VARCHAR}, 
+			#{yearsCapacity,jdbcType = VARCHAR}, 
+			#{lakeType,jdbcType = VARCHAR}, 
+			#{yearsDeep,jdbcType = VARCHAR}, 
+			#{remark,jdbcType = VARCHAR},
+			#{featureId,jdbcType = VARCHAR}
+		)
+	</insert>
+
+    <update id="update" parameterType="com.khidi.manager.basicinfo.entity.LakeEntity">
+        update LAKE
+        <set>
+            <if test="header != null">
+                HEADER = #{header} ,
+            </if>
+            <if test="coordinater != null">
+                COORDINATER = #{coordinater} ,
+            </if>
+            <if test="policeman != null">
+                POLICEMAN = #{policeman} ,
+            </if>
+            <if test="checker != null">
+                CHECKER = #{checker} ,
+            </if>
+            <if test="superviser != null">
+                SUPERVISER = #{superviser} ,
+            </if>
+            <if test="duty != null">
+                DUTY = #{duty} ,
+            </if>
+            <if test="aim != null">
+                AIM = #{aim} ,
+            </if>
+            <if test="headerremark != null">
+                HEADERREMARK = #{headerremark} ,
+            </if>
+            <if test="headerpost != null">
+                HEADERPOST = #{headerpost} ,
+            </if>
+            <if test="coordinaterpost != null">
+                COORDINATERPOST = #{coordinaterpost} ,
+            </if>
+            <if test="checkerpost != null">
+                CHECKERPOST = #{checkerpost} ,
+            </if>
+            <if test="superviserpost != null">
+                SUPERVISERPOST = #{superviserpost} ,
+            </if>
+            <if test="id != null">
+                ID = #{id} ,
+            </if>
+            <if test="name != null">
+                NAME = #{name} ,
+            </if>
+            <if test="code != null">
+                CODE = #{code} ,
+            </if>
+            <if test="areaId != null">
+                AREA_ID = #{areaId} ,
+            </if>
+            <if test="alias != null">
+                ALIAS = #{alias} ,
+            </if>
+            <if test="deep != null">
+                DEEP = #{deep} ,
+            </if>
+            <if test="location != null">
+                LOCATION = #{location} ,
+            </if>
+            <if test="leftX != null">
+                LEFTX = #{leftX} ,
+            </if>
+            <if test="rightX != null">
+                RIGHTX = #{rightX} ,
+            </if>
+            <if test="rightY != null">
+                RIGHTY = #{rightY} ,
+            </if>
+            <if test="leftY != null">
+                LEFTY = #{leftY} ,
+            </if>
+            <if test="yearsArea != null">
+                YEARSAREA = #{yearsArea} ,
+            </if>
+            <if test="yearsCapacity != null">
+                YEARSCAPACITY = #{yearsCapacity} ,
+            </if>
+            <if test="lakeType != null">
+                LAKETYPE = #{lakeType} ,
+            </if>
+            <if test="yearsDeep != null">
+                YEARSDEEP = #{yearsDeep} ,
+            </if>
+            <if test="remark != null">
+                REMARK = #{remark},
+            </if>
+            <if test="featureId != null">
+                FEATUREID = #{featureId},
+            </if>
+        </set>
+        where ID = #{id}
+    </update>
+
+    <delete id="delete">
+		delete from LAKE where ID = #{id}
+	</delete>
+</mapper>

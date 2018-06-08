@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.basicinfo.dao.ResourcePublicitycardDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.basicinfo.entity.ResourcePublicitycardEntity" id="resourcePublicitycardMap">
+        <result property="id" column="ID"/>
+        <result property="code" column="CODE"/>
+        <result property="name" column="NAME"/>
+        <result property="resourcetype" column="RESOURCETYPE"/>
+        <result property="resourceid" column="RESOURCEID"/>
+        <result property="x" column="X"/>
+        <result property="y" column="Y"/>
+        <result property="areaId" column="AREA_ID"/>
+        <result property="address" column="ADDRESS"/>
+        <result property="fileaddress" column="FILEADDRESS"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.khidi.manager.basicinfo.entity.ResourcePublicitycardEntity">
+		select * from RESOURCE_PUBLICITYCARD where ID = #{id}
+	</select>
+
+
+    <select id="queryList" resultType="com.khidi.manager.basicinfo.entity.ResourcePublicitycardEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN
+                FROM (select * from RESOURCE_PUBLICITYCARD
+                <where>
+                                            <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                        </if>
+                                            <if test="code != null and code!=''">AND CODE like '%'||to_char(#{code})||'%'
+                        </if>
+                                            <if test="name != null and name!=''">AND NAME like '%'||to_char(#{name})||'%'
+                        </if>
+                                            <if test="resourcetype != null and resourcetype!=''">AND RESOURCETYPE like '%'||to_char(#{resourcetype})||'%'
+                        </if>
+					    <if test="resourceName != null and resourceName!=''">
+												resourceid IN
+												(SELECT id FROM river WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+												UNION
+												SELECT id FROM lake WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+												UNION
+												SELECT id FROM part_river WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+												UNION
+												SELECT id FROM part_lake WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+												UNION
+												SELECT id FROM canal WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+												UNION
+												SELECT id FROM part_canal WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+												UNION
+												SELECT id FROM reservoir WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+												UNION
+												SELECT id FROM part_reservoir WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+												)
+						</if>
+                                            <if test="resourceid != null and resourceid!=''">AND RESOURCEID like '%'||to_char(#{resourceid})||'%'
+                        </if>
+                                            <if test="x != null and x!=''">AND X like '%'||to_char(#{x})||'%'
+                        </if>
+                                            <if test="y != null and y!=''">AND Y like '%'||to_char(#{y})||'%'
+                        </if>
+					<if test="areaId != null and areaId!=''">AND AREA_ID in (select area_id FROM sys_area START WITH area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+					</if>
+                                            <if test="address != null and address!=''">AND ADDRESS like '%'||to_char(#{address})||'%'
+                        </if>
+                                            <if test="fileaddress != null and fileaddress!=''">AND FILEADDRESS like '%'||to_char(#{fileaddress})||'%'
+                        </if>
+                                    </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by create_time desc
+                    </otherwise>
+                </choose>
+                )a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from RESOURCE_PUBLICITYCARD
+            </otherwise>
+        </choose>
+    </select>
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from RESOURCE_PUBLICITYCARD
+		<where>
+			<if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+			</if>
+			<if test="code != null and code!=''">AND CODE like '%'||to_char(#{code})||'%'
+			</if>
+			<if test="name != null and name!=''">AND NAME like '%'||to_char(#{name})||'%'
+			</if>
+			<if test="resourcetype != null and resourcetype!=''">AND RESOURCETYPE like '%'||to_char(#{resourcetype})||'%'
+			</if>
+			<if test="resourceName != null and resourceName!=''">
+				resourceid IN
+				(SELECT id FROM river WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				UNION
+				SELECT id FROM lake WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				UNION
+				SELECT id FROM part_river WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				UNION
+				SELECT id FROM part_lake WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				UNION
+				SELECT id FROM canal WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				UNION
+				SELECT id FROM part_canal WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				UNION
+				SELECT id FROM reservoir WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				UNION
+				SELECT id FROM part_reservoir WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				)
+			</if>
+			<if test="resourceid != null and resourceid!=''">AND RESOURCEID like '%'||to_char(#{resourceid})||'%'
+			</if>
+			<if test="x != null and x!=''">AND X like '%'||to_char(#{x})||'%'
+			</if>
+			<if test="y != null and y!=''">AND Y like '%'||to_char(#{y})||'%'
+			</if>
+			<if test="areaId != null and areaId!=''">AND AREA_ID in (select area_id FROM sys_area START WITH area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+			</if>
+			<if test="address != null and address!=''">AND ADDRESS like '%'||to_char(#{address})||'%'
+			</if>
+			<if test="fileaddress != null and fileaddress!=''">AND FILEADDRESS like '%'||to_char(#{fileaddress})||'%'
+			</if>
+		</where>
+	</select>
+	 
+	<insert id="save" parameterType="com.khidi.manager.basicinfo.entity.ResourcePublicitycardEntity">
+		insert into RESOURCE_PUBLICITYCARD
+		(
+			ID , 
+			CODE , 
+			NAME , 
+			RESOURCETYPE , 
+			RESOURCEID , 
+			X , 
+			Y , 
+			AREA_ID , 
+			ADDRESS ,
+			REMARK,
+			FILEADDRESS 
+		)
+		values
+		(
+			#{id,jdbcType = VARCHAR}, 
+			#{code,jdbcType = VARCHAR}, 
+			#{name,jdbcType = VARCHAR}, 
+			#{resourcetype,jdbcType = VARCHAR}, 
+			#{resourceid,jdbcType = VARCHAR}, 
+			#{x,jdbcType = VARCHAR}, 
+			#{y,jdbcType = VARCHAR}, 
+			#{areaId,jdbcType = VARCHAR}, 
+			#{address,jdbcType = VARCHAR},
+			#{remark,jdbcType = VARCHAR},
+			#{fileaddress,jdbcType = VARCHAR}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.khidi.manager.basicinfo.entity.ResourcePublicitycardEntity">
+		update RESOURCE_PUBLICITYCARD 
+		<set>
+			<if test="code != null">
+				CODE = #{code}  , </if>
+			<if test="name != null">
+				NAME = #{name}  , </if>
+			<if test="resourcetype != null">
+				RESOURCETYPE = #{resourcetype}  , </if>
+			<if test="resourceid != null">
+				RESOURCEID = #{resourceid}  , </if>
+			<if test="x != null">
+				X = #{x}  , </if>
+			<if test="remark != null">
+				REMARK = #{remark}  , </if>
+			<if test="y != null">
+				Y = #{y}  , </if>
+			<if test="areaId != null">
+				AREA_ID = #{areaId}  , </if>
+			<if test="address != null">
+				ADDRESS = #{address}  , </if>
+			<if test="fileaddress != null">
+				FILEADDRESS = #{fileaddress}  </if>
+		</set>
+		where ID = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from RESOURCE_PUBLICITYCARD where ID = #{id}
+	</delete>
+</mapper>

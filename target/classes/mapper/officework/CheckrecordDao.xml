@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.officework.dao.CheckrecordDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.officework.entity.CheckrecordEntity" id="checkrecordMap">
+        <result property="id" column="ID"/>
+        <result property="status" column="STATUS"/>
+        <result property="checkstarttime" column="CHECKSTARTTIME"/>
+        <result property="eventids" column="EVENTIDS"/>
+        <result property="taskid" column="TASKID"/>
+        <result property="checkendtime" column="CHECKENDTIME"/>
+        <result property="createtime" column="CREATETIME"/>
+        <result property="situation" column="SITUATION"/>
+        <result property="attachmentids" column="ATTACHMENTIDS"/>
+        <result property="iswaterdirty" column="ISWATERDIRTY"/>
+        <result property="isoccupyriver" column="ISOCCUPYRIVER"/>
+        <result property="isfloater" column="ISFLOATER"/>
+        <result property="isrubbish" column="ISRUBBISH"/>
+        <result property="issmelly" column="ISSMELLY"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.khidi.manager.officework.entity.CheckrecordEntity">
+		select * from CHECKRECORD where ID = #{id}
+	</select>
+
+
+    <select id="queryList" resultType="com.khidi.manager.officework.entity.CheckrecordEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN
+                FROM (select * from CHECKRECORD
+                <where>
+                                            <if test="areaId != null and areaId!=''">AND taskid in(select id from checktask where checktask.routeid in (select id from checkroute where areaid in (select area_id FROM sys_area START WITH area_id=#{areaId} CONNECT BY prior area_id = parent_id)))
+                        </if>
+                                            <if test="resourceName != null and resourceName!=''"> AND taskid in ( select id from checktask where  checktask.routeid in (select id from checkroute where checkroute.resourceid in (
+												SELECT id FROM river WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+												UNION
+												SELECT id FROM lake WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+												UNION
+												SELECT id FROM part_river WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+												UNION
+												SELECT id FROM part_lake WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+												UNION
+												SELECT id FROM canal WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+												UNION
+												SELECT id FROM part_canal WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+												UNION
+												SELECT id FROM reservoir WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+												UNION
+												SELECT id FROM part_reservoir WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+												)) )
+                        </if>
+											<if test="checker != null and checker!=''">AND taskid in (select id from checktask where exists ( select user_id from  sys_user where  name  like  '%'||#{checker}||'%'   and  checktask.checker like sys_user.user_id )  )
+						</if>
+											<if test="checkstarttime != null and checkstarttime!=''">AND CHECKSTARTTIME &lt;= #{checkstarttime}
+                        </if>
+											<if test="checkendtime != null and checkendtime!=''">AND CHECKENDTIME &gt;= #{checkendtime}
+						</if>
+                                            <if test="eventids != null and eventids!=''">AND EVENTIDS IS NOT NULL
+                        </if>
+                                            <if test="iswaterdirty != null and iswaterdirty!=''">AND ISWATERDIRTY IS NOT NULL
+											</if>
+                                            <if test="isoccupyriver != null and isoccupyriver!=''">AND ISOCCUPYRIVER IS NOT NULL '%'
+                        </if>
+                                            <if test="isfloater != null and isfloater!=''">AND ISFLOATER IS NOT NULL
+											</if>
+                                            <if test="isrubbish != null and isrubbish!=''">AND ISRUBBISH IS NOT NULL
+											</if>
+                                            <if test="issmelly != null and issmelly!=''">AND ISSMELLY IS NOT NULL
+											</if>
+                                    </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by createtime desc
+                    </otherwise>
+                </choose>
+                )a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from CHECKRECORD
+            </otherwise>
+        </choose>
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from CHECKRECORD
+		<where>
+			<if test="areaId != null and areaId!=''">AND taskid in(select id from checktask where checktask.routeid in (select id from checkroute where areaid in (select area_id FROM sys_area START WITH area_id=#{areaId} CONNECT BY prior area_id = parent_id)))
+			</if>
+			<if test="resourceName != null and resourceName!=''"> AND taskid in ( select id from checktask where  checktask.routeid in (select id from checkroute where checkroute.resourceid in (
+				SELECT id FROM river WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				UNION
+				SELECT id FROM lake WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				UNION
+				SELECT id FROM part_river WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				UNION
+				SELECT id FROM part_lake WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				UNION
+				SELECT id FROM canal WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				UNION
+				SELECT id FROM part_canal WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				UNION
+				SELECT id FROM reservoir WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				UNION
+				SELECT id FROM part_reservoir WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				)) )
+			</if>
+			<if test="checker != null and checker!=''">AND taskid in (select id from checktask where exists ( select user_id from  sys_user where  name  like  '%'||#{checker}||'%'   and  checktask.checker like sys_user.user_id )  )
+			</if>
+			<if test="checkstarttime != null and checkstarttime!=''">AND CHECKSTARTTIME &lt;= #{checkstarttime}
+			</if>
+			<if test="checkendtime != null and checkendtime!=''">AND CHECKENDTIME &gt;= #{checkendtime}
+			</if>
+			<if test="eventids != null and eventids!=''">AND EVENTIDS IS NOT NULL
+			</if>
+			<if test="iswaterdirty != null and iswaterdirty!=''">AND ISWATERDIRTY IS NOT NULL
+			</if>
+			<if test="isoccupyriver != null and isoccupyriver!=''">AND ISOCCUPYRIVER IS NOT NULL '%'
+			</if>
+			<if test="isfloater != null and isfloater!=''">AND ISFLOATER IS NOT NULL
+			</if>
+			<if test="isrubbish != null and isrubbish!=''">AND ISRUBBISH IS NOT NULL
+			</if>
+			<if test="issmelly != null and issmelly!=''">AND ISSMELLY IS NOT NULL
+			</if>
+		</where>
+	</select>
+	 
+	<insert id="save" parameterType="com.khidi.manager.officework.entity.CheckrecordEntity">
+		insert into CHECKRECORD
+		(
+			ID , 
+			STATUS , 
+			CHECKSTARTTIME , 
+			EVENTIDS , 
+			TASKID , 
+			CHECKENDTIME , 
+			CREATETIME , 
+			SITUATION , 
+			ATTACHMENTIDS , 
+			ISWATERDIRTY , 
+			ISOCCUPYRIVER , 
+			ISFLOATER , 
+			ISRUBBISH , 
+			ISSMELLY 
+		)
+		values
+		(
+			#{id,jdbcType = VARCHAR}, 
+			#{status,jdbcType = VARCHAR}, 
+			#{checkstarttime,jdbcType = VARCHAR}, 
+			#{eventids,jdbcType = VARCHAR}, 
+			#{taskid,jdbcType = VARCHAR}, 
+			#{checkendtime,jdbcType = VARCHAR}, 
+			#{createtime,jdbcType = VARCHAR}, 
+			#{situation,jdbcType = VARCHAR}, 
+			#{attachmentids,jdbcType = VARCHAR}, 
+			#{iswaterdirty,jdbcType = VARCHAR}, 
+			#{isoccupyriver,jdbcType = VARCHAR}, 
+			#{isfloater,jdbcType = VARCHAR}, 
+			#{isrubbish,jdbcType = VARCHAR}, 
+			#{issmelly,jdbcType = VARCHAR}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.khidi.manager.officework.entity.CheckrecordEntity">
+		update CHECKRECORD 
+		<set>
+			<if test="status != null">
+				STATUS = #{status}  , </if>
+			<if test="checkstarttime != null">
+				CHECKSTARTTIME = #{checkstarttime}  , </if>
+			<if test="eventids != null">
+				EVENTIDS = #{eventids}  , </if>
+			<if test="taskid != null">
+				TASKID = #{taskid}  , </if>
+			<if test="checkendtime != null">
+				CHECKENDTIME = #{checkendtime}  , </if>
+			<if test="createtime != null">
+				CREATETIME = #{createtime}  , </if>
+			<if test="situation != null">
+				SITUATION = #{situation}  , </if>
+			<if test="attachmentids != null">
+				ATTACHMENTIDS = #{attachmentids}  , </if>
+			<if test="iswaterdirty != null">
+				ISWATERDIRTY = #{iswaterdirty}  , </if>
+			<if test="isoccupyriver != null">
+				ISOCCUPYRIVER = #{isoccupyriver}  , </if>
+			<if test="isfloater != null">
+				ISFLOATER = #{isfloater}  , </if>
+			<if test="isrubbish != null">
+				ISRUBBISH = #{isrubbish}  , </if>
+			<if test="issmelly != null">
+				ISSMELLY = #{issmelly}  </if>
+		</set>
+		where ID = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from CHECKRECORD where ID = #{id}
+	</delete>
+</mapper>

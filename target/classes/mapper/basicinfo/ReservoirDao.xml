@@ -1,0 +1,636 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.basicinfo.dao.ReservoirDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.basicinfo.entity.ReservoirEntity"
+               id="reservoirMap">
+        <result property="id" column="ID"/>
+        <result property="name" column="NAME"/>
+        <result property="code" column="CODE"/>
+        <result property="areaId" column="AREA_ID"/>
+        <result property="alias" column="ALIAS"/>
+        <result property="location" column="LOCATION"/>
+        <result property="leftX" column="LEFTX"/>
+        <result property="rightX" column="RIGHTX"/>
+        <result property="rightY" column="RIGHTY"/>
+        <result property="leftY" column="LEFTY"/>
+        <result property="reservoirType" column="RESERVOIR_TYPE"/>
+        <result property="reservoirWork" column="RESERVOIRWORK"/>
+        <result property="build" column="BUILD"/>
+        <result property="reservoirLevel" column="RESERVOIRLEVEL"/>
+        <result property="scale" column="SCALE"/>
+        <result property="waterLevel" column="WATERLEVEL"/>
+        <result property="highLevel" column="HIGHLEVEL"/>
+        <result property="normalLevel" column="NORMALLEVEL"/>
+        <result property="area" column="AREA"/>
+        <result property="normalCapacity" column="NORMALCAPACITY"/>
+        <result property="sumCapacity" column="SUMCAPACITY"/>
+        <result property="floodCapacity" column="FLOODCAPACITY"/>
+        <result property="deadCapacity" column="DEADCAPACITY"/>
+        <result property="floodLimitCapacity" column="FLOODLIMITCAPACITY"/>
+        <result property="normalArea" column="NORMALAREA"/>
+        <result property="floodLimitLevel" column="FLOODLIMITLEVEL"/>
+        <result property="deadLevel" column="DEADLEVEL"/>
+        <result property="yearsFlow" column="YEARSFLOW"/>
+        <result property="starttime" column="STARTTIME"/>
+        <result property="endtime" column="ENDTIME"/>
+        <result property="reservoirManager" column="RESERVOIRMANAGER"/>
+        <result property="remark" column="REMARK"/>
+        <result property="header" column="HEADER"/>
+        <result property="coordinater" column="COORDINATER"/>
+        <result property="policeman" column="POLICEMAN"/>
+        <result property="checker" column="CHECKER"/>
+        <result property="superviser" column="SUPERVISER"/>
+        <result property="duty" column="DUTY"/>
+        <result property="aim" column="AIM"/>
+        <result property="headerremark" column="HEADERREMARK"/>
+        <result property="coordinaterpost" column="COORDINATERPOST"/>
+        <result property="checkerpost" column="CHECKERPOST"/>
+        <result property="superviserpost" column="SUPERVISERPOST"/>
+        <result property="headerpost" column="HEADERPOST"/>
+        <result property="featureId" column="FEATUREID"/>
+    </resultMap>
+
+    <select id="queryObject" resultType="com.khidi.manager.basicinfo.entity.ReservoirEntity">
+		select * from RESERVOIR
+		where ID = #{id}
+	</select>
+
+
+    <select id="queryList" resultType="com.khidi.manager.basicinfo.entity.ReservoirEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN
+                FROM (select * from RESERVOIR
+                <where>
+                    <if test="roleId != null">
+
+                        ((SELECT XMLAGG(XMLELEMENT(E,RESERVOIRIDS
+                        ||',')).EXTRACT('//text()').getclobval() AS RESERVOIRIDS
+                        FROM sys_role_resource
+                        WHERE roleid IN (${roleId})) LIKE '%'||RESERVOIR.ID||'%'
+                        or
+                        RESERVOIR.ID in (select RESERVOIRid from part_RESERVOIR where (SELECT XMLAGG(XMLELEMENT(E,partRESERVOIRIDS
+                        ||',')).EXTRACT('//text()').getclobval() AS partRESERVOIRIDS
+                        FROM sys_role_resource
+                        WHERE roleid IN (${roleId})) like '%'||id||'%'))
+
+                        <!--
+                        ((exists (select 1 from (SELECT b.reservoirids
+                        FROM sys_role_resource b
+                        WHERE b.roleid IN (${roleId})) t where t.reservoirids LIKE '%'
+                        ||RESERVOIR.ID
+                        ||'%'
+                        ))
+                        OR RESERVOIR.ID IN
+                        (SELECT RESERVOIRID
+                        FROM part_RESERVOIR
+                        WHERE
+                        (SELECT wm_concat(b.PARTRESERVOIRIDS)
+                        FROM sys_role_resource b
+                        WHERE b.roleid IN (${roleId})) LIKE '%'
+                        ||id
+                        ||'%'
+                        ))
+                        -->
+                    </if>
+                    <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                    </if>
+                    <if test="name != null and name!=''">AND NAME like '%'||to_char(#{name})||'%'
+                    </if>
+                    <if test="code != null and code!=''">AND CODE like '%'||to_char(#{code})||'%'
+                    </if>
+                    <if test="areaId != null and areaId!=''">AND AREA_ID in (select area_id FROM sys_area START WITH
+                        area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+                    </if>
+                    <if test="alias != null and alias!=''">AND ALIAS like '%'||to_char(#{alias})||'%'
+                    </if>
+                    <if test="location != null and location!=''">AND LOCATION like '%'||to_char(#{location})||'%'
+                    </if>
+                    <if test="leftX != null and leftX!=''">AND LEFTX like '%'||to_char(#{leftX})||'%'
+                    </if>
+                    <if test="rightX != null and rightX!=''">AND RIGHTX like '%'||to_char(#{rightX})||'%'
+                    </if>
+                    <if test="rightY != null and rightY!=''">AND RIGHTY like '%'||to_char(#{rightY})||'%'
+                    </if>
+                    <if test="leftY != null and leftY!=''">AND LEFTY like '%'||to_char(#{leftY})||'%'
+                    </if>
+                    <if test="reservoirType != null and reservoirType!=''">AND RESERVOIR_TYPE like
+                        '%'||to_char(#{reservoirType})||'%'
+                    </if>
+                    <if test="reservoirWork != null and reservoirWork!=''">AND RESERVOIRWORK like
+                        '%'||to_char(#{reservoirWork})||'%'
+                    </if>
+                    <if test="build != null and build!=''">AND BUILD like '%'||to_char(#{build})||'%'
+                    </if>
+                    <if test="reservoirLevel != null and reservoirLevel!=''">AND RESERVOIRLEVEL like
+                        '%'||to_char(#{reservoirLevel})||'%'
+                    </if>
+                    <if test="scale != null and scale!=''">AND SCALE like '%'||to_char(#{scale})||'%'
+                    </if>
+                    <if test="waterLevel != null and waterLevel!=''">AND WATERLEVEL like
+                        '%'||to_char(#{waterLevel})||'%'
+                    </if>
+                    <if test="highLevel != null and highLevel!=''">AND HIGHLEVEL like '%'||to_char(#{highLevel})||'%'
+                    </if>
+                    <if test="normalLevel != null and normalLevel!=''">AND NORMALLEVEL like
+                        '%'||to_char(#{normalLevel})||'%'
+                    </if>
+                    <if test="area != null and area!=''">AND AREA like '%'||to_char(#{area})||'%'
+                    </if>
+                    <if test="normalCapacity != null and normalCapacity!=''">AND NORMALCAPACITY like
+                        '%'||to_char(#{normalCapacity})||'%'
+                    </if>
+                    <if test="sumCapacity != null and sumCapacity!=''">AND SUMCAPACITY like
+                        '%'||to_char(#{sumCapacity})||'%'
+                    </if>
+                    <if test="floodCapacity != null and floodCapacity!=''">AND FLOODCAPACITY like
+                        '%'||to_char(#{floodCapacity})||'%'
+                    </if>
+                    <if test="deadCapacity != null and deadCapacity!=''">AND DEADCAPACITY like
+                        '%'||to_char(#{deadCapacity})||'%'
+                    </if>
+                    <if test="floodLimitCapacity != null and floodLimitCapacity!=''">AND FLOODLIMIT_CAPACITY like
+                        '%'||to_char(#{floodLimitCapacity})||'%'
+                    </if>
+                    <if test="normalArea != null and normalArea!=''">AND NORMALAREA like
+                        '%'||to_char(#{normalArea})||'%'
+                    </if>
+                    <if test="floodLimitLevel != null and floodLimitLevel!=''">AND FLOODLIMITLEVEL like
+                        '%'||to_char(#{floodLimitLevel})||'%'
+                    </if>
+                    <if test="deadLevel != null and deadLevel!=''">AND DEADLEVEL like '%'||to_char(#{deadLevel})||'%'
+                    </if>
+                    <if test="yearsFlow != null and yearsFlow!=''">AND YEARSFLOW like '%'||to_char(#{yearsFlow})||'%'
+                    </if>
+                    <if test="starttime != null and starttime!=''">AND STARTTIME like '%'||to_char(#{starttime})||'%'
+                    </if>
+                    <if test="endtime != null and endtime!=''">AND ENDTIME like '%'||to_char(#{endtime})||'%'
+                    </if>
+                    <if test="reservoirManager != null and reservoirManager!=''">AND RESERVOIRMANAGER like
+                        '%'||to_char(#{reservoirManager})||'%'
+                    </if>
+                    <if test="remark != null and remark!=''">AND REMARK like '%'||to_char(#{remark})||'%'
+                    </if>
+                    <if test="featureId != null and featureId!=''">AND FEATUREID like '%'||to_char(#{featureId})||'%'
+                    </if>
+                </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by createtime desc
+                    </otherwise>
+                </choose>
+                ) a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from RESERVOIR
+                <where>
+                    <if test="roleId != null">
+                        ((SELECT XMLAGG(XMLELEMENT(E,RESERVOIRIDS
+                        ||',')).EXTRACT('//text()').getclobval() AS RESERVOIRIDS
+                        FROM sys_role_resource
+                        WHERE roleid IN (${roleId})) LIKE '%'||RESERVOIR.ID||'%'
+                        or
+                        RESERVOIR.ID in (select RESERVOIRid from part_RESERVOIR where (SELECT XMLAGG(XMLELEMENT(E,partRESERVOIRIDS
+                        ||',')).EXTRACT('//text()').getclobval() AS partRESERVOIRIDS
+                        FROM sys_role_resource
+                        WHERE roleid IN (${roleId})) like '%'||id||'%'))
+                    </if>
+                    <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                    </if>
+                    <if test="name != null and name!=''">AND NAME like '%'||to_char(#{name})||'%'
+                    </if>
+                    <if test="code != null and code!=''">AND CODE like '%'||to_char(#{code})||'%'
+                    </if>
+                    <if test="areaId != null and areaId!=''">AND AREA_ID in (select area_id FROM sys_area START WITH
+                        area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+                    </if>
+                    <if test="alias != null and alias!=''">AND ALIAS like '%'||to_char(#{alias})||'%'
+                    </if>
+                    <if test="location != null and location!=''">AND LOCATION like '%'||to_char(#{location})||'%'
+                    </if>
+                    <if test="leftX != null and leftX!=''">AND LEFTX like '%'||to_char(#{leftX})||'%'
+                    </if>
+                    <if test="rightX != null and rightX!=''">AND RIGHTX like '%'||to_char(#{rightX})||'%'
+                    </if>
+                    <if test="rightY != null and rightY!=''">AND RIGHTY like '%'||to_char(#{rightY})||'%'
+                    </if>
+                    <if test="leftY != null and leftY!=''">AND LEFTY like '%'||to_char(#{leftY})||'%'
+                    </if>
+                    <if test="reservoirType != null and reservoirType!=''">AND RESERVOIR_TYPE like
+                        '%'||to_char(#{reservoirType})||'%'
+                    </if>
+                    <if test="reservoirWork != null and reservoirWork!=''">AND RESERVOIRWORK like
+                        '%'||to_char(#{reservoirWork})||'%'
+                    </if>
+                    <if test="build != null and build!=''">AND BUILD like '%'||to_char(#{build})||'%'
+                    </if>
+                    <if test="reservoirLevel != null and reservoirLevel!=''">AND RESERVOIRLEVEL like
+                        '%'||to_char(#{reservoirLevel})||'%'
+                    </if>
+                    <if test="scale != null and scale!=''">AND SCALE like '%'||to_char(#{scale})||'%'
+                    </if>
+                    <if test="waterLevel != null and waterLevel!=''">AND WATERLEVEL like
+                        '%'||to_char(#{waterLevel})||'%'
+                    </if>
+                    <if test="highLevel != null and highLevel!=''">AND HIGHLEVEL like '%'||to_char(#{highLevel})||'%'
+                    </if>
+                    <if test="normalLevel != null and normalLevel!=''">AND NORMALLEVEL like
+                        '%'||to_char(#{normalLevel})||'%'
+                    </if>
+                    <if test="area != null and area!=''">AND AREA like '%'||to_char(#{area})||'%'
+                    </if>
+                    <if test="normalCapacity != null and normalCapacity!=''">AND NORMALCAPACITY like
+                        '%'||to_char(#{normalCapacity})||'%'
+                    </if>
+                    <if test="sumCapacity != null and sumCapacity!=''">AND SUMCAPACITY like
+                        '%'||to_char(#{sumCapacity})||'%'
+                    </if>
+                    <if test="floodCapacity != null and floodCapacity!=''">AND FLOODCAPACITY like
+                        '%'||to_char(#{floodCapacity})||'%'
+                    </if>
+                    <if test="deadCapacity != null and deadCapacity!=''">AND DEADCAPACITY like
+                        '%'||to_char(#{deadCapacity})||'%'
+                    </if>
+                    <if test="floodLimitCapacity != null and floodLimitCapacity!=''">AND FLOODLIMIT_CAPACITY like
+                        '%'||to_char(#{floodLimitCapacity})||'%'
+                    </if>
+                    <if test="normalArea != null and normalArea!=''">AND NORMALAREA like
+                        '%'||to_char(#{normalArea})||'%'
+                    </if>
+                    <if test="floodLimitLevel != null and floodLimitLevel!=''">AND FLOODLIMITLEVEL like
+                        '%'||to_char(#{floodLimitLevel})||'%'
+                    </if>
+                    <if test="deadLevel != null and deadLevel!=''">AND DEADLEVEL like '%'||to_char(#{deadLevel})||'%'
+                    </if>
+                    <if test="yearsFlow != null and yearsFlow!=''">AND YEARSFLOW like '%'||to_char(#{yearsFlow})||'%'
+                    </if>
+                    <if test="starttime != null and starttime!=''">AND STARTTIME like '%'||to_char(#{starttime})||'%'
+                    </if>
+                    <if test="endtime != null and endtime!=''">AND ENDTIME like '%'||to_char(#{endtime})||'%'
+                    </if>
+                    <if test="reservoirManager != null and reservoirManager!=''">AND RESERVOIRMANAGER like
+                        '%'||to_char(#{reservoirManager})||'%'
+                    </if>
+                    <if test="remark != null and remark!=''">AND REMARK like '%'||to_char(#{remark})||'%'
+                    </if>
+                    <if test="featureId != null and featureId!=''">AND FEATUREID like '%'||to_char(#{featureId})||'%'
+                    </if>
+                </where>
+            </otherwise>
+        </choose>
+
+    </select>
+
+
+    <select id="queryTotal" resultType="int">
+        select count(*) from RESERVOIR
+        <where>
+            <if test="roleId != null">
+                ((SELECT XMLAGG(XMLELEMENT(E,RESERVOIRIDS
+                ||',')).EXTRACT('//text()').getclobval() AS RESERVOIRIDS
+                FROM sys_role_resource
+                WHERE roleid IN (${roleId})) LIKE '%'||RESERVOIR.ID||'%'
+                or
+                RESERVOIR.ID in (select RESERVOIRid from part_RESERVOIR where (SELECT XMLAGG(XMLELEMENT(E,partRESERVOIRIDS
+                ||',')).EXTRACT('//text()').getclobval() AS partRESERVOIRIDS
+                FROM sys_role_resource
+                WHERE roleid IN (${roleId})) like '%'||id||'%'))
+            </if>
+            <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+            </if>
+            <if test="name != null and name!=''">AND NAME like '%'||to_char(#{name})||'%'
+            </if>
+            <if test="code != null and code!=''">AND CODE like '%'||to_char(#{code})||'%'
+            </if>
+            <if test="areaId != null and areaId!=''">AND AREA_ID in (select area_id FROM sys_area START WITH
+                area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+            </if>
+            <if test="alias != null and alias!=''">AND ALIAS like '%'||to_char(#{alias})||'%'
+            </if>
+            <if test="location != null and location!=''">AND LOCATION like '%'||to_char(#{location})||'%'
+            </if>
+            <if test="leftX != null and leftX!=''">AND LEFTX like '%'||to_char(#{leftX})||'%'
+            </if>
+            <if test="rightX != null and rightX!=''">AND RIGHTX like '%'||to_char(#{rightX})||'%'
+            </if>
+            <if test="rightY != null and rightY!=''">AND RIGHTY like '%'||to_char(#{rightY})||'%'
+            </if>
+            <if test="leftY != null and leftY!=''">AND LEFTY like '%'||to_char(#{leftY})||'%'
+            </if>
+            <if test="reservoirType != null and reservoirType!=''">AND RESERVOIR_TYPE like
+                '%'||to_char(#{reservoirType})||'%'
+            </if>
+            <if test="reservoirWork != null and reservoirWork!=''">AND RESERVOIRWORK like
+                '%'||to_char(#{reservoirWork})||'%'
+            </if>
+            <if test="build != null and build!=''">AND BUILD like '%'||to_char(#{build})||'%'
+            </if>
+            <if test="reservoirLevel != null and reservoirLevel!=''">AND RESERVOIRLEVEL like
+                '%'||to_char(#{reservoirLevel})||'%'
+            </if>
+            <if test="scale != null and scale!=''">AND SCALE like '%'||to_char(#{scale})||'%'
+            </if>
+            <if test="waterLevel != null and waterLevel!=''">AND WATERLEVEL like
+                '%'||to_char(#{waterLevel})||'%'
+            </if>
+            <if test="highLevel != null and highLevel!=''">AND HIGHLEVEL like '%'||to_char(#{highLevel})||'%'
+            </if>
+            <if test="normalLevel != null and normalLevel!=''">AND NORMALLEVEL like
+                '%'||to_char(#{normalLevel})||'%'
+            </if>
+            <if test="area != null and area!=''">AND AREA like '%'||to_char(#{area})||'%'
+            </if>
+            <if test="normalCapacity != null and normalCapacity!=''">AND NORMALCAPACITY like
+                '%'||to_char(#{normalCapacity})||'%'
+            </if>
+            <if test="sumCapacity != null and sumCapacity!=''">AND SUMCAPACITY like
+                '%'||to_char(#{sumCapacity})||'%'
+            </if>
+            <if test="floodCapacity != null and floodCapacity!=''">AND FLOODCAPACITY like
+                '%'||to_char(#{floodCapacity})||'%'
+            </if>
+            <if test="deadCapacity != null and deadCapacity!=''">AND DEADCAPACITY like
+                '%'||to_char(#{deadCapacity})||'%'
+            </if>
+            <if test="floodLimitCapacity != null and floodLimitCapacity!=''">AND FLOODLIMIT_CAPACITY like
+                '%'||to_char(#{floodLimitCapacity})||'%'
+            </if>
+            <if test="normalArea != null and normalArea!=''">AND NORMALAREA like
+                '%'||to_char(#{normalArea})||'%'
+            </if>
+            <if test="floodLimitLevel != null and floodLimitLevel!=''">AND FLOODLIMITLEVEL like
+                '%'||to_char(#{floodLimitLevel})||'%'
+            </if>
+            <if test="deadLevel != null and deadLevel!=''">AND DEADLEVEL like '%'||to_char(#{deadLevel})||'%'
+            </if>
+            <if test="yearsFlow != null and yearsFlow!=''">AND YEARSFLOW like '%'||to_char(#{yearsFlow})||'%'
+            </if>
+            <if test="starttime != null and starttime!=''">AND STARTTIME like '%'||to_char(#{starttime})||'%'
+            </if>
+            <if test="endtime != null and endtime!=''">AND ENDTIME like '%'||to_char(#{endtime})||'%'
+            </if>
+            <if test="reservoirManager != null and reservoirManager!=''">AND RESERVOIRMANAGER like
+                '%'||to_char(#{reservoirManager})||'%'
+            </if>
+            <if test="remark != null and remark!=''">AND REMARK like '%'||to_char(#{remark})||'%'
+            </if>
+            <if test="featureId != null and featureId!=''">AND FEATUREID like '%'||to_char(#{featureId})||'%'
+            </if>
+        </where>
+    </select>
+
+    <insert id="save" parameterType="com.khidi.manager.basicinfo.entity.ReservoirEntity">
+		insert into RESERVOIR
+		(
+        HEADER ,
+		COORDINATER ,
+		POLICEMAN ,
+		CHECKER ,
+		SUPERVISER ,
+		DUTY ,
+		AIM ,
+		HEADERREMARK ,
+		COORDINATERPOST ,
+		CHECKERPOST ,
+		SUPERVISERPOST ,
+		HEADERPOST ,
+		ID ,
+		NAME ,
+		CODE ,
+		AREA_ID ,
+		ALIAS ,
+		LOCATION ,
+		LEFTX ,
+		RIGHTX ,
+		RIGHTY ,
+		LEFTY ,
+		RESERVOIR_TYPE ,
+		RESERVOIRWORK ,
+		BUILD ,
+		RESERVOIRLEVEL ,
+		SCALE ,
+		WATERLEVEL ,
+		HIGHLEVEL ,
+		NORMALLEVEL ,
+		AREA ,
+		NORMALCAPACITY ,
+		SUMCAPACITY ,
+		FLOODCAPACITY ,
+		DEADCAPACITY ,
+		FLOODLIMITCAPACITY ,
+		NORMALAREA ,
+		FLOODLIMITLEVEL ,
+		DEADLEVEL ,
+		YEARSFLOW ,
+		STARTTIME ,
+		ENDTIME ,
+		RESERVOIRMANAGER ,
+		REMARK,
+		FEATUREID
+		)
+		values
+		(
+        #{header,jdbcType = VARCHAR},
+		#{coordinater,jdbcType = VARCHAR},
+		#{policeman,jdbcType = VARCHAR},
+		#{checker,jdbcType = VARCHAR},
+		#{superviser,jdbcType = VARCHAR},
+		#{duty,jdbcType = VARCHAR},
+		#{aim,jdbcType = VARCHAR},
+		#{headerremark,jdbcType = VARCHAR},
+		#{coordinaterpost,jdbcType = VARCHAR},
+		#{checkerpost,jdbcType = VARCHAR},
+		#{superviserpost,jdbcType = VARCHAR},
+		#{headerpost,jdbcType = VARCHAR},
+		#{id,jdbcType = VARCHAR},
+		#{name,jdbcType = VARCHAR},
+		#{code,jdbcType = VARCHAR},
+		#{areaId,jdbcType = VARCHAR},
+		#{alias,jdbcType = VARCHAR},
+		#{location,jdbcType = VARCHAR},
+		#{leftX,jdbcType = VARCHAR},
+		#{rightX,jdbcType = VARCHAR},
+		#{rightY,jdbcType = VARCHAR},
+		#{leftY,jdbcType = VARCHAR},
+		#{reservoirType,jdbcType = VARCHAR},
+		#{reservoirWork,jdbcType = VARCHAR},
+		#{build,jdbcType = VARCHAR},
+		#{reservoirLevel,jdbcType = VARCHAR},
+		#{scale,jdbcType = VARCHAR},
+		#{waterLevel,jdbcType = VARCHAR},
+		#{highLevel,jdbcType = VARCHAR},
+		#{normalLevel,jdbcType = VARCHAR},
+		#{area,jdbcType = VARCHAR},
+		#{normalCapacity,jdbcType = VARCHAR},
+		#{sumCapacity,jdbcType = VARCHAR},
+		#{floodCapacity,jdbcType = VARCHAR},
+		#{deadCapacity,jdbcType = VARCHAR},
+		#{floodLimitCapacity,jdbcType = VARCHAR},
+		#{normalArea,jdbcType = VARCHAR},
+		#{floodLimitLevel,jdbcType = VARCHAR},
+		#{deadLevel,jdbcType = VARCHAR},
+		#{yearsFlow,jdbcType = VARCHAR},
+		to_date(substr(#{starttime,jdbcType = DATE},1,10),'yyyy-MM-dd'),
+        to_date(substr(#{endtime,jdbcType = DATE},1,10),'yyyy-MM-dd'),
+		#{reservoirManager,jdbcType = VARCHAR},
+		#{remark,jdbcType = VARCHAR},
+		#{featureId,jdbcType = VARCHAR}
+		)
+	</insert>
+
+    <update id="update" parameterType="com.khidi.manager.basicinfo.entity.ReservoirEntity">
+        update RESERVOIR
+        <set>
+            <if test="header != null">
+                HEADER = #{header} ,
+            </if>
+            <if test="coordinater != null">
+                COORDINATER = #{coordinater} ,
+            </if>
+            <if test="policeman != null">
+                POLICEMAN = #{policeman} ,
+            </if>
+            <if test="checker != null">
+                CHECKER = #{checker} ,
+            </if>
+            <if test="superviser != null">
+                SUPERVISER = #{superviser} ,
+            </if>
+            <if test="duty != null">
+                DUTY = #{duty} ,
+            </if>
+            <if test="aim != null">
+                AIM = #{aim} ,
+            </if>
+            <if test="headerremark != null">
+                HEADERREMARK = #{headerremark} ,
+            </if>
+            <if test="coordinaterpost != null">
+                COORDINATERPOST = #{coordinaterpost} ,
+            </if>
+            <if test="checkerpost != null">
+                CHECKERPOST = #{checkerpost} ,
+            </if>
+            <if test="superviserpost != null">
+                SUPERVISERPOST = #{superviserpost} ,
+            </if>
+            <if test="headerpost != null">
+                HEADERPOST = #{headerpost} ,
+            </if>
+            <if test="name != null">
+                NAME = #{name} ,
+            </if>
+            <if test="code != null">
+                CODE = #{code} ,
+            </if>
+            <if test="areaId != null">
+                AREA_ID = #{areaId} ,
+            </if>
+            <if test="alias != null">
+                ALIAS = #{alias} ,
+            </if>
+            <if test="location != null">
+                LOCATION = #{location} ,
+            </if>
+            <if test="leftX != null">
+                LEFTX = #{leftX} ,
+            </if>
+            <if test="rightX != null">
+                RIGHTX = #{rightX} ,
+            </if>
+            <if test="rightY != null">
+                RIGHTY = #{rightY} ,
+            </if>
+            <if test="leftY != null">
+                LEFTY = #{leftY} ,
+            </if>
+            <if test="reservoirType != null">
+                RESERVOIR_TYPE = #{reservoirType} ,
+            </if>
+            <if test="reservoirWork != null">
+                RESERVOIRWORK = #{reservoirWork} ,
+            </if>
+            <if test="build != null">
+                BUILD = #{build} ,
+            </if>
+            <if test="reservoirLevel != null">
+                RESERVOIRLEVEL = #{reservoirLevel} ,
+            </if>
+            <if test="scale != null">
+                SCALE = #{scale} ,
+            </if>
+            <if test="waterLevel != null">
+                WATERLEVEL = #{waterLevel} ,
+            </if>
+            <if test="highLevel != null">
+                HIGHLEVEL = #{highLevel} ,
+            </if>
+            <if test="normalLevel != null">
+                NORMALLEVEL = #{normalLevel} ,
+            </if>
+            <if test="area != null">
+                AREA = #{area} ,
+            </if>
+            <if test="normalCapacity != null">
+                NORMALCAPACITY = #{normalCapacity} ,
+            </if>
+            <if test="sumCapacity != null">
+                SUMCAPACITY = #{sumCapacity} ,
+            </if>
+            <if test="floodCapacity != null">
+                FLOODCAPACITY = #{floodCapacity} ,
+            </if>
+            <if test="deadCapacity != null">
+                DEADCAPACITY = #{deadCapacity} ,
+            </if>
+            <if test="floodLimitCapacity != null">
+                FLOODLIMITCAPACITY = #{floodLimitCapacity} ,
+            </if>
+            <if test="normalArea != null">
+                NORMALAREA = #{normalArea} ,
+            </if>
+            <if test="floodLimitLevel != null">
+                FLOODLIMITLEVEL = #{floodLimitLevel} ,
+            </if>
+            <if test="deadLevel != null">
+                DEADLEVEL = #{deadLevel} ,
+            </if>
+            <if test="yearsFlow != null">
+                YEARSFLOW = #{yearsFlow} ,
+            </if>
+            <if test="starttime != null">
+                STARTTIME = to_date(substr(#{starttime},1,10),'yyyy-MM-dd'),
+            </if>
+            <if test="endtime != null">
+                ENDTIME = to_date(substr(#{endtime},1,10),'yyyy-MM-dd'),
+            </if>
+            <if test="reservoirManager != null">
+                RESERVOIRMANAGER = #{reservoirManager} ,
+            </if>
+            <if test="remark != null">
+                REMARK = #{remark},
+            </if>
+            <if test="featureId != null">
+                FEATUREID = #{featureId},
+            </if>
+        </set>
+        where ID = #{id}
+    </update>
+
+    <delete id="delete">
+		delete from RESERVOIR where ID = #{id}
+	</delete>
+</mapper>

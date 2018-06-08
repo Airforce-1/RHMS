@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<template>
+	<div class="row">
+		<div class="well">
+			<h1>查询用法</h1>
+			<el-table-query>
+					<div :option="{title:'选择菜单'+editData.selectMenu.id,value:editData.selectMenu,setValue:o=>editData.selectMenu=o}" :is="selectMenu"></div>
+					<div style="margin-left:5px;" :option="{title:'菜单类型'+editData.menuType,value:editData.menuType,setValue:o=>editData.menuType=o}" :is="menuType"></div>
+					<div style="margin-left:5px;" :option="{title:'选择行政区划'+editData.selectArea.id,value:editData.selectArea,setValue:o=>editData.selectArea=o}" :is="selectArea"></div>
+			</el-table-query>	  
+			<h1>编辑用法</h1>
+			<div>
+				<el-form-query>
+					<div :option="{className:'col-xs-6',width:'200px',split:'3:9',title:'选择菜单'+editData.selectMenu.id,value:editData.selectMenu,setValue:o=>editData.selectMenu=o,target:'form'}" :is="selectMenu"></div>
+					<div :option="{className:'col-xs-6',width:'200px',split:'3:9',title:'菜单类型'+editData.menuType,value:editData.menuType,setValue:o=>editData.menuType=o,target:'form'}" :is="menuType"></div>
+					<div :option="{className:'col-xs-6',width:'200px',split:'3:9',title:'选择行政区划'+editData.selectArea.id,value:editData.selectArea,setValue:o=>editData.selectArea=o,target:'form'}" :is="selectArea"></div>
+					<div :option="{className:'col-xs-6',width:'200px',split:'3:9',title:'选择河流类型'+editData.selectDict,value:editData.selectDict,setValue:o=>editData.selectDict=o,target:'form'}" refParam="河流（渠道）类型" :is="selectDict"></div>
+					<div :option="{className:'col-xs-6',width:'200px',split:'3:9',title:'运行状况'+editData.selectDict1,value:editData.selectDict1,setValue:o=>editData.selectDict1=o,target:'form'}" refParam="运行状况" :is="selectDict"></div>
+					<div :option="{className:'col-xs-6',width:'200px',split:'3:9',title:'备注'+editData.textArea,value:editData.textArea,setValue:o=>editData.textArea=o,target:'form'}" :is="textArea"></div>
+					<div :option="{className:'col-xs-6',width:'200px',split:'3:9',title:'是否启用'+editData.selectEnable,value:editData.selectEnable,setValue:o=>editData.selectEnable=o,target:'form'}" :is="selectEnable"></div>
+				</el-form-query>
+			</div>
+		</div>
+	</div>
+</template>
+<script>
+	//下拉菜单业务组件
+	import selectMenu from "@/components-business/cbTreeInput/selectMenu"
+	import selectArea from "@/components-business/cbTreeInput/selectArea"
+	//菜单类型业务组件
+	import menuType from "@/components-business/cbRadio/menuType"
+	//下拉
+	import selectDict from "@/components-business/cbSelect/selectDict"
+	//文本域
+	import textArea from "@/components-business/cbTextarea"
+	//checkbox
+	import selectEnable from "@/components-business/cbCheckbox/selectEnable"
+	export default {
+		data:function(){
+			 return{
+			 	selectMenu:selectMenu,
+			 	menuType:menuType,
+			 	selectArea:selectArea,
+			 	selectDict:selectDict,
+			 	textArea:textArea,
+			 	selectEnable:selectEnable,
+			 	editData:{
+			 		selectMenu:{id:null},
+			 		menuType:null,
+			 		selectArea:{id:null},
+			 		selectDict:null,
+			 		selectDict1:null,
+			 		textArea:null,
+			 		selectEnable:null
+			 	}
+			 }
+		},
+		mounted:function(){
+			this.editData.selectMenu={id:5};
+			//this.editData.menuType=1;
+		}
+	}
+</script>
+
+</body>
+</html>

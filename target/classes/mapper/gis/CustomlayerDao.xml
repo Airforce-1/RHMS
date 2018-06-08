@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.gis.dao.CustomlayerDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.gis.entity.CustomlayerEntity" id="customlayerMap">
+        <result property="id" column="ID"/>
+        <result property="title" column="TITLE"/>
+        <result property="geoset" column="GEOSET"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.khidi.manager.gis.entity.CustomlayerEntity">
+		select * from CUSTOMLAYER where ID = #{id}
+	</select>
+
+
+    <select id="queryList" resultType="com.khidi.manager.gis.entity.CustomlayerEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN
+                FROM (select * from CUSTOMLAYER
+                <where>
+                                            <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                        </if>
+                                            <if test="title != null and title!=''">AND TITLE like '%'||to_char(#{title})||'%'
+                        </if>
+                                            <if test="geoset != null and geoset!=''">AND GEOSET like '%'||to_char(#{geoset})||'%'
+                        </if>
+                                    </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by createtime desc
+                    </otherwise>
+                </choose>
+                )a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from CUSTOMLAYER
+            </otherwise>
+        </choose>
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from CUSTOMLAYER
+        <where>
+			                <if test="id != null and id!=''">AND  ID like '%'||to_char(#{id})||'%'
+                </if>
+			                <if test="title != null and title!=''">AND  TITLE like '%'||to_char(#{title})||'%'
+                </if>
+			                <if test="geoset != null and geoset!=''">AND  GEOSET like '%'||to_char(#{geoset})||'%'
+                </if>
+			        </where>
+	</select>
+	 
+	<insert id="save" parameterType="com.khidi.manager.gis.entity.CustomlayerEntity">
+		insert into CUSTOMLAYER
+		(
+			ID , 
+			TITLE , 
+			GEOSET 
+		)
+		values
+		(
+			#{id,jdbcType = VARCHAR}, 
+			#{title,jdbcType = VARCHAR}, 
+			#{geoset,jdbcType = VARCHAR}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.khidi.manager.gis.entity.CustomlayerEntity">
+		update CUSTOMLAYER 
+		<set>
+			<if test="title != null">
+				TITLE = #{title}  , </if>
+			<if test="geoset != null">
+				GEOSET = #{geoset}  </if>
+		</set>
+		where ID = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from CUSTOMLAYER where ID = #{id}
+	</delete>
+</mapper>

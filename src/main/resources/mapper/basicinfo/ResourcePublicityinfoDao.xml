@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.basicinfo.dao.ResourcePublicityinfoDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.basicinfo.entity.ResourcePublicityinfoEntity" id="resourcePublicityinfoMap">
+        <result property="id" column="ID"/>
+        <result property="areaName" column="AREANAME"/>
+        <result property="resourcetype" column="RESOURCETYPE"/>
+        <result property="resourcename" column="RESOURCENAME"/>
+        <result property="aim" column="AIM"/>
+        <result property="duty" column="DUTY"/>
+        <result property="checker" column="CHECKER"/>
+        <result property="policeman" column="POLICEMAN"/>
+        <result property="superviser" column="SUPERVISER"/>
+        <result property="header" column="HEADER"/>
+        <result property="headerpost" column="HEADERPOST"/>
+    </resultMap>
+
+
+
+
+    <select id="queryObject" resultType="com.khidi.manager.basicinfo.entity.ResourcePublicityinfoEntity">
+        select id,(select name from sys_area area where area.area_id = a.area_id) as areaName ,1  as resourcetype, name as resourcename,aim,duty,(select name from sys_user where user_id = a.checker)as checker,(select name from sys_user where user_id = a.policeman)as policeman,(select name from sys_user where user_id = a.SUPERVISER) as SUPERVISER ,(select name from sys_user where user_id = a.HEADER) as HEADER ,headerpost from river a  where a.id = #{id}
+        union
+        select id,(select name from sys_area area where area.area_id = b.area_id) as areaName ,3  as resourcetype,name as resourcename ,aim,duty ,(select name from sys_user where user_id = b.checker)as checker,(select name from sys_user where user_id = b.policeman)as policeman,(select name from sys_user where user_id = b.SUPERVISER) as SUPERVISER ,(select name from sys_user where user_id = b.HEADER) as HEADER,headerpost from canal b where b.id = #{id}
+        union
+        select id,(select name from sys_area area where area.area_id = c.area_id) as areaName  ,5  as resourcetype,name as resourcename ,aim ,duty,(select name from sys_user where user_id = c.checker)as checker,(select name from sys_user where user_id = c.policeman)as policeman,(select name from sys_user where user_id = c.SUPERVISER) as SUPERVISER,(select name from sys_user where user_id = c.HEADER) as HEADER,headerpost from lake c where c.id = #{id}
+        union
+        select id,(select name from sys_area area where area.area_id = d.area_id) as areaName  ,7  as resourcetype,name as resourcename  ,aim ,duty ,(select name from sys_user where user_id = d.checker)as checker,(select name from sys_user where user_id = d.policeman)as policeman,(select name from sys_user where user_id = d.SUPERVISER) as SUPERVISER,(select name from sys_user where user_id = d.HEADER) as HEADER,headerpost from reservoir d where d.id = #{id}
+        union
+        select id,(select name from sys_area area where area.area_id = e.area_id) as areaName ,2  as resourcetype,name as resourcename  ,aim ,duty,(select name from sys_user where user_id = e.checker)as checker,(select name from sys_user where user_id = e.policeman)as policeman,(select name from sys_user where user_id = e.SUPERVISER) as SUPERVISER ,(select name from sys_user where user_id = e.HEADER) as HEADER,headerpost from part_river e where e.id =#{id}
+        union
+        select id,(select name from sys_area area where area.area_id = f.area_id) as areaName ,4  as resourcetype,name as resourcename ,aim ,duty ,(select name from sys_user where user_id = f.checker)as checker,(select name from sys_user where user_id = f.policeman)as policeman,(select name from sys_user where user_id = f.SUPERVISER) as SUPERVISER ,(select name from sys_user where user_id = f.HEADER) as HEADER,headerpost from part_canal f where f.id = #{id}
+        union
+        select id,(select name from sys_area area where area.area_id = g.area_id) as areaName  ,6  as resourcetype,name as resourcename  ,aim,duty ,(select name from sys_user where user_id = g.checker)as checker,(select name from sys_user where user_id = g.policeman)as policeman,(select name from sys_user where user_id = g.SUPERVISER) as SUPERVISER,(select name from sys_user where user_id = g.HEADER) as HEADER,headerpost from part_lake g where g.id = #{id}
+        union
+        select id,(select name from sys_area area where area.area_id = h.area_id) as areaName  ,8  as resourcetype ,name as resourcename  ,aim,duty ,(select name from sys_user where user_id = h.checker)as checker,(select name from sys_user where user_id = h.policeman)as policeman,(select name from sys_user where user_id = h.SUPERVISER) as SUPERVISER ,(select name from sys_user where user_id = h.HEADER) as HEADER,headerpost from part_reservoir h where h.id = #{id}
+    </select>
+
+
+
+    <select id="queryList" resultType="com.khidi.manager.basicinfo.entity.ResourcePublicityinfoEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT z.*, ROWNUM RN
+                FROM (SELECT * FROM(
+                select a.id,(select name from sys_area area where area.area_id = a.area_id) as areaName ,1 as
+                resourcetype, name as resourcename,aim,duty,(select name from sys_user where user_id = a.checker)as
+                checker,(select name from sys_user where user_id = a.policeman)as policeman,(select name from sys_user
+                where user_id = a.SUPERVISER) as SUPERVISER ,(select name from sys_user where user_id = a.HEADER) as
+                HEADER ,headerpost  ,AREA_ID from river a
+                union
+                select b.id,(select name from sys_area area where area.area_id = b.area_id) as areaName ,3 as
+                resourcetype,name as resourcename ,aim,duty ,(select name from sys_user where user_id = b.checker)as
+                checker,(select name from sys_user where user_id = b.policeman)as policeman,(select name from sys_user
+                where user_id = b.SUPERVISER) as SUPERVISER ,(select name from sys_user where user_id = b.HEADER) as
+                HEADER,headerpost ,AREA_ID  from canal b
+                union
+                select c.id,(select name from sys_area area where area.area_id = c.area_id) as areaName ,5 as
+                resourcetype,name as resourcename ,aim ,duty,(select name from sys_user where user_id = c.checker)as
+                checker,(select name from sys_user where user_id = c.policeman)as policeman,(select name from sys_user
+                where user_id = c.SUPERVISER) as SUPERVISER,(select name from sys_user where user_id = c.HEADER) as
+                HEADER,headerpost  ,AREA_ID from lake c
+                union
+                select d.id,(select name from sys_area area where area.area_id = d.area_id) as areaName ,7 as
+                resourcetype,name as resourcename ,aim ,duty ,(select name from sys_user where user_id = d.checker)as
+                checker,(select name from sys_user where user_id = d.policeman)as policeman,(select name from sys_user
+                where user_id = d.SUPERVISER) as SUPERVISER,(select name from sys_user where user_id = d.HEADER) as
+                HEADER,headerpost ,AREA_ID  from reservoir d
+                union
+                select e.id,(select name from sys_area area where area.area_id = e.area_id) as areaName ,2 as
+                resourcetype,name as resourcename ,aim ,duty,(select name from sys_user where user_id = e.checker)as
+                checker,(select name from sys_user where user_id = e.policeman)as policeman,(select name from sys_user
+                where user_id = e.SUPERVISER) as SUPERVISER ,(select name from sys_user where user_id = e.HEADER) as
+                HEADER,headerpost  ,AREA_ID from part_river e
+                union
+                select f.id,(select name from sys_area area where area.area_id = f.area_id) as areaName ,4 as
+                resourcetype,name as resourcename ,aim ,duty ,(select name from sys_user where user_id = f.checker)as
+                checker,(select name from sys_user where user_id = f.policeman)as policeman,(select name from sys_user
+                where user_id = f.SUPERVISER) as SUPERVISER ,(select name from sys_user where user_id = f.HEADER) as
+                HEADER,headerpost ,AREA_ID  from part_canal f
+                union
+                select g.id,(select name from sys_area area where area.area_id = g.area_id) as areaName ,6 as
+                resourcetype,name as resourcename ,aim,duty ,(select name from sys_user where user_id = g.checker)as
+                checker,(select name from sys_user where user_id = g.policeman)as policeman,(select name from sys_user
+                where user_id = g.SUPERVISER) as SUPERVISER,(select name from sys_user where user_id = g.HEADER) as
+                HEADER,headerpost  ,AREA_ID from part_lake g
+                union
+                select h.id,(select name from sys_area area where area.area_id = h.area_id) as areaName ,8 as
+                resourcetype ,name as resourcename ,aim,duty ,(select name from sys_user where user_id = h.checker)as
+                checker,(select name from sys_user where user_id = h.policeman)as policeman,(select name from sys_user
+                where user_id = h.SUPERVISER) as SUPERVISER ,(select name from sys_user where user_id = h.HEADER) as
+                HEADER,headerpost  ,AREA_ID from part_reservoir h
+                )
+                <where>
+                    <if test="resourceType != null and resourceType!=''">AND RESOURCETYPE in (${resourceType})
+                    </if>
+                    <if test="resourceName != null and resourceName!=''">
+                        AND id IN
+                        (SELECT id FROM river WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+                        UNION
+                        SELECT id FROM lake WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+                        UNION
+                        SELECT id FROM part_river WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+                        UNION
+                        SELECT id FROM part_lake WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+                        UNION
+                        SELECT id FROM canal WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+                        UNION
+                        SELECT id FROM part_canal WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+                        UNION
+                        SELECT id FROM reservoir WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+                        UNION
+                        SELECT id FROM part_reservoir WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+                        )
+                    </if>
+                    <if test="areaId != null and areaId!=''">AND AREA_ID in (select area_id FROM sys_area START WITH area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+                    </if>
+                    <if test="header != null and header!=''">AND header LIKE '%' ||TO_CHAR(#{header}) ||'%'
+                    </if>
+                </where>
+                order by resourcetype desc
+                )z
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+        </choose>
+    </select>
+
+
+
+    <select id="queryTotal" resultType="int">
+        select count(*) from
+        (
+        select a.id,(select name from sys_area area where area.area_id = a.area_id) as areaName ,1 as resourcetype, name
+        as resourcename,aim,duty,(select name from sys_user where user_id = a.checker)as checker,(select name from
+        sys_user where user_id = a.policeman)as policeman,(select name from sys_user where user_id = a.SUPERVISER) as
+        SUPERVISER ,(select name from sys_user where user_id = a.HEADER) as HEADER ,headerpost,AREA_ID from river a
+        union
+        select b.id,(select name from sys_area area where area.area_id = b.area_id) as areaName ,3 as resourcetype,name
+        as resourcename ,aim,duty ,(select name from sys_user where user_id = b.checker)as checker,(select name from
+        sys_user where user_id = b.policeman)as policeman,(select name from sys_user where user_id = b.SUPERVISER) as
+        SUPERVISER ,(select name from sys_user where user_id = b.HEADER) as HEADER,headerpost ,AREA_ID from canal b
+        union
+        select c.id,(select name from sys_area area where area.area_id = c.area_id) as areaName ,5 as resourcetype,name
+        as resourcename ,aim ,duty,(select name from sys_user where user_id = c.checker)as checker,(select name from
+        sys_user where user_id = c.policeman)as policeman,(select name from sys_user where user_id = c.SUPERVISER) as
+        SUPERVISER,(select name from sys_user where user_id = c.HEADER) as HEADER,headerpost,AREA_ID from lake c
+        union
+        select d.id,(select name from sys_area area where area.area_id = d.area_id) as areaName ,7 as resourcetype,name
+        as resourcename ,aim ,duty ,(select name from sys_user where user_id = d.checker)as checker,(select name from
+        sys_user where user_id = d.policeman)as policeman,(select name from sys_user where user_id = d.SUPERVISER) as
+        SUPERVISER,(select name from sys_user where user_id = d.HEADER) as HEADER,headerpost,AREA_ID from reservoir d
+        union
+        select e.id,(select name from sys_area area where area.area_id = e.area_id) as areaName ,2 as resourcetype,name
+        as resourcename ,aim ,duty,(select name from sys_user where user_id = e.checker)as checker,(select name from
+        sys_user where user_id = e.policeman)as policeman,(select name from sys_user where user_id = e.SUPERVISER) as
+        SUPERVISER ,(select name from sys_user where user_id = e.HEADER) as HEADER,headerpost,AREA_ID from part_river e
+        union
+        select f.id,(select name from sys_area area where area.area_id = f.area_id) as areaName ,4 as resourcetype,name
+        as resourcename ,aim ,duty ,(select name from sys_user where user_id = f.checker)as checker,(select name from
+        sys_user where user_id = f.policeman)as policeman,(select name from sys_user where user_id = f.SUPERVISER) as
+        SUPERVISER ,(select name from sys_user where user_id = f.HEADER) as HEADER,headerpost ,AREA_ID from part_canal f
+        union
+        select g.id,(select name from sys_area area where area.area_id = g.area_id) as areaName ,6 as resourcetype,name
+        as resourcename ,aim,duty ,(select name from sys_user where user_id = g.checker)as checker,(select name from
+        sys_user where user_id = g.policeman)as policeman,(select name from sys_user where user_id = g.SUPERVISER) as
+        SUPERVISER,(select name from sys_user where user_id = g.HEADER) as HEADER,headerpost ,AREA_ID from part_lake g
+        union
+        select h.id,(select name from sys_area area where area.area_id = h.area_id) as areaName ,8 as resourcetype ,name
+        as resourcename ,aim,duty ,(select name from sys_user where user_id = h.checker)as checker,(select name from
+        sys_user where user_id = h.policeman)as policeman,(select name from sys_user where user_id = h.SUPERVISER) as
+        SUPERVISER ,(select name from sys_user where user_id = h.HEADER) as HEADER,headerpost ,AREA_ID  from part_reservoir h
+        )
+        <where>
+            <if test="resourceType != null and resourceType!=''">AND RESOURCETYPE in (${resourceType})
+            </if>
+            <if test="resourceName != null and resourceName!=''">
+                AND id IN
+                (SELECT id FROM river WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+                UNION
+                SELECT id FROM lake WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+                UNION
+                SELECT id FROM part_river WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+                UNION
+                SELECT id FROM part_lake WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+                UNION
+                SELECT id FROM canal WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+                UNION
+                SELECT id FROM part_canal WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+                UNION
+                SELECT id FROM reservoir WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+                UNION
+                SELECT id FROM part_reservoir WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+                )
+            </if>
+            <if test="areaId != null and areaId!=''">AND AREA_ID in (select area_id FROM sys_area START WITH area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+            </if>
+            <if test="header != null and header!=''">AND header LIKE '%' ||TO_CHAR(#{header}) ||'%'
+            </if>
+        </where>
+    </select>
+</mapper>

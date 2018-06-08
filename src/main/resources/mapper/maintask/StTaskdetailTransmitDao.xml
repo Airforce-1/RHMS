@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.maintask.dao.StTaskdetailTransmitDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.maintask.entity.StTaskdetailTransmitEntity" id="stTaskdetailTransmitMap">
+        <result property="taskdetailid" column="TASKDETAILID"/>
+        <result property="taskid" column="TASKID"/>
+        <result property="tasktype" column="TASKTYPE"/>
+        <result property="zftime" column="ZFTIME"/>
+        <result property="todeptid" column="TODEPTID"/>
+        <result property="id" column="ID"/>
+        <result property="transmitDeptid" column="TRANSMIT_DEPTID"/>
+        <result property="transmitUserid" column="TRANSMIT_USERID"/>
+        <result property="delind" column="DELIND"/>
+    </resultMap>
+
+    <select id="queryObject" resultType="com.khidi.manager.maintask.entity.StTaskdetailTransmitEntity">
+		select a.*,
+                (Select b.name FROM SYS_DEPT b WHERE b.DEPT_ID = a.TODEPTID) as todeptName,
+                (Select b.name FROM SYS_DEPT b WHERE b.DEPT_ID = a.TRANSMIT_DEPTID) as transmitDeptName
+                 from ST_TASKDETAIL_TRANSMIT a where ID = #{id}
+	</select>
+
+
+    <select id="queryList" resultType="com.khidi.manager.maintask.entity.StTaskdetailTransmitEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN,
+                (Select b.name FROM SYS_DEPT b WHERE b.DEPT_ID = a.TODEPTID) as todeptName,
+                (Select b.name FROM SYS_DEPT b WHERE b.DEPT_ID = a.TRANSMIT_DEPTID) as transmitDeptName
+                FROM (select * from ST_TASKDETAIL_TRANSMIT
+                <where>
+                    <if test="taskdetailid != null and taskdetailid!=''">AND TASKDETAILID like
+                        '%'||to_char(#{taskdetailid})||'%'
+                    </if>
+                    <if test="taskid != null and taskid!=''">AND TASKID like '%'||to_char(#{taskid})||'%'
+                    </if>
+                    <if test="tasktype != null and tasktype!=''">AND TASKTYPE like '%'||to_char(#{tasktype})||'%'
+                    </if>
+                    <if test="todeptid != null and todeptid!=''">AND TODEPTID like '%'||to_char(#{todeptid})||'%'
+                    </if>
+                    <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                    </if>
+                    <if test="transmitDeptid != null and transmitDeptid!=''">AND TRANSMIT_DEPTID like
+                        '%'||to_char(#{transmitDeptid})||'%'
+                    </if>
+                    <if test="transmitUserid != null and transmitUserid!=''">AND TRANSMIT_USERID like
+                        '%'||to_char(#{transmitUserid})||'%'
+                    </if>
+                    <if test="delind != null and delind!=''">AND DELIND like '%'||to_char(#{delind})||'%'
+                    </if>
+                </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by  zftime desc
+                    </otherwise>
+                </choose>
+                )a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from ST_TASKDETAIL_TRANSMIT
+            </otherwise>
+        </choose>
+    </select>
+
+
+    <select id="queryTotal" resultType="int">
+        select count(*) from ST_TASKDETAIL_TRANSMIT
+        <where>
+            <if test="taskdetailid != null and taskdetailid!=''">AND TASKDETAILID like
+                '%'||to_char(#{taskdetailid})||'%'
+            </if>
+            <if test="taskid != null and taskid!=''">AND TASKID like '%'||to_char(#{taskid})||'%'
+            </if>
+            <if test="tasktype != null and tasktype!=''">AND TASKTYPE like '%'||to_char(#{tasktype})||'%'
+            </if>
+            <if test="todeptid != null and todeptid!=''">AND TODEPTID like '%'||to_char(#{todeptid})||'%'
+            </if>
+            <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+            </if>
+            <if test="transmitDeptid != null and transmitDeptid!=''">AND TRANSMIT_DEPTID like
+                '%'||to_char(#{transmitDeptid})||'%'
+            </if>
+            <if test="transmitUserid != null and transmitUserid!=''">AND TRANSMIT_USERID like
+                '%'||to_char(#{transmitUserid})||'%'
+            </if>
+            <if test="delind != null and delind!=''">AND DELIND like '%'||to_char(#{delind})||'%'
+            </if>
+        </where>
+    </select>
+
+    <insert id="save" parameterType="com.khidi.manager.maintask.entity.StTaskdetailTransmitEntity">
+		insert into ST_TASKDETAIL_TRANSMIT
+		(
+			TASKDETAILID , 
+			TASKID , 
+			TASKTYPE ,
+			TODEPTID , 
+			ID ,
+			TRANSMIT_DEPTID ,
+			TRANSMIT_USERID ,
+			DELIND
+		)
+		values
+		(
+			#{taskdetailid,jdbcType = VARCHAR}, 
+			#{taskid,jdbcType = VARCHAR}, 
+			#{tasktype,jdbcType = VARCHAR},
+			#{todeptid,jdbcType = VARCHAR}, 
+			#{id,jdbcType = VARCHAR},
+			#{transmitDeptid,jdbcType = VARCHAR},
+			#{transmitUserid,jdbcType = VARCHAR},
+			#{delind,jdbcType = VARCHAR}
+		)
+	</insert>
+
+    <update id="update" parameterType="com.khidi.manager.maintask.entity.StTaskdetailTransmitEntity">
+        update ST_TASKDETAIL_TRANSMIT
+        <set>
+            <if test="taskdetailid != null">
+                TASKDETAILID = #{taskdetailid}
+            </if>
+            <if test="taskid != null">
+                TASKID = #{taskid} ,
+            </if>
+            <if test="tasktype != null">
+                TASKTYPE = #{tasktype} ,
+            </if>
+            <if test="todeptid != null">
+                TODEPTID = #{todeptid} ,
+            </if>
+            <if test="transmitDeptid != null">
+                TRANSMIT_DEPTID = #{transmitDeptid} ,
+            </if>
+            <if test="transmitUserid != null">
+                TRANSMIT_USERID = #{transmitUserid} ,
+            </if>
+            <if test="delind != null">
+                DELIND = #{delind}
+            </if>
+        </set>
+        where ID = #{id}
+    </update>
+
+    <delete id="delete">
+		delete from ST_TASKDETAIL_TRANSMIT where ID = #{id}
+	</delete>
+</mapper>

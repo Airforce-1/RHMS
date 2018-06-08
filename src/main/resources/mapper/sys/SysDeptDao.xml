@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.sys.dao.SysDeptDao">
+
+	<select id="queryObject" resultType="com.khidi.manager.sys.entity.SysDeptEntity">
+		select * from sys_dept where dept_id = #{value} and del_flag = 0
+	</select>
+
+
+	<select id="queryParentIdIsCorrent" parameterType="com.khidi.manager.sys.entity.SysDeptEntity" resultType="String">
+		select dept_id from (select dept_id from sys_dept START WITH dept_id= #{deptId} CONNECT BY prior dept_id = parent_id) b
+		where b.dept_id = #{parentId}
+	</select>
+
+
+
+
+	<select id="queryList" resultType="com.khidi.manager.sys.entity.SysDeptEntity">
+		select d.*,(select p.name from sys_dept p where p.dept_id = d.parent_id) as parentName
+		from sys_dept d where d.del_flag = 0
+		<if test="deptFilter != null">
+			and '${deptFilter}' like  '%'|| d.dept_id  ||'%'
+		</if>
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by d.${sidx} ${order}
+            </when>
+			<otherwise>
+                order by d.order_num asc
+			</otherwise>
+        </choose>
+	</select>
+	<insert id="save" parameterType="com.khidi.manager.sys.entity.SysDeptEntity" useGeneratedKeys="true" keyProperty="deptId">
+		insert into sys_dept
+		(
+			DEPT_ID ,
+			PARENT_ID ,
+			NAME ,
+			ORDER_NUM ,
+			DEL_FLAG ,
+			DEPT_LEVEL ,
+			AREA_ID ,
+			DEPT_TYPE ,
+			DEPT_DESC ,
+			REMARK
+		)
+		values
+		(
+			#{deptId,jdbcType=VARCHAR},
+			#{parentId,jdbcType=VARCHAR},
+			#{name,jdbcType=VARCHAR},
+			#{orderNum},
+			#{delFlag,jdbcType=VARCHAR},
+			#{deptLevel,jdbcType=VARCHAR},
+			#{areaId,jdbcType=VARCHAR},
+			#{deptType,jdbcType=VARCHAR},
+			#{deptDesc,jdbcType=VARCHAR},
+			#{remark,jdbcType=VARCHAR}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.khidi.manager.sys.entity.SysDeptEntity">
+		update sys_dept
+		<set>
+			<if test="deptId != null">
+				DEPT_ID = #{deptId}  , </if>
+			<if test="parentId != null">
+				PARENT_ID = #{parentId}  , </if>
+			<if test="name != null">
+				NAME = #{name}  , </if>
+			<if test="orderNum != null">
+				ORDER_NUM = #{orderNum}  , </if>
+			<if test="delFlag != null">
+				DEL_FLAG = #{delFlag}  , </if>
+			<if test="deptLevel != null">
+				DEPT_LEVEL = #{deptLevel}  , </if>
+			<if test="areaId != null">
+				AREA_ID = #{areaId}  , </if>
+			<if test="deptType != null">
+				DEPT_TYPE = #{deptType}  , </if>
+			<if test="deptDesc != null">
+				DEPT_DESC = #{deptDesc}  , </if>
+			<if test="remark != null">
+				REMARK = #{remark}  </if>
+		</set>
+		where dept_id = #{deptId}
+	</update>
+	
+	<update id="delete">
+		update sys_dept set del_flag = -1 where dept_id = #{value}
+	</update>
+	
+	<select id="queryDetpIdList" resultType="String">
+		select dept_id from sys_dept where parent_id = #{value}
+	</select>
+
+</mapper>

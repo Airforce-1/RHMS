@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.event.dao.AppeventWpDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.event.entity.AppeventWpEntity" id="appeventWpMap">
+        <result property="id" column="ID"/>
+        <result property="bwpr" column="BWPR"/>
+        <result property="wpnr" column="WPNR"/>
+        <result property="zxclgc" column="ZXCLGC"/>
+        <result property="createtime" column="CREATETIME"/>
+        <result property="eid" column="EID"/>
+        <result property="grpid" column="GRPID"/>
+        <result property="eflowid" column="EFLOWID"/>
+        <result property="currentind" column="CURRENTIND"/>
+        <result property="delind" column="DELIND"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.khidi.manager.event.entity.AppeventWpEntity">
+		select * from APPEVENT_WP where ID = #{id}
+	</select>
+
+
+    <select id="queryList" resultType="com.khidi.manager.event.entity.AppeventWpEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN
+                FROM (select * from APPEVENT_WP
+                <where>
+                                            <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                        </if>
+                                            <if test="bwpr != null and bwpr!=''">AND BWPR like '%'||to_char(#{bwpr})||'%'
+                        </if>
+                                            <if test="wpnr != null and wpnr!=''">AND WPNR like '%'||to_char(#{wpnr})||'%'
+                        </if>
+                                            <if test="zxclgc != null and zxclgc!=''">AND ZXCLGC like '%'||to_char(#{zxclgc})||'%'
+                        </if>
+                                            <if test="createtime != null and createtime!=''">AND CREATETIME like '%'||to_char(#{createtime})||'%'
+                        </if>
+                                            <if test="eid != null and eid!=''">AND EID like '%'||to_char(#{eid})||'%'
+                        </if>
+                                            <if test="grpid != null and grpid!=''">AND GRPID like '%'||to_char(#{grpid})||'%'
+                        </if>
+                                            <if test="eflowid != null and eflowid!=''">AND EFLOWID like '%'||to_char(#{eflowid})||'%'
+                        </if>
+                                            <if test="currentind != null and currentind!=''">AND CURRENTIND like '%'||to_char(#{currentind})||'%'
+                        </if>
+                                            <if test="delind != null and delind!=''">AND DELIND like '%'||to_char(#{delind})||'%'
+                        </if>
+                                    </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by createtime desc
+                    </otherwise>
+                </choose>
+                )a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from APPEVENT_WP
+            </otherwise>
+        </choose>
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from APPEVENT_WP
+        <where>
+			                <if test="id != null and id!=''">AND  ID like '%'||to_char(#{id})||'%'
+                </if>
+			                <if test="bwpr != null and bwpr!=''">AND  BWPR like '%'||to_char(#{bwpr})||'%'
+                </if>
+			                <if test="wpnr != null and wpnr!=''">AND  WPNR like '%'||to_char(#{wpnr})||'%'
+                </if>
+			                <if test="zxclgc != null and zxclgc!=''">AND  ZXCLGC like '%'||to_char(#{zxclgc})||'%'
+                </if>
+			                <if test="createtime != null and createtime!=''">AND  CREATETIME like '%'||to_char(#{createtime})||'%'
+                </if>
+			                <if test="eid != null and eid!=''">AND  EID like '%'||to_char(#{eid})||'%'
+                </if>
+			                <if test="grpid != null and grpid!=''">AND  GRPID like '%'||to_char(#{grpid})||'%'
+                </if>
+			                <if test="eflowid != null and eflowid!=''">AND  EFLOWID like '%'||to_char(#{eflowid})||'%'
+                </if>
+			                <if test="currentind != null and currentind!=''">AND  CURRENTIND like '%'||to_char(#{currentind})||'%'
+                </if>
+			                <if test="delind != null and delind!=''">AND  DELIND like '%'||to_char(#{delind})||'%'
+                </if>
+			        </where>
+	</select>
+	 
+	<insert id="save" parameterType="com.khidi.manager.event.entity.AppeventWpEntity">
+		insert into APPEVENT_WP
+		(
+			ID , 
+			BWPR , 
+			WPNR , 
+			ZXCLGC , 
+			CREATETIME , 
+			EID , 
+			GRPID , 
+			EFLOWID , 
+			CURRENTIND , 
+			DELIND 
+		)
+		values
+		(
+			#{id,jdbcType = VARCHAR}, 
+			#{bwpr,jdbcType = VARCHAR}, 
+			#{wpnr,jdbcType = VARCHAR}, 
+			#{zxclgc,jdbcType = VARCHAR}, 
+			#{createtime,jdbcType = VARCHAR}, 
+			#{eid,jdbcType = VARCHAR}, 
+			#{grpid,jdbcType = VARCHAR}, 
+			#{eflowid,jdbcType = VARCHAR}, 
+			#{currentind,jdbcType = VARCHAR}, 
+			#{delind,jdbcType = VARCHAR}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.khidi.manager.event.entity.AppeventWpEntity">
+		update APPEVENT_WP 
+		<set>
+			<if test="bwpr != null">
+				BWPR = #{bwpr}  , </if>
+			<if test="wpnr != null">
+				WPNR = #{wpnr}  , </if>
+			<if test="zxclgc != null">
+				ZXCLGC = #{zxclgc}  , </if>
+			<if test="createtime != null">
+				CREATETIME = #{createtime}  , </if>
+			<if test="eid != null">
+				EID = #{eid}  , </if>
+			<if test="grpid != null">
+				GRPID = #{grpid}  , </if>
+			<if test="eflowid != null">
+				EFLOWID = #{eflowid}  , </if>
+			<if test="currentind != null">
+				CURRENTIND = #{currentind}  , </if>
+			<if test="delind != null">
+				DELIND = #{delind}  </if>
+		</set>
+		where ID = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from APPEVENT_WP where ID = #{id}
+	</delete>
+</mapper>

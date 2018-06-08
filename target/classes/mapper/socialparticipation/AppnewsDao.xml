@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.socialparticipation.dao.AppnewsDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap type="com.khidi.manager.socialparticipation.entity.AppnewsEntity"
+		id="appnewsMap">
+		<result property="sortNum" column="SORTNUM" />
+		<result property="id" column="ID" />
+		<result property="newsTitle" column="NEWSTITLE" />
+		<result property="deptName" column="DEPTNAME" />
+		<result property="newsAuthor" column="NEWSAUTHOR" />
+		<result property="areaId" column="AREAID" />
+		<result property="menuId" column="MENUID" />
+		<result property="isTop" column="ISTOP" />
+		<result property="isPlay" column="ISPLAY" />
+		<result property="destroyTime" column="DESTROYTIME" />
+		<result property="newsContent" column="NEWSCONTENT" />
+		<result property="createTime" column="CREATETIME" />
+		<result property="areaName" column="AREANAME" />
+		<result property="newState" column="NEWSTATE" />
+		<result property="lastUpdateTime" column="LASTUPDATETIME" />
+
+
+		<collection property="menus"
+			ofType="com.khidi.manager.socialparticipation.entity.AppmenuEntity">
+			<id property="id" column="menu_id"></id>
+			<result property="name" column="menu_name"></result>
+			<result property="code" column="menu_code"></result>
+		</collection>
+	</resultMap>
+
+
+
+	<select id="queryObject"
+		resultType="com.khidi.manager.socialparticipation.entity.AppnewsEntity"
+		resultMap="appnewsMap">
+		SELECT * FROM (
+		select
+		a.sortNum,a.id,a.newstitle,a.deptname,a.newsauthor,a.areaid,a.menuid,a.istop,a.isplay,a.newstate,a.destroytime,UTL_RAW.CAST_TO_RAW(UTL_RAW.CAST_TO_VARCHAR2(a.newscontent))
+		AS
+		newscontent,a.createtime,a.lastupdatetime,b.NAME
+		as areaname,c.ID AS
+		MENU_ID,c.NAME AS MENU_NAME,c.CODE AS MENU_CODE
+		from APPNEWS a
+		LEFT JOIN
+		SYS_AREA b ON a.AREAID = b.AREA_ID
+		LEFT JOIN APPNEWS_MENU d ON a.ID =
+		d.APPINFOID
+		LEFT JOIN APPMENU c ON c.ID = d.APPMENUID )
+		WHERE ID = #{id}
+	</select>
+
+
+	<select id="queryList"
+		resultType="com.khidi.manager.socialparticipation.entity.AppnewsEntity"
+		resultMap="appnewsMap">
+		<choose>
+			<when test="limit != null and offset !=null and page!=null">
+				select
+				x.sortNum,x.id,x.newstitle,x.deptname,x.newsauthor,x.areaid,x.menuid,x.istop,x.isplay,x.newstate,x.destroytime,UTL_RAW.CAST_TO_RAW(UTL_RAW.CAST_TO_VARCHAR2(x.newscontent))
+				AS
+				newscontent,x.createtime,x.lastupdatetime,b.NAME
+				as areaname,c.ID
+				AS
+				MENU_ID,c.NAME AS MENU_NAME,c.CODE AS MENU_CODE
+				FROM (
+				SELECT
+				sortNum,id,newstitle,deptname,newsauthor,areaid,menuid,istop,isplay,newstate,destroytime,UTL_RAW.CAST_TO_RAW(UTL_RAW.CAST_TO_VARCHAR2(newscontent))
+				AS newscontent,createtime,lastupdatetime FROM
+				(
+				SELECT
+				a.sortNum,a.id,a.newstitle,a.deptname,a.newsauthor,a.areaid,a.menuid,a.istop,a.isplay,a.newstate,a.destroytime,UTL_RAW.CAST_TO_RAW(UTL_RAW.CAST_TO_VARCHAR2(a.newscontent))
+				AS newscontent,a.createtime,a.lastupdatetime,
+				ROWNUM RN
+				FROM (select
+				sortNum,id,newstitle,deptname,newsauthor,areaid,menuid,istop,isplay,newstate,destroytime,UTL_RAW.CAST_TO_RAW(UTL_RAW.CAST_TO_VARCHAR2(newscontent))
+				AS newscontent,createtime,lastupdatetime from APPNEWS
+				<where>
+					<if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+					</if>
+					<if test="newsTitle != null and newsTitle!=''">AND NEWSTITLE like '%'||to_char(#{newsTitle})||'%'
+					</if>
+					<if test="deptName != null and deptName!=''">AND DEPTNAME like '%'||to_char(#{deptName})||'%'
+					</if>
+					<if test="newsAuthor != null and newsAuthor!=''">AND NEWSAUTHOR like '%'||to_char(#{newsAuthor})||'%'
+					</if>
+					<if test="areaId != null and areaId!=''">AND AREAID like '%'||to_char(#{areaId})||'%'
+					</if>
+					<if test="menuId != null and menuId!=''">AND MENUID like '%'||to_char(#{menuId})||'%'
+					</if>
+					<if test="isTop != null and isTop!=''">AND ISTOP like '%'||to_char(#{isTop})||'%'
+					</if>
+					<if test="isPlay != null and isPlay!=''">AND ISPLAY like '%'||to_char(#{isPlay})||'%'
+					</if>
+					<if test="newState != null and newState!=''">AND NEWSTATE like '%'||to_char(#{newState})||'%'
+					</if>
+					<if test="destroyTime != null and destroyTime!=''">AND DESTROYTIME like '%'||to_char(#{destroyTime})||'%'
+					</if>
+
+					<if test="createTime != null and createTime!=''">AND CREATETIME like '%'||to_char(#{createTime})||'%'
+					</if>
+				</where>
+				<choose>
+					<when test="sidx != null and sidx.trim() != ''">
+						order by ${sidx} ${order}
+					</when>
+					<when test="sortNum != null and sortNum.trim() != ''">
+						order by ${sortNum} asc
+					</when>
+					<otherwise>
+						order by createtime desc
+					</otherwise>
+				</choose>
+				) a
+				WHERE ROWNUM &lt;= #{limit} * #{page}
+				)
+				WHERE RN > #{offset}
+				)
+				x LEFT
+				JOIN SYS_AREA b ON x.AREAID = b.AREA_ID LEFT JOIN APPNEWS_MENU d ON
+				x.ID
+				= d.APPINFOID LEFT JOIN APPMENU c ON c.ID = d.APPMENUID
+			</when>
+			<otherwise>
+				select
+				a.sortNum,a.id,a.newstitle,a.deptname,a.newsauthor,a.areaid,a.menuid,a.istop,a.isplay,a.newstate,a.destroytime,UTL_RAW.CAST_TO_RAW(UTL_RAW.CAST_TO_VARCHAR2(a.newscontent))
+				AS
+				newscontent,a.createtime,a.lastupdatetime,b.NAME
+				as areaname,c.ID
+				AS
+				MENU_ID,c.NAME AS MENU_NAME,c.CODE AS MENU_CODE
+				from APPNEWS a
+				LEFT
+				JOIN SYS_AREA b ON a.AREAID = b.AREA_ID
+				LEFT JOIN APPNEWS_MENU d ON
+				a.ID = d.APPINFOID
+				LEFT JOIN APPMENU c ON c.ID = d.APPMENUID
+				order by a.sortNum desc
+			</otherwise>
+		</choose>
+	</select>
+
+
+	<select id="queryTotal" resultType="int">
+		select count(*) from APPNEWS
+		<where>
+			<if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+			</if>
+			<if test="newsTitle != null and newsTitle!=''">AND NEWSTITLE like '%'||to_char(#{newsTitle})||'%'
+			</if>
+			<if test="deptName != null and deptName!=''">AND DEPTNAME like '%'||to_char(#{deptName})||'%'
+			</if>
+			<if test="newsAuthor != null and newsAuthor!=''">AND NEWSAUTHOR like '%'||to_char(#{newsAuthor})||'%'
+			</if>
+			<if test="areaId != null and areaId!=''">AND AREAID like '%'||to_char(#{areaId})||'%'
+			</if>
+			<if test="menuId != null and menuId!=''">AND MENUID like '%'||to_char(#{menuId})||'%'
+			</if>
+			<if test="isTop != null and isTop!=''">AND ISTOP like '%'||to_char(#{isTop})||'%'
+			</if>
+			<if test="destroyTime != null and destroyTime!=''">AND DESTROYTIME like '%'||to_char(#{destroyTime})||'%'
+			</if>
+
+			<if test="createTime != null and createTime!=''">AND CREATETIME like '%'||to_char(#{createTime})||'%'
+			</if>
+		</where>
+	</select>
+
+	<insert id="save"
+		parameterType="com.khidi.manager.socialparticipation.entity.AppnewsEntity">
+		insert into APPNEWS
+		(
+		SORTNUM,
+		ID ,
+		NEWSTITLE ,
+		DEPTNAME ,
+		NEWSAUTHOR,
+		AREAID ,
+		MENUID ,
+		ISTOP ,
+		ISPLAY,
+		NEWSTATE,
+		DESTROYTIME ,
+		NEWSCONTENT ,
+		CREATETIME,
+		LASTUPDATETIME
+		)
+		values
+		(
+		#{sortNum,jdbcType =
+		INTEGER},
+		#{id,jdbcType = VARCHAR},
+		#{newsTitle,jdbcType = VARCHAR},
+		#{deptName,jdbcType = VARCHAR},
+		#{newsAuthor,jdbcType = VARCHAR},
+		#{areaId,jdbcType = VARCHAR},
+		#{menuId,jdbcType = VARCHAR},
+		#{isTop,jdbcType = VARCHAR},
+		#{isPlay,jdbcType = VARCHAR},
+		#{newState,jdbcType = VARCHAR},
+		#{destroyTime,jdbcType = VARCHAR},
+		#{newsContent,jdbcType= BLOB },
+		#{createTime,jdbcType = VARCHAR},
+		#{lastUpdateTime,jdbcType = VARCHAR}
+		)
+	</insert>
+
+	<update id="update"
+		parameterType="com.khidi.manager.socialparticipation.entity.AppnewsEntity">
+		update APPNEWS
+		<set>
+			<if test="sortNum != null">
+				SORTNUM = #{sortNum} ,
+			</if>
+			<if test="newsTitle != null">
+				NEWSTITLE = #{newsTitle} ,
+			</if>
+			<if test="deptName != null">
+				DEPTNAME = #{deptName} ,
+			</if>
+			<if test="newsAuthor != null">
+				NEWSAUTHOR = #{newsAuthor} ,
+			</if>
+			<if test="areaId != null">
+				AREAID = #{areaId} ,
+			</if>
+			<if test="menuId != null">
+				MENUID = #{menuId} ,
+			</if>
+			<if test="isTop != null">
+				ISTOP = #{isTop} ,
+			</if>
+			<if test="isPlay != null">
+				ISPLAY = #{isPlay} ,
+			</if>
+			<if test="destroyTime != null">
+				DESTROYTIME = #{destroyTime} ,
+			</if>
+			<if test="newsContent != null">
+				NEWSCONTENT = #{newsContent} ,
+			</if>
+			<if test="lastUpdateTime != null">
+				LASTUPDATETIME = #{lastUpdateTime},
+			</if>
+		</set>
+		where ID = #{id}
+	</update>
+
+
+	<update id="updateState"
+		parameterType="com.khidi.manager.socialparticipation.entity.AppnewsEntity">
+		update APPNEWS
+		<set>
+			<if test="newState != null">
+				NEWSTATE = #{newState} ,
+			</if>
+			<if test="lastUpdateTime != null">
+				LASTUPDATETIME = #{lastUpdateTime},
+			</if>
+		</set>
+		where ID = #{id}
+	</update>
+
+	<delete id="delete">
+		delete from APPNEWS where ID = #{id}
+	</delete>
+</mapper>

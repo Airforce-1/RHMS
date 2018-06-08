@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.basicinfo.dao.ResourceAirStationDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.basicinfo.entity.ResourceAirStationEntity" id="resourceAirStationMap">
+        <result property="id" column="ID"/>
+        <result property="name" column="NAME"/>
+        <result property="address" column="ADDRESS"/>
+        <result property="areaId" column="AREA_ID"/>
+        <result property="areaName" column="AREA_Name"/>
+        <result property="x" column="X"/>
+        <result property="y" column="Y"/>
+        <result property="code" column="CODE"/>
+        <result property="createTime" column="CREATE_TIME"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.khidi.manager.basicinfo.entity.ResourceAirStationEntity">
+		select * from RESOURCE_AIR_STATION where ID = #{id}
+	</select>
+
+
+    <select id="queryList" resultType="com.khidi.manager.basicinfo.entity.ResourceAirStationEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN
+                FROM (select RESOURCE_AIR_STATION.*,(select name from sys_area where sys_area.area_Id = RESOURCE_AIR_STATION.AREA_ID) as AREA_Name from RESOURCE_AIR_STATION
+                <where>
+                                            <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                        </if>
+                                            <if test="name != null and name!=''">AND NAME like '%'||to_char(#{name})||'%'
+                        </if>
+                                            <if test="address != null and address!=''">AND ADDRESS like '%'||to_char(#{address})||'%'
+                        </if>
+                                            <if test="areaId != null and areaId!=''">AND AREA_ID like '%'||to_char(#{areaId})||'%'
+                        </if>
+                                            <if test="x != null and x!=''">AND X like '%'||to_char(#{x})||'%'
+                        </if>
+                                            <if test="y != null and y!=''">AND Y like '%'||to_char(#{y})||'%'
+                        </if>
+                                            <if test="createTime != null and createTime!=''">AND CREATE_TIME like '%'||to_char(#{createTime})||'%'
+                        </if>
+                                    </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by CREATE_TIME desc
+                    </otherwise>
+                </choose>
+                )a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from RESOURCE_AIR_STATION
+            </otherwise>
+        </choose>
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from RESOURCE_AIR_STATION
+        <where>
+			                <if test="id != null and id!=''">AND  ID like '%'||to_char(#{id})||'%'
+                </if>
+			                <if test="name != null and name!=''">AND  NAME like '%'||to_char(#{name})||'%'
+                </if>
+			                <if test="address != null and address!=''">AND  ADDRESS like '%'||to_char(#{address})||'%'
+                </if>
+			                <if test="areaId != null and areaId!=''">AND  AREA_ID like '%'||to_char(#{areaId})||'%'
+                </if>
+			                <if test="x != null and x!=''">AND  X like '%'||to_char(#{x})||'%'
+                </if>
+			                <if test="y != null and y!=''">AND  Y like '%'||to_char(#{y})||'%'
+                </if>
+			                <if test="createTime != null and createTime!=''">AND  CREATE_TIME like '%'||to_char(#{createTime})||'%'
+                </if>
+			        </where>
+	</select>
+	 
+	<insert id="save" parameterType="com.khidi.manager.basicinfo.entity.ResourceAirStationEntity">
+		insert into RESOURCE_AIR_STATION
+		(
+			ID , 
+			NAME , 
+			ADDRESS , 
+			AREA_ID , 
+			X , 
+			Y,
+			CODE
+		)
+		values
+		(
+			#{id,jdbcType = VARCHAR}, 
+			#{name,jdbcType = VARCHAR}, 
+			#{address,jdbcType = VARCHAR}, 
+			#{areaId,jdbcType = VARCHAR}, 
+			#{x,jdbcType = VARCHAR}, 
+			#{y,jdbcType = VARCHAR},
+			#{code,jdbcType = VARCHAR}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.khidi.manager.basicinfo.entity.ResourceAirStationEntity">
+		update RESOURCE_AIR_STATION 
+		<set>
+			<if test="name != null">
+				NAME = #{name}  , </if>
+			<if test="address != null">
+				ADDRESS = #{address}  , </if>
+			<if test="areaId != null">
+				AREA_ID = #{areaId}  , </if>
+			<if test="x != null">
+				X = #{x}  , </if>
+			<if test="y != null">
+				Y = #{y}  , </if>
+            <if test="code != null">
+                CODE = #{code}  , </if>
+		</set>
+		where ID = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from RESOURCE_AIR_STATION where ID = #{id}
+	</delete>
+</mapper>

@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.basicinfo.dao.PartRiverDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.basicinfo.entity.PartRiverEntity"
+               id="partRiverMap">
+        <result property="id" column="ID"/>
+        <result property="riverId" column="RIVERID"/>
+        <result property="name" column="NAME"/>
+        <result property="code" column="CODE"/>
+        <result property="areaId" column="AREA_ID"/>
+        <result property="alias" column="ALIAS"/>
+        <result property="riverStart" column="RIVERSTART"/>
+        <result property="riverEnd" column="RIVEREND"/>
+        <result property="startX" column="STARTX"/>
+        <result property="startY" column="STARTY"/>
+        <result property="endX" column="ENDX"/>
+        <result property="endY" column="ENDY"/>
+        <result property="length" column="LENGTH"/>
+        <result property="remark" column="REMARK"/>
+        <result property="parentId" column="PARENTID"/>
+        <result property="header" column="HEADER"/>
+        <result property="coordinater" column="COORDINATER"/>
+        <result property="policeman" column="POLICEMAN"/>
+        <result property="checker" column="CHECKER"/>
+        <result property="superviser" column="SUPERVISER"/>
+        <result property="duty" column="DUTY"/>
+        <result property="aim" column="AIM"/>
+        <result property="headerremark" column="HEADERREMARK"/>
+        <result property="headerpost" column="HEADERPOST"/>
+        <result property="coordinaterpost" column="COORDINATERPOST"/>
+        <result property="checkerpost" column="CHECKERPOST"/>
+        <result property="superviserpost" column="SUPERVISERPOST"/>
+        <result property="featureId" column="FEATUREID"/>
+    </resultMap>
+
+    <select id="queryObject" resultType="com.khidi.manager.basicinfo.entity.PartRiverEntity">
+		select * from PART_RIVER
+		where ID = #{id}
+	</select>
+
+    <select id="queryListByRiverId" resultType="com.khidi.manager.basicinfo.entity.PartRiverEntity">
+        select * from PART_RIVER
+        where RIVERID = #{riverId}
+    </select>
+
+
+    <select id="queryList" resultType="com.khidi.manager.basicinfo.entity.PartRiverEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN
+                FROM (select *
+                FROM PART_RIVER
+                <where>
+                    <if test="roleId != null">
+                        AND (SELECT wm_concat(b.partriverids)
+                        FROM sys_role_resource b
+                        WHERE b.roleid IN (${roleId})) LIKE '%'||PART_RIVER.ID||'%'
+                    </if>
+                    <if test="riverId != null and riverId!='' ">AND RIVERID = #{riverId}
+                    </if>
+                    <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                    </if>
+                    <if test="name != null and name!=''">AND NAME like '%'||to_char(#{name})||'%'
+                    </if>
+                    <if test="code != null and code!=''">AND CODE like '%'||to_char(#{code})||'%'
+                    </if>
+                    <if test="areaId != null and areaId!=''">AND AREA_ID in (select area_id FROM sys_area START WITH
+                        area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+                    </if>
+                    <if test="alias != null and alias!=''">AND ALIAS like '%'||to_char(#{alias})||'%'
+                    </if>
+                    <if test="riverStart != null and riverStart!=''">AND RIVERSTART like
+                        '%'||to_char(#{riverStart})||'%'
+                    </if>
+                    <if test="riverEnd != null and riverEnd!=''">AND RIVEREND like '%'||to_char(#{riverEnd})||'%'
+                    </if>
+                    <if test="startX != null and startX!=''">AND STARTX like '%'||to_char(#{startX})||'%'
+                    </if>
+                    <if test="startY != null and startY!=''">AND STARTY like '%'||to_char(#{startY})||'%'
+                    </if>
+                    <if test="endX != null and endX!=''">AND ENDX like '%'||to_char(#{endX})||'%'
+                    </if>
+                    <if test="endY != null and endY!=''">AND ENDY like '%'||to_char(#{endY})||'%'
+                    </if>
+                    <if test="length != null and length!=''">AND LENGTH like '%'||to_char(#{length})||'%'
+                    </if>
+                    <if test="remark != null and remark!=''">AND REMARK like '%'||to_char(#{remark})||'%'
+                    </if>
+                    <if test="featureId != null and featureId!=''">AND FEATUREID like '%'||to_char(#{featureId})||'%'
+                    </if>
+                </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by createtime desc
+                    </otherwise>
+                </choose>
+                ) a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from PART_RIVER
+                <where>
+                    <if test="roleId != null">
+                        AND (SELECT wm_concat(b.partriverids)
+                        FROM sys_role_resource b
+                        WHERE b.roleid IN (${roleId})) LIKE '%'||PART_RIVER.ID||'%'
+                    </if>
+                    <if test="riverId != null and riverId!='' ">AND RIVERID = #{riverId}
+                    </if>
+                    <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                    </if>
+                    <if test="name != null and name!=''">AND NAME like '%'||to_char(#{name})||'%'
+                    </if>
+                    <if test="code != null and code!=''">AND CODE like '%'||to_char(#{code})||'%'
+                    </if>
+                    <if test="areaId != null and areaId!=''">AND AREA_ID in (select area_id FROM sys_area START WITH
+                        area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+                    </if>
+                    <if test="alias != null and alias!=''">AND ALIAS like '%'||to_char(#{alias})||'%'
+                    </if>
+                    <if test="riverStart != null and riverStart!=''">AND RIVERSTART like
+                        '%'||to_char(#{riverStart})||'%'
+                    </if>
+                    <if test="riverEnd != null and riverEnd!=''">AND RIVEREND like '%'||to_char(#{riverEnd})||'%'
+                    </if>
+                    <if test="startX != null and startX!=''">AND STARTX like '%'||to_char(#{startX})||'%'
+                    </if>
+                    <if test="startY != null and startY!=''">AND STARTY like '%'||to_char(#{startY})||'%'
+                    </if>
+                    <if test="endX != null and endX!=''">AND ENDX like '%'||to_char(#{endX})||'%'
+                    </if>
+                    <if test="endY != null and endY!=''">AND ENDY like '%'||to_char(#{endY})||'%'
+                    </if>
+                    <if test="length != null and length!=''">AND LENGTH like '%'||to_char(#{length})||'%'
+                    </if>
+                    <if test="remark != null and remark!=''">AND REMARK like '%'||to_char(#{remark})||'%'
+                    </if>
+                    <if test="featureId != null and featureId!=''">AND FEATUREID like '%'||to_char(#{featureId})||'%'
+                    </if>
+                </where>
+            </otherwise>
+        </choose>
+
+    </select>
+
+
+    <select id="queryTotal" resultType="int">
+        select count(*) from PART_RIVER
+        <where>
+            <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+            </if>
+            <if test="riverId != null and riverId!=''">AND RIVERID = #{riverId}
+            </if>
+            <if test="name != null and name!=''">AND NAME like '%'||to_char(#{name})||'%'
+            </if>
+            <if test="code != null and code!=''">AND CODE like '%'||to_char(#{code})||'%'
+            </if>
+            <if test="areaId != null and areaId!=''">AND AREA_ID in (select area_id FROM sys_area START WITH
+                area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+            </if>
+            <if test="alias != null and alias!=''">AND ALIAS like '%'||to_char(#{alias})||'%'
+            </if>
+            <if test="riverStart != null and riverStart!=''">AND RIVERSTART like '%'||to_char(#{riverStart})||'%'
+            </if>
+            <if test="riverEnd != null and riverEnd!=''">AND RIVEREND like '%'||to_char(#{riverEnd})||'%'
+            </if>
+            <if test="startX != null and startX!=''">AND STARTX like '%'||to_char(#{startX})||'%'
+            </if>
+            <if test="startY != null and startY!=''">AND STARTY like '%'||to_char(#{startY})||'%'
+            </if>
+            <if test="endX != null and endX!=''">AND ENDX like '%'||to_char(#{endX})||'%'
+            </if>
+            <if test="endY != null and endY!=''">AND ENDY like '%'||to_char(#{endY})||'%'
+            </if>
+            <if test="length != null and length!=''">AND LENGTH like '%'||to_char(#{length})||'%'
+            </if>
+            <if test="remark != null and remark!=''">AND REMARK like '%'||to_char(#{remark})||'%'
+            </if>
+            <if test="featureId != null and featureId!=''">AND FEATUREID like '%'||to_char(#{featureId})||'%'
+            </if>
+        </where>
+    </select>
+
+    <insert id="save" parameterType="com.khidi.manager.basicinfo.entity.PartRiverEntity">
+		insert into PART_RIVER
+		(
+		HEADER ,
+		COORDINATER ,
+		POLICEMAN ,
+		CHECKER ,
+		SUPERVISER ,
+		DUTY ,
+		AIM ,
+		HEADERREMARK ,
+		HEADERPOST ,
+		COORDINATERPOST ,
+		CHECKERPOST ,
+		SUPERVISERPOST ,
+		ID ,
+		RIVERID ,
+		NAME ,
+		CODE ,
+		AREA_ID ,
+		ALIAS ,
+		RIVERSTART ,
+		RIVEREND ,
+		STARTX ,
+		STARTY ,
+		ENDX ,
+		ENDY ,
+		LENGTH ,
+		REMARK,
+		FEATUREID
+		)
+		values
+		(
+		#{header,jdbcType = VARCHAR},
+		#{coordinater,jdbcType = VARCHAR},
+		#{policeman,jdbcType = VARCHAR},
+		#{checker,jdbcType = VARCHAR},
+		#{superviser,jdbcType = VARCHAR},
+		#{duty,jdbcType = VARCHAR},
+		#{aim,jdbcType = VARCHAR},
+		#{headerremark,jdbcType = VARCHAR},
+		#{headerpost,jdbcType = VARCHAR},
+		#{coordinaterpost,jdbcType = VARCHAR},
+		#{checkerpost,jdbcType = VARCHAR},
+		#{superviserpost,jdbcType = VARCHAR},
+		#{id,jdbcType = VARCHAR},
+		#{riverId,jdbcType = VARCHAR},
+		#{name,jdbcType = VARCHAR},
+		#{code,jdbcType = VARCHAR},
+		#{areaId,jdbcType = VARCHAR},
+		#{alias,jdbcType = VARCHAR},
+		#{riverStart,jdbcType = VARCHAR},
+		#{riverEnd,jdbcType = VARCHAR},
+		#{startX,jdbcType = VARCHAR},
+		#{startY,jdbcType = VARCHAR},
+		#{endX,jdbcType = VARCHAR},
+		#{endY,jdbcType = VARCHAR},
+		#{length,jdbcType = VARCHAR},
+		#{remark,jdbcType = VARCHAR},
+		#{featureId,jdbcType = VARCHAR}
+		)
+	</insert>
+
+    <update id="update" parameterType="com.khidi.manager.basicinfo.entity.PartRiverEntity">
+        update PART_RIVER
+        <set>
+            <if test="header != null">
+                HEADER = #{header} ,
+            </if>
+            <if test="coordinater != null">
+                COORDINATER = #{coordinater} ,
+            </if>
+            <if test="policeman != null">
+                POLICEMAN = #{policeman} ,
+            </if>
+            <if test="checker != null">
+                CHECKER = #{checker} ,
+            </if>
+            <if test="superviser != null">
+                SUPERVISER = #{superviser} ,
+            </if>
+            <if test="duty != null">
+                DUTY = #{duty} ,
+            </if>
+            <if test="aim != null">
+                AIM = #{aim} ,
+            </if>
+            <if test="headerremark != null">
+                HEADERREMARK = #{headerremark} ,
+            </if>
+            <if test="headerpost != null">
+                HEADERPOST = #{headerpost} ,
+            </if>
+            <if test="coordinaterpost != null">
+                COORDINATERPOST = #{coordinaterpost} ,
+            </if>
+            <if test="checkerpost != null">
+                CHECKERPOST = #{checkerpost} ,
+            </if>
+            <if test="superviserpost != null">
+                SUPERVISERPOST = #{superviserpost} ,
+            </if>
+            <if test="riverId != null">
+                RIVERID = #{riverId} ,
+            </if>
+            <if test="name != null">
+                NAME = #{name} ,
+            </if>
+            <if test="code != null">
+                CODE = #{code} ,
+            </if>
+            <if test="areaId != null">
+                AREA_ID = #{areaId} ,
+            </if>
+            <if test="alias != null">
+                ALIAS = #{alias} ,
+            </if>
+            <if test="riverStart != null">
+                RIVERSTART = #{riverStart} ,
+            </if>
+            <if test="riverEnd != null">
+                RIVEREND = #{riverEnd} ,
+            </if>
+            <if test="startX != null">
+                STARTX = #{startX} ,
+            </if>
+            <if test="startY != null">
+                STARTY = #{startY} ,
+            </if>
+            <if test="endX != null">
+                ENDX = #{endX} ,
+            </if>
+            <if test="endY != null">
+                ENDY = #{endY} ,
+            </if>
+            <if test="length != null">
+                LENGTH = #{length} ,
+            </if>
+            <if test="remark != null">
+                REMARK = #{remark},
+            </if>
+            <if test="featureId != null">
+                FEATUREID = #{featureId},
+            </if>
+        </set>
+        where ID = #{id}
+    </update>
+
+    <delete id="delete">
+		delete from PART_RIVER where ID = #{id}
+	</delete>
+</mapper>

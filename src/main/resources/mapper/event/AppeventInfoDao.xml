@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.event.dao.AppeventInfoDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap type="com.khidi.manager.event.entity.AppeventInfoEntity"
+		id="appeventInfoMap">
+		<result property="delind" column="DELIND" />
+		<result property="id" column="ID" />
+		<result property="flag" column="FLAG" />
+		<result property="title" column="TITLE" />
+		<result property="state" column="STATE" />
+		<result property="fqr" column="FQR" />
+		<result property="createtime" column="CREATETIME" />
+		<result property="etype" column="ETYPE" />
+		<result property="econtent" column="ECONTENT" />
+		<result property="elat" column="ELAT" />
+		<result property="eheight" column="EHEIGHT" />
+		<result property="elon" column="ELON" />
+		<result property="dwprocedure" column="DWPROCEDURE" />
+		<result property="dwuserid" column="DWUSERID" />
+		<result property="hd" column="HD" />
+	</resultMap>
+
+	<select id="queryObject" resultType="com.khidi.manager.event.entity.AppeventInfoEntity">
+		select * from APPEVENT_INFO
+		where ID = #{id}
+	</select>
+
+
+	<select id="queryList" resultType="com.khidi.manager.event.entity.AppeventInfoEntity">
+		<choose>
+			<when test="limit != null and offset !=null and page!=null">
+				select * FROM (
+				SELECT * FROM
+				(
+				SELECT a.*, ROWNUM RN
+				FROM (select * from APPEVENT_INFO
+				<where>
+					<if test="delind != null and delind!=''">AND DELIND like '%'||to_char(#{delind})||'%'
+					</if>
+					<if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+					</if>
+					<if test="flag != null and flag!=''">AND FLAG like '%'||to_char(#{flag})||'%'
+					</if>
+					<if test="title != null and title!=''">AND TITLE like '%'||to_char(#{title})||'%'
+					</if>
+					<if test="state != null and state!=''">AND STATE like '%'||to_char(#{state})||'%'
+					</if>
+					<if test="fqr != null and fqr!=''">AND FQR like '%'||to_char(#{fqr})||'%'
+					</if>
+					<if test="createtime != null and createtime!=''">AND CREATETIME like '%'||to_char(#{createtime})||'%'
+					</if>
+					<if test="etype != null and etype!=''">AND ETYPE like '%'||to_char(#{etype})||'%'
+					</if>
+					<if test="econtent != null and econtent!=''">AND ECONTENT like '%'||to_char(#{econtent})||'%'
+					</if>
+					<if test="elat != null and elat!=''">AND ELAT like '%'||to_char(#{elat})||'%'
+					</if>
+					<if test="eheight != null and eheight!=''">AND EHEIGHT like '%'||to_char(#{eheight})||'%'
+					</if>
+					<if test="elon != null and elon!=''">AND ELON like '%'||to_char(#{elon})||'%'
+					</if>
+					<if test="dwprocedure != null and dwprocedure!=''">AND DWPROCEDURE like '%'||to_char(#{dwprocedure})||'%'
+					</if>
+					<if test="dwuserid != null and dwuserid!=''">AND DWUSERID like '%'||to_char(#{dwuserid})||'%'
+					</if>
+					<if test="hd != null and hd!=''">AND HD like '%'||to_char(#{hd})||'%'
+					</if>
+				</where>
+				<choose>
+					<when test="sidx != null and sidx.trim() != ''">
+						order by ${sidx} ${order}
+					</when>
+					<otherwise>
+						order by createtime desc
+					</otherwise>
+				</choose>
+				)a
+				WHERE ROWNUM &lt;= #{limit} * #{page}
+				)
+				WHERE RN > #{offset}
+				)
+			</when>
+			<otherwise>
+				select * from APPEVENT_INFO
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="queryTotal" resultType="int">
+		select count(*) from APPEVENT_INFO
+		<where>
+			<if test="delind != null and delind!=''">AND DELIND like '%'||to_char(#{delind})||'%'
+			</if>
+			<if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+			</if>
+			<if test="flag != null and flag!=''">AND FLAG like '%'||to_char(#{flag})||'%'
+			</if>
+			<if test="title != null and title!=''">AND TITLE like '%'||to_char(#{title})||'%'
+			</if>
+			<if test="state != null and state!=''">AND STATE like '%'||to_char(#{state})||'%'
+			</if>
+			<if test="fqr != null and fqr!=''">AND FQR like '%'||to_char(#{fqr})||'%'
+			</if>
+			<if test="createtime != null and createtime!=''">AND CREATETIME like '%'||to_char(#{createtime})||'%'
+			</if>
+			<if test="etype != null and etype!=''">AND ETYPE like '%'||to_char(#{etype})||'%'
+			</if>
+			<if test="econtent != null and econtent!=''">AND ECONTENT like '%'||to_char(#{econtent})||'%'
+			</if>
+			<if test="elat != null and elat!=''">AND ELAT like '%'||to_char(#{elat})||'%'
+			</if>
+			<if test="eheight != null and eheight!=''">AND EHEIGHT like '%'||to_char(#{eheight})||'%'
+			</if>
+			<if test="elon != null and elon!=''">AND ELON like '%'||to_char(#{elon})||'%'
+			</if>
+			<if test="dwprocedure != null and dwprocedure!=''">AND DWPROCEDURE like '%'||to_char(#{dwprocedure})||'%'
+			</if>
+			<if test="dwuserid != null and dwuserid!=''">AND DWUSERID like '%'||to_char(#{dwuserid})||'%'
+			</if>
+			<if test="hd != null and hd!=''">AND HD like '%'||to_char(#{hd})||'%'
+			</if>
+		</where>
+	</select>
+
+	<insert id="save" parameterType="com.khidi.manager.event.entity.AppeventInfoEntity">
+		insert into APPEVENT_INFO
+		(
+		DELIND ,
+		ID ,
+		FLAG ,
+		TITLE ,
+		STATE ,
+		FQR ,
+		CREATETIME ,
+		ETYPE ,
+		ECONTENT ,
+		ELAT ,
+		EHEIGHT ,
+		ELON ,
+		DWPROCEDURE ,
+		DWUSERID ,
+		HD,
+		ATTID
+		)
+		values
+		(
+		#{delind,jdbcType = VARCHAR},
+		#{id,jdbcType = VARCHAR},
+		#{flag,jdbcType = VARCHAR},
+		#{title,jdbcType = VARCHAR},
+		#{state,jdbcType = VARCHAR},
+		#{fqr,jdbcType = VARCHAR},
+		#{createtime,jdbcType = DATE},
+		#{etype,jdbcType = VARCHAR},
+		#{econtent,jdbcType = VARCHAR},
+		#{elat,jdbcType = DOUBLE},
+		#{eheight,jdbcType = DOUBLE},
+		#{elon,jdbcType = DOUBLE},
+		#{dwprocedure,jdbcType = VARCHAR},
+		#{dwuserid,jdbcType = VARCHAR},
+		#{hd,jdbcType = VARCHAR}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.khidi.manager.event.entity.AppeventInfoEntity">
+		update APPEVENT_INFO
+		<set>
+			<if test="id != null">
+				ID = #{id} ,
+			</if>
+			<if test="flag != null">
+				FLAG = #{flag} ,
+			</if>
+			<if test="title != null">
+				TITLE = #{title} ,
+			</if>
+			<if test="state != null">
+				STATE = #{state} ,
+			</if>
+			<if test="fqr != null">
+				FQR = #{fqr} ,
+			</if>
+			<if test="createtime != null">
+				CREATETIME = #{createtime} ,
+			</if>
+			<if test="etype != null">
+				ETYPE = #{etype} ,
+			</if>
+			<if test="econtent != null">
+				ECONTENT = #{econtent} ,
+			</if>
+			<if test="elat != null">
+				ELAT = #{elat} ,
+			</if>
+			<if test="eheight != null">
+				EHEIGHT = #{eheight} ,
+			</if>
+			<if test="elon != null">
+				ELON = #{elon} ,
+			</if>
+			<if test="dwprocedure != null">
+				DWPROCEDURE = #{dwprocedure} ,
+			</if>
+			<if test="dwuserid != null">
+				DWUSERID = #{dwuserid} ,
+			</if>
+			<if test="hd != null">
+				HD = #{hd}
+			</if>
+			
+		</set>
+		where ID = #{id}
+	</update>
+
+	<delete id="delete">
+		delete from APPEVENT_INFO where ID = #{id}
+	</delete>
+</mapper>

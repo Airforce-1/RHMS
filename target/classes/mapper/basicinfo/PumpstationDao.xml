@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.basicinfo.dao.PumpstationDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap type="com.khidi.manager.basicinfo.entity.PumpstationEntity"
+		id="pumpstationMap">
+		<result property="id" column="ID" />
+		<result property="name" column="NAME" />
+
+	</resultMap>
+
+	<select id="queryObject"
+		resultType="com.khidi.manager.basicinfo.entity.PumpstationEntity">
+		select * from pumpstation where ID = #{id}
+	</select>
+
+
+	<select id="queryList"
+		resultType="com.khidi.manager.basicinfo.entity.PumpstationEntity">
+		<choose>
+			<when test="limit != null and offset !=null and page!=null">
+				select d.* FROM (
+				SELECT c.* FROM
+				(
+				SELECT a.*, ROWNUM RN
+				FROM (select *
+				from pumpstation
+				<where>
+					<if test="managerCode != null and managerCode!=''">AND manager_Code like '%'||to_char(#{managerCode})||'%'
+					</if>
+					<if test="underManager != null and underManager!=''">AND under_Manager like
+						'%'||to_char(#{underManager})||'%'
+					</if>
+					<if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+					</if>
+					<if test="name != null and name!=''">AND NAME like '%'||to_char(#{name})||'%'
+					</if>
+					<if test="code != null and code!=''">AND CODE like '%'||to_char(#{code})||'%'
+					</if>
+					<if test="x != null and x !=''">AND x like '%'||to_char(#{x})||'%'
+					</if>
+					<if test="y != null and y !=''">AND y like '%'||to_char(#{y})||'%'
+					</if>
+					<if test="task != null and task !=''">AND task like '%'||to_char(#{task})||'%'
+					</if>
+					<if test="buildSiuation != null and buildSiuation!=''">AND build_Siuation like
+						'%'||to_char(#{buildSiuation})||'%'
+					</if>
+					<if test="buildTime != null and buildTime!=''">AND build_Time like '%'||to_char(#{buildTime})||'%'
+					</if>
+					<if test="grade != null and grade!=''">AND grade like '%'||to_char(#{grade})||'%'
+					</if>
+					<if test="buildLevel != null and buildLevel!=''">AND build_Level like '%'||to_char(#{buildLevel})||'%'
+					</if>
+					<if test="installedFlow != null and installedFlow!=''">AND installed_Flow like
+						'%'||to_char(#{installedFlow})||'%'
+					</if>
+					<if test="installedPower != null and installedPower!=''">AND installed_Power like
+						'%'||to_char(#{installedPower})||'%'
+					</if>
+					<if test="designLength != null and designLength!=''">AND design_Length like
+						'%'||to_char(#{designLength})||'%'
+					</if>
+					<if test="count != null and count!=''">AND count like
+						'%'||to_char(#{count})||'%'
+					</if>
+					<if test="managerName != null and managerName!=''">AND manager_Name like '%'||to_char(#{managerName})||'%'
+					</if>
+					<if test="areaId != null and areaId!=''">AND area_Id in (select area_id FROM sys_area START WITH
+						area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+					</if>
+					<if test="resourceType != null and resourceType!=''">AND resource_Type like
+						'%'||to_char(#{resourceType})||'%'
+					</if>
+					<if test="resourceId != null and resourceId!=''">AND resource_Id like '%'||to_char(#{resourceId})||'%'
+					</if>
+					<if test="createTime != null and createTime!=''">AND create_Time like
+						'%'||to_char(#{createTime})||'%'
+					</if>
+					<if test="resourceName != null and resourceName!=''">AND resource_Id in (select id from river where name
+						like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_river where name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from lake where name
+						like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_lake where name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from canal where name
+						like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_canal where name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from reservoir where
+						name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_reservoir where name like
+						'%'||to_char(#{resourceName})||'%')
+					</if>
+				</where>
+				<choose>
+					<when test="sidx != null and sidx.trim() != ''">
+						order by ${sidx} ${order}
+					</when>
+					<otherwise>
+						order by create_Time desc
+					</otherwise>
+				</choose>
+				)
+				a
+				WHERE ROWNUM &lt;= #{limit} * #{page}
+				)c
+				WHERE RN > #{offset}
+				)d
+			</when>
+			<otherwise>
+				select * from pumpstation
+				<where>
+					<if test="managerCode != null and managerCode!=''">AND manager_Code like '%'||to_char(#{managerCode})||'%'
+					</if>
+					<if test="underManager != null and underManager!=''">AND under_Manager like
+						'%'||to_char(#{underManager})||'%'
+					</if>
+					<if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+					</if>
+					<if test="name != null and name!=''">AND NAME like '%'||to_char(#{name})||'%'
+					</if>
+					<if test="code != null and code!=''">AND CODE like '%'||to_char(#{code})||'%'
+					</if>
+					<if test="x != null and x !=''">AND x like '%'||to_char(#{x})||'%'
+					</if>
+					<if test="y != null and y !=''">AND y like '%'||to_char(#{y})||'%'
+					</if>
+					<if test="task != null and task !=''">AND task like '%'||to_char(#{task})||'%'
+					</if>
+					<if test="buildSiuation != null and buildSiuation!=''">AND build_Siuation like
+						'%'||to_char(#{buildSiuation})||'%'
+					</if>
+					<if test="buildTime != null and buildTime!=''">AND build_Time like '%'||to_char(#{buildTime})||'%'
+					</if>
+					<if test="grade != null and grade!=''">AND grade like '%'||to_char(#{grade})||'%'
+					</if>
+					<if test="buildLevel != null and buildLevel!=''">AND build_Level like '%'||to_char(#{buildLevel})||'%'
+					</if>
+					<if test="installedFlow != null and installedFlow!=''">AND installed_Flow like
+						'%'||to_char(#{installedFlow})||'%'
+					</if>
+					<if test="installedPower != null and installedPower!=''">AND installed_Power like
+						'%'||to_char(#{installedPower})||'%'
+					</if>
+					<if test="designLength != null and designLength!=''">AND design_Length like
+						'%'||to_char(#{designLength})||'%'
+					</if>
+					<if test="count != null and count!=''">AND count like
+						'%'||to_char(#{count})||'%'
+					</if>
+					<if test="managerName != null and managerName!=''">AND manager_Name like '%'||to_char(#{managerName})||'%'
+					</if>
+					<if test="areaId != null and areaId!=''">AND area_Id in (select area_id FROM sys_area START WITH
+						area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+					</if>
+					<if test="resourceType != null and resourceType!=''">AND resource_Type like
+						'%'||to_char(#{resourceType})||'%'
+					</if>
+					<if test="resourceId != null and resourceId!=''">AND resource_Id like '%'||to_char(#{resourceId})||'%'
+					</if>
+					<if test="createTime != null and createTime!=''">AND create_Time like
+						'%'||to_char(#{createTime})||'%'
+					</if>
+					<if test="resourceName != null and resourceName!=''">AND resource_Id in (select id from river where name
+						like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_river where name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from lake where name
+						like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_lake where name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from canal where name
+						like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_canal where name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from reservoir where
+						name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_reservoir where name like
+						'%'||to_char(#{resourceName})||'%')
+					</if>
+				</where>
+			</otherwise>
+		</choose>
+
+	</select>
+
+
+	<select id="queryTotal" resultType="int">
+		select count(*) from pumpstation
+		<where>
+			<if test="managerCode != null and managerCode!=''">AND manager_Code like '%'||to_char(#{managerCode})||'%'
+			</if>
+			<if test="underManager != null and underManager!=''">AND under_Manager like '%'||to_char(#{underManager})||'%'
+			</if>
+			<if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+			</if>
+			<if test="name != null and name!=''">AND NAME like '%'||to_char(#{name})||'%'
+			</if>
+			<if test="code != null and code!=''">AND CODE like '%'||to_char(#{code})||'%'
+			</if>
+			<if test="x != null and x !=''">AND x like '%'||to_char(#{x})||'%'
+			</if>
+			<if test="y != null and y !=''">AND y like '%'||to_char(#{y})||'%'
+			</if>
+			<if test="task != null and task !=''">AND task like '%'||to_char(#{task})||'%'
+			</if>
+			<if test="buildSiuation != null and buildSiuation!=''">AND build_Siuation like
+				'%'||to_char(#{buildSiuation})||'%'
+			</if>
+			<if test="buildTime != null and buildTime!=''">AND build_Time like '%'||to_char(#{buildTime})||'%'
+			</if>
+			<if test="grade != null and grade!=''">AND grade like '%'||to_char(#{grade})||'%'
+			</if>
+			<if test="buildLevel != null and buildLevel!=''">AND build_Level like '%'||to_char(#{buildLevel})||'%'
+			</if>
+			<if test="installedFlow != null and installedFlow!=''">AND installed_Flow like
+				'%'||to_char(#{installedFlow})||'%'
+			</if>
+			<if test="installedPower != null and installedPower!=''">AND installed_Power like
+				'%'||to_char(#{installedPower})||'%'
+			</if>
+			<if test="designLength != null and designLength!=''">AND design_Length like
+				'%'||to_char(#{designLength})||'%'
+			</if>
+			<if test="count != null and count!=''">AND count like
+				'%'||to_char(#{count})||'%'
+			</if>
+			<if test="managerName != null and managerName!=''">AND manager_Name like '%'||to_char(#{managerName})||'%'
+			</if>
+			<if test="areaId != null and areaId!=''">AND area_Id in (select area_id FROM sys_area START WITH
+				area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+			</if>
+			<if test="resourceType != null and resourceType!=''">AND resource_Type like '%'||to_char(#{resourceType})||'%'
+			</if>
+			<if test="resourceId != null and resourceId!=''">AND resource_Id like '%'||to_char(#{resourceId})||'%'
+			</if>
+			<if test="createTime != null and createTime!=''">AND create_Time like
+				'%'||to_char(#{createTime})||'%'
+			</if>
+			<if test="resourceName != null and resourceName!=''">AND resource_Id in (select id from river where name
+						like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_river where name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from lake where name
+						like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_lake where name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from canal where name
+						like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_canal where name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from reservoir where
+						name like
+						'%'||to_char(#{resourceName})||'%' UNION ALL select id from part_reservoir where name like
+						'%'||to_char(#{resourceName})||'%')
+					</if>
+		</where>
+	</select>
+
+	<insert id="save"
+		parameterType="com.khidi.manager.basicinfo.entity.PumpstationEntity">
+		insert into pumpstation
+		(
+		manager_Code,
+		under_Manager,
+		ID ,
+		NAME ,
+		CODE ,
+		x,
+		y,
+		task ,
+		build_Siuation ,
+		build_Time ,
+		grade ,
+		build_Level ,
+		installed_Flow ,
+		installed_Power ,
+		design_Length ,
+		count ,
+		manager_Name ,
+		area_Id ,
+		resource_Type ,
+		resource_Id ,
+		create_Time
+		)
+		values
+		(
+		#{managerCode,jdbcType = VARCHAR},
+		#{underManager,jdbcType =
+		VARCHAR},
+		#{id,jdbcType = VARCHAR},
+		#{name,jdbcType = VARCHAR},
+		#{code,jdbcType = VARCHAR},
+		#{x,jdbcType = VARCHAR},
+		#{y,jdbcType =
+		VARCHAR},
+		#{task,jdbcType = VARCHAR},
+		#{buildSiuation,jdbcType =
+		VARCHAR},
+		#{buildTime,jdbcType = DATE},
+		#{grade,jdbcType = VARCHAR},
+		#{buildLevel,jdbcType = VARCHAR},
+		#{installedFlow,jdbcType = VARCHAR},
+		#{installedPower,jdbcType = VARCHAR},
+		#{designLength,jdbcType =
+		VARCHAR},
+		#{count,jdbcType = VARCHAR},
+		#{managerName,jdbcType =
+		VARCHAR},
+		#{areaId,jdbcType = VARCHAR},
+		#{resourceType,jdbcType =
+		VARCHAR},
+		#{resourceId,jdbcType = VARCHAR},
+		#{createTime,jdbcType =
+		DATE}
+		)
+	</insert>
+
+	<update id="update"
+		parameterType="com.khidi.manager.basicinfo.entity.PumpstationEntity">
+		update pumpstation
+		<set>
+			<if test="managerCode != null">manager_Code = #{managerCode},
+			</if>
+			<if test="underManager != null">under_Manager = #{underManager},
+			</if>
+			<if test="id != null">ID = #{id},
+			</if>
+			<if test="name != null">NAME = #{name},
+			</if>
+			<if test="code != null">CODE = #{code},
+			</if>
+			<if test="x != null">x = #{x},
+			</if>
+			<if test="y != null">y = #{y},
+			</if>
+			<if test="task != null">task = #{task},
+			</if>
+			<if test="buildSiuation != null">build_Siuation = #{buildSiuation},
+			</if>
+			<if test="buildTime != null">build_Time = #{buildTime},
+			</if>
+			<if test="grade != null">grade = #{grade},
+			</if>
+			<if test="buildLevel != null">build_Level = #{buildLevel},
+			</if>
+			<if test="installedFlow != null">installed_Flow = #{installedFlow},
+			</if>
+			<if test="installedPower != null">installed_Power = #{installedPower},
+			</if>
+			<if test="designLength != null">design_Length = #{designLength},
+			</if>
+			<if test="count != null">count = #{count},
+			</if>
+			<if test="managerName != null">manager_Name = #{managerName},
+			</if>
+			<if test="areaId != null">area_Id = #{areaId},
+			</if>
+			<if test="resourceType != null">resource_Type = #{resourceType},
+			</if>
+			<if test="resourceId != null">resource_Id = #{resourceId},
+			</if>
+			<if test="createTime != null">create_Time = #{createTime},
+			</if>
+		</set>
+		where ID = #{id}
+	</update>
+
+	<delete id="delete">
+		delete from pumpstation where ID = #{id}
+	</delete>
+</mapper>

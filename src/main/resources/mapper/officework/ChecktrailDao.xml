@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.officework.dao.ChecktrailDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.officework.entity.ChecktrailEntity" id="checktrailMap">
+        <result property="id" column="ID"/>
+        <result property="x" column="X"/>
+        <result property="recordid" column="RECORDID"/>
+        <result property="y" column="Y"/>
+        <result property="createtime" column="CREATETIME"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.khidi.manager.officework.entity.ChecktrailEntity">
+		select * from CHECKTRAIL where ID = #{id}
+	</select>
+
+
+    <select id="queryList" resultType="com.khidi.manager.officework.entity.ChecktrailEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN
+                FROM (select * from CHECKTRAIL
+                <where>
+                                            <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                        </if>
+                                            <if test="x != null and x!=''">AND X like '%'||to_char(#{x})||'%'
+                        </if>
+                                            <if test="recordid != null and recordid!=''">AND RECORDID like '%'||to_char(#{recordid})||'%'
+                        </if>
+                                            <if test="y != null and y!=''">AND Y like '%'||to_char(#{y})||'%'
+                        </if>
+                                            <if test="createtime != null and createtime!=''">AND CREATETIME like '%'||to_char(#{createtime})||'%'
+                        </if>
+                                    </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by createtime desc
+                    </otherwise>
+                </choose>
+                )a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from CHECKTRAIL
+            </otherwise>
+        </choose>
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from CHECKTRAIL
+        <where>
+			                <if test="id != null and id!=''">AND  ID like '%'||to_char(#{id})||'%'
+                </if>
+			                <if test="x != null and x!=''">AND  X like '%'||to_char(#{x})||'%'
+                </if>
+			                <if test="recordid != null and recordid!=''">AND  RECORDID like '%'||to_char(#{recordid})||'%'
+                </if>
+			                <if test="y != null and y!=''">AND  Y like '%'||to_char(#{y})||'%'
+                </if>
+			                <if test="createtime != null and createtime!=''">AND  CREATETIME like '%'||to_char(#{createtime})||'%'
+                </if>
+			        </where>
+	</select>
+	 
+	<insert id="save" parameterType="com.khidi.manager.officework.entity.ChecktrailEntity">
+		insert into CHECKTRAIL
+		(
+			ID , 
+			X , 
+			RECORDID , 
+			Y , 
+			CREATETIME 
+		)
+		values
+		(
+			#{id,jdbcType = VARCHAR}, 
+			#{x,jdbcType = VARCHAR}, 
+			#{recordid,jdbcType = VARCHAR}, 
+			#{y,jdbcType = VARCHAR}, 
+			#{createtime,jdbcType = VARCHAR}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.khidi.manager.officework.entity.ChecktrailEntity">
+		update CHECKTRAIL 
+		<set>
+			<if test="x != null">
+				X = #{x}  , </if>
+			<if test="recordid != null">
+				RECORDID = #{recordid}  , </if>
+			<if test="y != null">
+				Y = #{y}  , </if>
+			<if test="createtime != null">
+				CREATETIME = #{createtime}  </if>
+		</set>
+		where ID = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from CHECKTRAIL where ID = #{id}
+	</delete>
+</mapper>

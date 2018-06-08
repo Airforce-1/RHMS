@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.officework.dao.MeetingmembersDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.officework.entity.MeetingmembersEntity" id="meetingmembersMap">
+        <result property="id" column="ID"/>
+        <result property="memberOrg" column="MEMBERORG"/>
+        <result property="memberName" column="MEMBERNAME"/>
+        <result property="formType" column="FORMTYPE"/>
+        <result property="formId" column="FORMID"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.khidi.manager.officework.entity.MeetingmembersEntity">
+		select * from MEETINGMEMBERS where ID = #{id}
+	</select>
+
+
+    <select id="queryList" resultType="com.khidi.manager.officework.entity.MeetingmembersEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN
+                FROM (select * from MEETINGMEMBERS
+                <where>
+                                            <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                        </if>
+                                            <if test="memberOrg != null and memberOrg!=''">AND MEMBERORG like '%'||to_char(#{memberOrg})||'%'
+                        </if>
+                                            <if test="memberName != null and memberName!=''">AND MEMBERNAME like '%'||to_char(#{memberName})||'%'
+                        </if>
+                                            <if test="formType != null and formType!=''">AND FORMTYPE like '%'||to_char(#{formType})||'%'
+                        </if>
+                                            <if test="formId != null and formId!=''">AND FORMID like '%'||to_char(#{formId})||'%'
+                        </if>
+                                    </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by createtime desc
+                    </otherwise>
+                </choose>
+                )a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from MEETINGMEMBERS
+            </otherwise>
+        </choose>
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from MEETINGMEMBERS
+        <where>
+			                <if test="id != null and id!=''">AND  ID like '%'||to_char(#{id})||'%'
+                </if>
+			                <if test="memberOrg != null and memberOrg!=''">AND  MEMBERORG like '%'||to_char(#{memberOrg})||'%'
+                </if>
+			                <if test="memberName != null and memberName!=''">AND  MEMBERNAME like '%'||to_char(#{memberName})||'%'
+                </if>
+			                <if test="formType != null and formType!=''">AND  FORMTYPE like '%'||to_char(#{formType})||'%'
+                </if>
+			                <if test="formId != null and formId!=''">AND  FORMID like '%'||to_char(#{formId})||'%'
+                </if>
+			        </where>
+	</select>
+	 
+	<insert id="save" parameterType="com.khidi.manager.officework.entity.MeetingmembersEntity">
+		insert into MEETINGMEMBERS
+		(
+			ID , 
+			MEMBERORG , 
+			MEMBERNAME , 
+			FORMTYPE , 
+			FORMID 
+		)
+		values
+		(
+			#{id,jdbcType = VARCHAR}, 
+			#{memberOrg,jdbcType = VARCHAR}, 
+			#{memberName,jdbcType = VARCHAR}, 
+			#{formType,jdbcType = VARCHAR}, 
+			#{formId,jdbcType = VARCHAR}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.khidi.manager.officework.entity.MeetingmembersEntity">
+		update MEETINGMEMBERS 
+		<set>
+			<if test="memberorg != null">
+				MEMBERORG = #{memberOrg}  , </if>
+			<if test="membername != null">
+				MEMBERNAME = #{memberName}  , </if>
+			<if test="formtype != null">
+				FORMTYPE = #{formType}  , </if>
+			<if test="formid != null">
+				FORMID = #{formId}  </if>
+		</set>
+		where ID = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from MEETINGMEMBERS where ID = #{id}
+	</delete>
+</mapper>

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.socialparticipation.dao.AppmenuDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap type="com.khidi.manager.socialparticipation.entity.AppmenuEntity"
+		id="appmenuMap">
+		<result property="id" column="ID" />
+		<result property="name" column="NAME" />
+		<result property="code" column="CODE" />
+		<result property="parentId" column="PARENTID" />
+		<result property="remark" column="REMARK" />
+	</resultMap>
+
+	<select id="queryObject"
+		resultType="com.khidi.manager.socialparticipation.entity.AppmenuEntity">
+		select * from APPMENU where ID = #{id}
+	</select>
+
+
+	<select id="queryList"
+		resultType="com.khidi.manager.socialparticipation.entity.AppmenuEntity">
+		<choose>
+			<when test="limit != null and offset !=null and page!=null">
+				select * FROM (
+				SELECT * FROM
+				(
+				SELECT a.*, ROWNUM RN
+				FROM (select *
+				from APPMENU
+				<where>
+					<if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+					</if>
+					<if test="name != null and name!=''">AND NAME like '%'||to_char(#{name})||'%'
+					</if>
+					<if test="code != null and code!=''">AND CODE like '%'||to_char(#{code})||'%'
+					</if>
+					<if test="parentId != null and parentId!=''">AND PARENTID like '%'||to_char(#{parentId})||'%'
+					</if>
+					<if test="remark != null and remark!=''">AND REMARK like '%'||to_char(#{remark})||'%'
+					</if>
+				</where>
+				<choose>
+					<when test="sidx != null and sidx.trim() != ''">
+						order by ${sidx} ${order}
+					</when>
+					<otherwise>
+						order by createtime desc
+					</otherwise>
+				</choose>
+				)a
+				WHERE ROWNUM &lt;= #{limit} * #{page}
+				)
+				WHERE RN > #{offset}
+				)
+			</when>
+			<otherwise>
+				select * from APPMENU
+			</otherwise>
+		</choose>
+	</select>
+
+
+
+
+	<select id="queryList0"
+		resultType="com.khidi.manager.socialparticipation.entity.AppmenuEntity">
+		SELECT * from APPMENU 
+		<where>
+			<if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+			</if>
+			<if test="name != null and name!=''">AND NAME like '%'||to_char(#{name})||'%'
+			</if>
+			<if test="code != null and code!=''">AND CODE like '%'||to_char(#{code})||'%'
+			</if>
+			<if test="parentId != null and parentId!=''">AND PARENTID like '%'||to_char(#{parentId})||'%'
+			</if>
+			<if test="remark != null and remark!=''">AND REMARK like '%'||to_char(#{remark})||'%'
+			</if>
+		</where>
+	</select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<select id="queryTotal" resultType="int">
+		select count(*) from APPMENU
+		<where>
+			<if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+			</if>
+			<if test="name != null and name!=''">AND NAME like '%'||to_char(#{name})||'%'
+			</if>
+			<if test="code != null and code!=''">AND CODE like '%'||to_char(#{code})||'%'
+			</if>
+			<if test="parentId != null and parentId!=''">AND PARENTID like '%'||to_char(#{parentId})||'%'
+			</if>
+			<if test="remark != null and remark!=''">AND REMARK like '%'||to_char(#{remark})||'%'
+			</if>
+		</where>
+	</select>
+
+	<insert id="save"
+		parameterType="com.khidi.manager.socialparticipation.entity.AppmenuEntity">
+		insert into APPMENU
+		(
+		ID ,
+		NAME ,
+		CODE ,
+		PARENTID ,
+		REMARK
+		)
+		values
+		(
+		#{id,jdbcType = VARCHAR},
+		#{name,jdbcType = VARCHAR},
+		#{code,jdbcType = VARCHAR},
+		#{parentId,jdbcType = VARCHAR},
+		#{remark,jdbcType = VARCHAR}
+		)
+	</insert>
+
+	<update id="update"
+		parameterType="com.khidi.manager.socialparticipation.entity.AppmenuEntity">
+		update APPMENU
+		<set>
+			<if test="name != null">
+				NAME = #{name} ,
+			</if>
+			<if test="code != null">
+				CODE = #{code} ,
+			</if>
+			<if test="parentId != null">
+				PARENTID = #{parentId} ,
+			</if>
+			<if test="remark != null">
+				REMARK = #{remark}
+			</if>
+		</set>
+		where ID = #{id}
+	</update>
+
+
+	<select id="querySonMenusCounts" resultType="int">
+
+		SELECT COUNT(*) FROM
+		APPMENU WHERE PARENTID = #{parentId}
+
+	</select>
+
+	<select id="queryAll" resultMap="appmenuMap">
+
+		SELECT * FROM APPMENU
+
+	</select>
+
+	<select id="queryChildren" resultMap="appmenuMap">
+
+		SELECT * FROM APPMENU WHERE PARENTID = #{parentId}
+
+	</select>
+
+	<delete id="delete">
+		delete from APPMENU where ID = #{id}
+	</delete>
+</mapper>

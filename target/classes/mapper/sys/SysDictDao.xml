@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.sys.dao.SysDictDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.sys.entity.SysDictEntity" id="sysDictMap">
+        <result property="createTime" column="CREATETIME"/>
+        <result property="dictValue" column="DICTVALUE"/>
+        <result property="id" column="ID"/>
+        <result property="dictType" column="DICTTYPE"/>
+        <result property="dictName" column="DICTNAME"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.khidi.manager.sys.entity.SysDictEntity">
+		select * from SYS_DICT
+		<where>
+			<if test="id != null and id!=''">ID = #{id}
+			</if>
+			<if test="dictValue != null and dictValue!=''">AND DICTVALUE = #{dictValue}
+			</if>
+			<if test="dictType != null and dictType!=''">AND DICTTYPE =#{dictType}
+			</if>
+			<if test="dictName != null and dictName!=''">AND DICTNAME =#{dictName}
+			</if>
+		</where>
+
+	</select>
+
+	<select id="queryObjectbyId" resultType="com.khidi.manager.sys.entity.SysDictEntity">
+		select * from SYS_DICT where id =  #{id}
+	</select>
+
+
+
+
+
+
+    <select id="queryList" resultType="com.khidi.manager.sys.entity.SysDictEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN
+                FROM (SELECT * FROM SYS_DICT
+				<where>
+					<if test="createTime != null and createTime!=''">AND CREATETIME like '%'||to_char(#{createTime})||'%'
+					</if>
+					<if test="dictValue != null and dictValue!=''">AND DICTVALUE = #{dictValue}
+					</if>
+					<if test="id != null and id!=''">ID like '%'||to_char(#{id})||'%'
+					</if>
+					<if test="dictType != null and dictType!=''">AND DICTTYPE like '%'||to_char(#{dictType})||'%'
+					</if>
+					<if test="dictName != null and dictName!=''">AND DICTNAME like '%'||to_char(#{dictName})||'%'
+					</if>
+				</where>
+				<choose>
+					<when test="sidx != null and sidx.trim() != ''">
+						order by ${sidx} ${order}
+					</when>
+					<otherwise>
+						order by createtime desc
+					</otherwise>
+				</choose>
+				) a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from SYS_DICT
+            </otherwise>
+        </choose>
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from SYS_DICT
+        <where>
+			                <if test="dictValue != null and dictValue!=''">AND DICTVALUE like '%'||to_char(#{dictValue})||'%'
+                </if>
+			                <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                </if>
+			                <if test="dictType != null and dictType!=''">AND DICTTYPE like '%'||to_char(#{dictType})||'%'
+                </if>
+			                <if test="dictName != null and dictName!=''">AND DICTNAME like '%'||to_char(#{dictName})||'%'
+                </if>
+			        </where>
+	</select>
+	 
+	<insert id="save" parameterType="com.khidi.manager.sys.entity.SysDictEntity">
+		insert into SYS_DICT
+		(
+			DICTVALUE ,
+			ID , 
+			DICTTYPE ,
+			DICTNAME
+		)
+		values
+		(
+			#{dictValue}, 
+			#{id}, 
+			#{dictType}, 
+			#{dictName}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.khidi.manager.sys.entity.SysDictEntity">
+		update SYS_DICT 
+		<set>
+			<if test="dictValue != null">DICTVALUE = #{dictValue}, </if>
+			<if test="id != null">ID = #{id}, </if>
+			<if test="dictType != null">DICTTYPE = #{dictType}, </if>
+			<if test="dictName != null">DICTNAME = #{dictName}</if>
+		</set>
+		where ID = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from SYS_DICT where ID = '${_parameter}'
+	</delete>
+</mapper>

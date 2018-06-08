@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.officework.dao.ChecktaskdailyDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.officework.entity.ChecktaskdailyEntity" id="checktaskdailyMap">
+        <result property="id" column="ID"/>
+        <result property="code" column="CODE"/>
+        <result property="routeid" column="ROUTEID"/>
+        <result property="checker" column="CHECKER"/>
+        <result property="checktimes" column="CHECKTIMES"/>
+        <result property="unit" column="UNIT"/>
+        <result property="status" column="STATUS"/>
+        <result property="lastbegintime" column="LASTBEGINTIME"/>
+        <result property="lastendtime" column="LASTENDTIME"/>
+        <result property="begintime" column="BEGINTIME"/>
+        <result property="endtime" column="ENDTIME"/>
+        <result property="createtime" column="CREATETIME"/>
+		<result property="taskSender" column="TASKSENDER"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.khidi.manager.officework.entity.ChecktaskdailyEntity">
+		select * from CHECKTASKDAILY where ID = #{id}
+	</select>
+
+
+    <select id="queryList" resultType="com.khidi.manager.officework.vo.ChecktaskEntityVo">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN
+                FROM (select * from CHECKTASKDAILY
+                <where>
+					<if test="checker != null and checker!=''">checker in (select user_id from sys_user where name like '%' ||TO_CHAR(#{checker}) ||'%')
+					</if>
+					<if test="resourceName != null and resourceName!=''">
+						routeid in (select id from checkroute where name like '%' ||TO_CHAR(#{resourceName}) ||'%')
+					</if>
+					<if test="areaid != null and areaid!=''">
+						routeid in (select id from checkroute where areaid in (select area_id FROM sys_area START WITH
+						area_id=#{areaid} CONNECT BY prior area_id = parent_id))
+					</if>
+                                            <if test="checktimes != null and checktimes!=''">AND CHECKTIMES like '%'||to_char(#{checktimes})||'%'
+                        </if>
+                                            <if test="unit != null and unit!=''">AND UNIT like '%'||to_char(#{unit})||'%'
+                        </if>
+                                            <if test="status != null and status!=''">AND STATUS like '%'||to_char(#{status})||'%'
+                        </if>
+                                            <if test="lastbegintime != null and lastbegintime!=''">AND LASTBEGINTIME like '%'||to_char(#{lastbegintime})||'%'
+                        </if>
+                                            <if test="lastendtime != null and lastendtime!=''">AND LASTENDTIME like '%'||to_char(#{lastendtime})||'%'
+                        </if>
+                                            <if test="begintime != null and begintime!=''">AND BEGINTIME like '%'||to_char(#{begintime})||'%'
+                        </if>
+                                            <if test="endtime != null and endtime!=''">AND ENDTIME like '%'||to_char(#{endtime})||'%'
+                        </if>
+											<if test="createtime4start != null">AND CREATETIME  &gt;= #{createtime4start}
+						</if>
+											<if test="createtime4end != null">AND CREATETIME &lt;= #{createtime4end}
+						</if>
+											<if test="begintime4start != null">AND BEGINTIME  &gt;= #{begintime4start}
+						</if>
+											<if test="begintime4end != null">AND BEGINTIME &lt;= #{begintime4end}
+						</if>
+											<if test="areaId != null and areaId!=''">AND
+						</if>
+                                    </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by createtime desc
+                    </otherwise>
+                </choose>
+                )a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from CHECKTASKDAILY
+				<where>
+					<if test="checker != null and checker!=''">checker in (select user_id from sys_user where name like '%' ||TO_CHAR(#{checker}) ||'%')
+					</if>
+					<if test="resourceName != null and resourceName!=''">
+						routeid in (select id from checkroute where name like '%' ||TO_CHAR(#{resourceName}) ||'%')
+					</if>
+					<if test="areaid != null and areaid!=''">
+						routeid in (select id from checkroute where areaid in (select area_id FROM sys_area START WITH
+						area_id=#{areaid} CONNECT BY prior area_id = parent_id))
+					</if>
+					<if test="checktimes != null and checktimes!=''">AND CHECKTIMES like '%'||to_char(#{checktimes})||'%'
+					</if>
+					<if test="unit != null and unit!=''">AND UNIT like '%'||to_char(#{unit})||'%'
+					</if>
+					<if test="status != null and status!=''">AND STATUS like '%'||to_char(#{status})||'%'
+					</if>
+					<if test="lastbegintime != null and lastbegintime!=''">AND LASTBEGINTIME like '%'||to_char(#{lastbegintime})||'%'
+					</if>
+					<if test="lastendtime != null and lastendtime!=''">AND LASTENDTIME like '%'||to_char(#{lastendtime})||'%'
+					</if>
+					<if test="begintime != null and begintime!=''">AND BEGINTIME like '%'||to_char(#{begintime})||'%'
+					</if>
+					<if test="endtime != null and endtime!=''">AND ENDTIME like '%'||to_char(#{endtime})||'%'
+					</if>
+					<if test="createtime4start != null">AND CREATETIME  &gt;= #{createtime4start}
+					</if>
+					<if test="createtime4end != null">AND CREATETIME &lt;= #{createtime4end}
+					</if>
+					<if test="begintime4start != null">AND BEGINTIME  &gt;= #{begintime4start}
+					</if>
+					<if test="begintime4end != null">AND BEGINTIME &lt;= #{begintime4end}
+					</if>
+				</where>
+            </otherwise>
+        </choose>
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from CHECKTASKDAILY
+			<where>
+				<if test="checker != null and checker!=''">checker in (select user_id from sys_user where name like '%' ||TO_CHAR(#{checker}) ||'%')
+				</if>
+				<if test="resourceName != null and resourceName!=''">
+					routeid in (select id from checkroute where name like '%' ||TO_CHAR(#{resourceName}) ||'%')
+				</if>
+				<if test="areaid != null and areaid!=''">
+					routeid in (select id from checkroute where areaid in (select area_id FROM sys_area START WITH
+					area_id=#{areaid} CONNECT BY prior area_id = parent_id))
+				</if>
+				<if test="checktimes != null and checktimes!=''">AND CHECKTIMES like '%'||to_char(#{checktimes})||'%'
+				</if>
+				<if test="unit != null and unit!=''">AND UNIT like '%'||to_char(#{unit})||'%'
+				</if>
+				<if test="status != null and status!=''">AND STATUS like '%'||to_char(#{status})||'%'
+				</if>
+				<if test="lastbegintime != null and lastbegintime!=''">AND LASTBEGINTIME like '%'||to_char(#{lastbegintime})||'%'
+				</if>
+				<if test="lastendtime != null and lastendtime!=''">AND LASTENDTIME like '%'||to_char(#{lastendtime})||'%'
+				</if>
+				<if test="begintime != null and begintime!=''">AND BEGINTIME like '%'||to_char(#{begintime})||'%'
+				</if>
+				<if test="endtime != null and endtime!=''">AND ENDTIME like '%'||to_char(#{endtime})||'%'
+				</if>
+				<if test="createtime4start != null">AND CREATETIME  &gt;= #{createtime4start}
+				</if>
+				<if test="createtime4end != null">AND CREATETIME &lt;= #{createtime4end}
+				</if>
+				<if test="begintime4start != null">AND BEGINTIME  &gt;= #{begintime4start}
+				</if>
+				<if test="begintime4end != null">AND BEGINTIME &lt;= #{begintime4end}
+				</if>
+			</where>
+	</select>
+	 
+	<insert id="save" parameterType="com.khidi.manager.officework.entity.ChecktaskdailyEntity">
+		insert into CHECKTASKDAILY
+		(
+			ID , 
+			CODE , 
+			ROUTEID , 
+			CHECKER , 
+			CHECKTIMES , 
+			UNIT , 
+			STATUS , 
+			LASTBEGINTIME , 
+			LASTENDTIME , 
+			BEGINTIME , 
+			ENDTIME,
+			TASKSENDER
+		)
+		values
+		(
+			#{id,jdbcType = VARCHAR}, 
+			#{code,jdbcType = VARCHAR}, 
+			#{routeid,jdbcType = VARCHAR}, 
+			#{checker,jdbcType = VARCHAR}, 
+			#{checktimes,jdbcType = VARCHAR}, 
+			#{unit,jdbcType = VARCHAR}, 
+			#{status,jdbcType = VARCHAR}, 
+			#{lastbegintime,jdbcType = VARCHAR}, 
+			#{lastendtime,jdbcType = VARCHAR}, 
+			#{begintime,jdbcType = VARCHAR}, 
+			#{endtime,jdbcType = VARCHAR},
+			#{taskSender,jdbcType = VARCHAR}
+
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.khidi.manager.officework.entity.ChecktaskdailyEntity">
+		update CHECKTASKDAILY 
+		<set>
+			<if test="code != null">
+				CODE = #{code}  , </if>
+			<if test="routeid != null">
+				ROUTEID = #{routeid}  , </if>
+			<if test="checker != null">
+				CHECKER = #{checker}  , </if>
+			<if test="checktimes != null">
+				CHECKTIMES = #{checktimes}  , </if>
+			<if test="unit != null">
+				UNIT = #{unit}  , </if>
+			<if test="status != null">
+				STATUS = #{status}  , </if>
+			<if test="lastbegintime != null">
+				LASTBEGINTIME = #{lastbegintime}  , </if>
+			<if test="lastendtime != null">
+				LASTENDTIME = #{lastendtime}  , </if>
+			<if test="begintime != null">
+				BEGINTIME = #{begintime}  , </if>
+			<if test="endtime != null">
+				ENDTIME = #{endtime}  , </if>
+			<if test="createtime != null">
+				CREATETIME = #{createtime}  </if>
+		</set>
+		where ID = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from CHECKTASKDAILY where ID = #{id}
+	</delete>
+</mapper>

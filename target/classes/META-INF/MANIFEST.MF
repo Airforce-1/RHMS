@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Implementation-Title: RHMS
+Implementation-Version: 1.0.0
+Built-By: Administrator
+Implementation-Vendor-Id: khidi
+Build-Jdk: 1.8.0_171
+Implementation-URL: http://projects.spring.io/spring-boot/RHMS/
+Created-By: Maven Integration for Eclipse
+Implementation-Vendor: Pivotal Software, Inc.
+

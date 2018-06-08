@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.event.dao.AppentReportDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap type="com.khidi.manager.event.entity.AppentReportEntity"
+		id="appentReportMap">
+		<result property="id" column="ID" />
+		<result property="eid" column="EID" />
+		<result property="createtime" column="CREATETIME" />
+		<result property="grpid" column="GRPID" />
+		<result property="currentind" column="CURRENTIND" />
+		<result property="eflowid" column="EFLOWID" />
+		<result property="delind" column="DELIND" />
+	</resultMap>
+
+	<select id="queryObject" resultType="com.khidi.manager.event.entity.AppentReportEntity">
+		select * from APPENT_REPORT
+		where ID = #{id}
+	</select>
+
+
+	<select id="queryList" resultType="com.khidi.manager.event.entity.AppentReportEntity">
+		<choose>
+			<when test="limit != null and offset !=null and page!=null">
+				select * FROM (
+				SELECT * FROM
+				(
+				SELECT a.*, ROWNUM RN
+				FROM (select *
+				from APPENT_REPORT
+				<where>
+					<if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+					</if>
+					<if test="eid != null and eid!=''">AND EID like '%'||to_char(#{eid})||'%'
+					</if>
+					<if test="createtime != null and createtime!=''">AND CREATETIME like '%'||to_char(#{createtime})||'%'
+					</if>
+					<if test="grpid != null and grpid!=''">AND GRPID like '%'||to_char(#{grpid})||'%'
+					</if>
+					<if test="currentind != null and currentind!=''">AND CURRENTIND like '%'||to_char(#{currentind})||'%'
+					</if>
+					<if test="eflowid != null and eflowid!=''">AND EFLOWID like '%'||to_char(#{eflowid})||'%'
+					</if>
+					<if test="delind != null and delind!=''">AND DELIND like '%'||to_char(#{delind})||'%'
+					</if>
+					<if test="dwuser != null and dwuser!=''">AND DWUSER like '%'||to_char(#{dwuser})||'%'
+					</if>
+				</where>
+				<choose>
+					<when test="sidx != null and sidx.trim() != ''">
+						order by ${sidx} ${order}
+					</when>
+					<otherwise>
+						order by createtime desc
+					</otherwise>
+				</choose>
+				)a
+				WHERE ROWNUM &lt;= #{limit} * #{page}
+				)
+				WHERE RN > #{offset}
+				)
+			</when>
+			<otherwise>
+				select * from APPENT_REPORT
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="queryTotal" resultType="int">
+		select count(*) from APPENT_REPORT
+		<where>
+			<if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+			</if>
+			<if test="eid != null and eid!=''">AND EID like '%'||to_char(#{eid})||'%'
+			</if>
+			<if test="createtime != null and createtime!=''">AND CREATETIME like '%'||to_char(#{createtime})||'%'
+			</if>
+			<if test="grpid != null and grpid!=''">AND GRPID like '%'||to_char(#{grpid})||'%'
+			</if>
+			<if test="currentind != null and currentind!=''">AND CURRENTIND like '%'||to_char(#{currentind})||'%'
+			</if>
+			<if test="eflowid != null and eflowid!=''">AND EFLOWID like '%'||to_char(#{eflowid})||'%'
+			</if>
+			<if test="delind != null and delind!=''">AND DELIND like '%'||to_char(#{delind})||'%'
+			</if>
+			<if test="dwuser != null and dwuser!=''">AND DWUSER like '%'||to_char(#{dwuser})||'%'
+			</if>
+		</where>
+	</select>
+
+	<insert id="save" parameterType="com.khidi.manager.event.entity.AppentReportEntity">
+		insert into APPENT_REPORT
+		(
+		ID ,
+		EID ,
+		CREATETIME ,
+		GRPID ,
+		CURRENTIND ,
+		EFLOWID ,
+		DELIND,
+		DWUSER
+		)
+		values
+		(
+		#{id,jdbcType = VARCHAR},
+		#{eid,jdbcType = VARCHAR},
+		#{createtime,jdbcType = DATE},
+		#{grpid,jdbcType = VARCHAR},
+		#{currentind,jdbcType = VARCHAR},
+		#{eflowid,jdbcType = VARCHAR},
+		#{delind,jdbcType = VARCHAR},
+		#{dwuser,jdbcType = VARCHAR}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.khidi.manager.event.entity.AppentReportEntity">
+		update APPENT_REPORT
+		<set>
+			<if test="eid != null">
+				EID = #{eid} ,
+			</if>
+			<if test="createtime != null">
+				CREATETIME = #{createtime} ,
+			</if>
+			<if test="grpid != null">
+				GRPID = #{grpid} ,
+			</if>
+			<if test="currentind != null">
+				CURRENTIND = #{currentind} ,
+			</if>
+			<if test="eflowid != null">
+				EFLOWID = #{eflowid} ,
+			</if>
+			<if test="delind != null">
+				DELIND = #{delind},
+			</if>
+			<if test="dwuser != null">
+				DWUSER = #{dwuser},
+			</if>
+		</set>
+		where ID = #{id}
+	</update>
+
+	<delete id="delete">
+		delete from APPENT_REPORT where ID = #{id}
+	</delete>
+</mapper>

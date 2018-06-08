@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.basicinfo.dao.ResourceStationDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap type="com.khidi.manager.basicinfo.entity.ResourceStationEntity"
+		id="resourceStationMap">
+		<result property="id" column="ID" />
+		<result property="code" column="CODE" />
+		<result property="areaId" column="AREAID" />
+		<result property="stationType" column="STATION_TYPE" />
+		<result property="name" column="NAME" />
+		<result property="address" column="ADDRESS" />
+		<result property="resourceType" column="RESOURCE_TYPE" />
+		<result property="resourceId" column="RESOURCE_ID" />
+		<result property="stationX" column="STATIONX" />
+		<result property="stationY" column="STATIONY" />
+		<result property="owner" column="OWNER" />
+		<result property="phone" column="PHONE" />
+		<result property="stationBuild" column="STATIONBUILD" />
+		<result property="stationSituation" column="STATIONSITUATION" />
+		<result property="stationStarttime" column="STATIONSTARTTIME" />
+		<result property="stationBuildtime" column="STATIONBUILDTIME" />
+		<result property="remark" column="REMARK" />
+		<result property="attachment" column="ATTACHMENT" />
+		<result property="uprId" column="UPRID" />
+		<result property="dataOrgin" column="DATA_ORGIN" />
+		<result property="aimLevel" column="AIM_LEVEL" />
+	</resultMap>
+
+	<select id="queryObject"
+		resultType="com.khidi.manager.basicinfo.entity.ResourceStationEntity">
+		select * from RESOURCE_STATION where ID = #{id}
+	</select>
+
+
+
+	<!--根据滇管局编码返回水质监测站 -->
+	<select id="queryObjectByCode" resultType="com.khidi.manager.basicinfo.entity.ResourceStationEntity">
+		select * from RESOURCE_STATION where CODE = #{code} and  stationType = '1'
+	</select>
+
+
+	<select id="queryList"
+		resultType="com.khidi.manager.basicinfo.entity.ResourceStationEntity">
+		<choose>
+			<when test="limit != null and offset !=null and page!=null">
+				select * FROM (
+				SELECT * FROM
+				(
+				SELECT a.*, ROWNUM RN
+				FROM (select *
+				from RESOURCE_STATION
+				<where>
+					<!--根据角色编码集合过滤资源权限 -->
+					<if test="roleId != null">
+						(SELECT XMLAGG(XMLELEMENT(E,PARTRIVERIDS,riverids,lakeids,partlakeids,canalids,partcanalids,reservoirids,partreservoirids
+						||',')).EXTRACT('//text()').getclobval()
+						FROM sys_role_resource
+						WHERE roleid IN (${roleId}))   LIKE '%'|| RESOURCE_STATION.RESOURCE_ID  ||'%'
+					</if>
+					<if test="resourceName != null and resourceName!=''">
+						and resource_id IN
+						(SELECT id FROM river WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+						UNION
+						SELECT id FROM lake WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+						UNION
+						SELECT id FROM part_river WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+						UNION
+						SELECT id FROM part_lake WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+						UNION
+						SELECT id FROM canal WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+						UNION
+						SELECT id FROM part_canal WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+						UNION
+						SELECT id FROM reservoir WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+						UNION
+						SELECT id FROM part_reservoir WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+						)
+					</if>
+					<if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+					</if>
+					<if test="code != null and code!=''">AND CODE like '%'||to_char(#{code})||'%'
+					</if>
+					<if test="areaId != null and areaId!=''">AND AREA_ID in (select area_id FROM sys_area START WITH
+						area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+					</if>
+					<if test="stationType != null and stationType!=''">AND STATIONTYPE like '%'||to_char(#{stationType})||'%'
+					</if>
+					<if test="name != null and name!=''">AND NAME like '%'||to_char(#{name})||'%'
+					</if>
+					<if test="address != null and address!=''">AND ADDRESS like '%'||to_char(#{address})||'%'
+					</if>
+					<if test="resourceType != null and resourceType!=''">AND RESOURCE_TYPE like
+						'%'||to_char(#{resourceType})||'%'
+					</if>
+					<if test="resourceId != null and resourceId!=''">AND RESOURCE_ID like '%'||to_char(#{resourceId})||'%'
+					</if>
+					<if test="stationX != null and stationX!=''">AND STATIONX like '%'||to_char(#{stationX})||'%'
+					</if>
+					<if test="stationY != null and stationY!=''">AND STATIONY like '%'||to_char(#{stationY})||'%'
+					</if>
+					<if test="owner != null and owner!=''">AND OWNER like '%'||to_char(#{owner})||'%'
+					</if>
+					<if test="phone != null and phone!=''">AND PHONE like '%'||to_char(#{phone})||'%'
+					</if>
+					<if test="stationBuild != null and stationBuild!=''">AND STATIONBUILD like
+						'%'||to_char(#{stationBuild})||'%'
+					</if>
+					<if test="stationSituation != null and stationSituation!=''">AND STATIONSITUATION like
+						'%'||to_char(#{stationSituation})||'%'
+					</if>
+					<if test="stationStarttime != null and stationStarttime!=''">AND STATIONSTARTTIME like
+						'%'||to_char(#{stationStarttime})||'%'
+					</if>
+					<if test="stationBuildtime != null and stationBuildtime!=''">AND STATIONBUILDTIME like
+						'%'||to_char(#{stationBuildtime})||'%'
+					</if>
+					<if test="remark != null and remark!=''">AND REMARK like '%'||to_char(#{remark})||'%'
+					</if>
+					<if test="attachment != null and attachment!=''">AND ATTACHMENT like '%'||to_char(#{attachment})||'%'
+					</if>
+					<if test="uprId != null and uprId!=''">AND UPRID like '%'||to_char(#{uprId})||'%'
+					</if>
+				</where>
+				<choose>
+					<when test="sidx != null and sidx.trim() != ''">
+						order by ${sidx} ${order}
+					</when>
+					<otherwise>
+						order by createtime desc
+					</otherwise>
+				</choose>
+				)a
+				WHERE ROWNUM &lt;= #{limit} * #{page}
+				)
+				WHERE RN > #{offset}
+				)
+			</when>
+			<when test="stationType != null">
+				select * from RESOURCE_STATION
+				<where>
+					<!--根据角色编码集合过滤资源权限 -->
+					<if test="roleId != null">
+						(SELECT XMLAGG(XMLELEMENT(E,PARTRIVERIDS,riverids,lakeids,partlakeids,canalids,partcanalids,reservoirids,partreservoirids
+						||',')).EXTRACT('//text()').getclobval()
+						FROM sys_role_resource
+						WHERE roleid IN (${roleId}))   LIKE '%'|| RESOURCE_STATION.RESOURCE_ID  ||'%'
+					</if>
+					<if test="resourceName != null and resourceName!=''">
+						and resource_id IN
+						(SELECT id FROM river WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+						UNION
+						SELECT id FROM lake WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+						UNION
+						SELECT id FROM part_river WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+						UNION
+						SELECT id FROM part_lake WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+						UNION
+						SELECT id FROM canal WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+						UNION
+						SELECT id FROM part_canal WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+						UNION
+						SELECT id FROM reservoir WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+						UNION
+						SELECT id FROM part_reservoir WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+						)
+					</if>
+					<if test="areaId != null and areaId!=''">AND AREA_ID in (select area_id FROM sys_area START WITH
+						area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+					</if>
+					<if test="stationType != null and stationType!=''">AND STATIONTYPE = #{stationType}
+					</if>
+					<if test="dataOrgin != null and dataOrgin!=''">AND DATA_ORGIN = #{dataOrgin}
+					</if>
+					<if test="stationName != null and stationName!=''">AND NAME like '%'||to_char(#{stationName})||'%'
+					</if>
+				</where>
+			</when>
+			<otherwise>
+				select * from RESOURCE_STATION
+			</otherwise>
+		</choose>
+	</select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<select id="queryTotal" resultType="int">
+		select count(*) from RESOURCE_STATION
+		<where>
+			<!--根据角色编码集合过滤资源权限 -->
+			<if test="roleId != null">
+				(SELECT XMLAGG(XMLELEMENT(E,PARTRIVERIDS,riverids,lakeids,partlakeids,canalids,partcanalids,reservoirids,partreservoirids
+				||',')).EXTRACT('//text()').getclobval()
+				FROM sys_role_resource
+				WHERE roleid IN (${roleId}))   LIKE '%'|| RESOURCE_STATION.RESOURCE_ID  ||'%'
+			</if>
+			<if test="resourceName != null and resourceName!=''">
+				and resource_id IN
+				(SELECT id FROM river WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				UNION
+				SELECT id FROM lake WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				UNION
+				SELECT id FROM part_river WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				UNION
+				SELECT id FROM part_lake WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				UNION
+				SELECT id FROM canal WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				UNION
+				SELECT id FROM part_canal WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				UNION
+				SELECT id FROM reservoir WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				UNION
+				SELECT id FROM part_reservoir WHERE name LIKE '%' ||TO_CHAR(#{resourceName}) ||'%'
+				)
+			</if>
+			<if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+			</if>
+			<if test="code != null and code!=''">AND CODE like '%'||to_char(#{code})||'%'
+			</if>
+			<if test="areaId != null and areaId!=''">AND AREA_ID in (select area_id FROM sys_area START WITH
+				area_id=#{areaId} CONNECT BY prior area_id = parent_id)
+			</if>
+			<if test="stationType != null and stationType!=''">AND STATIONTYPE like '%'||to_char(#{stationType})||'%'
+			</if>
+			<if test="name != null and name!=''">AND NAME like '%'||to_char(#{name})||'%'
+			</if>
+			<if test="address != null and address!=''">AND ADDRESS like '%'||to_char(#{address})||'%'
+			</if>
+			<if test="resourceType != null and resourceType!=''">AND RESOURCE_TYPE like '%'||to_char(#{resourceType})||'%'
+			</if>
+			<if test="resourceId != null and resourceId!=''">AND RESOURCE_ID like '%'||to_char(#{resourceId})||'%'
+			</if>
+			<if test="stationX != null and stationX!=''">AND STATIONX like '%'||to_char(#{stationX})||'%'
+			</if>
+			<if test="stationY != null and stationY!=''">AND STATIONY like '%'||to_char(#{stationY})||'%'
+			</if>
+			<if test="owner != null and owner!=''">AND OWNER like '%'||to_char(#{owner})||'%'
+			</if>
+			<if test="phone != null and phone!=''">AND PHONE like '%'||to_char(#{phone})||'%'
+			</if>
+			<if test="stationBuild != null and stationBuild!=''">AND STATIONBUILD like '%'||to_char(#{stationBuild})||'%'
+			</if>
+			<if test="stationSituation != null and stationSituation!=''">AND STATIONSITUATION like
+				'%'||to_char(#{stationSituation})||'%'
+			</if>
+			<if test="stationStarttime != null and stationStarttime!=''">AND STATIONSTARTTIME like
+				'%'||to_char(#{stationStarttime})||'%'
+			</if>
+			<if test="stationBuildtime != null and stationBuildtime!=''">AND STATIONBUILDTIME like
+				'%'||to_char(#{stationBuildtime})||'%'
+			</if>
+			<if test="remark != null and remark!=''">AND REMARK like '%'||to_char(#{remark})||'%'
+			</if>
+			<if test="attachment != null and attachment!=''">AND ATTACHMENT like '%'||to_char(#{attachment})||'%'
+			</if>
+			<if test="uprId != null and uprId!=''">AND UPRID like '%'||to_char(#{uprId})||'%'
+			</if>
+		</where>
+	</select>
+
+
+
+	<select id="queryByResource"
+		resultType="com.khidi.manager.basicinfo.entity.ResourceStationEntity">
+		SELECT * FROM RESOURCE_STATION
+		<where>
+			RESOURCE_ID = #{resourceId}
+			<if test="stationType != null and stationType != ''">
+				AND STATIONTYPE = #{stationType}
+			</if>
+			<if test="resourceType != null and resourceType != ''">
+				AND RESOURCE_TYPE = #{resourceType}
+			</if>
+		</where>
+	</select>
+	
+	<select id="allStations" resultType="com.khidi.manager.basicinfo.entity.ResourceStationEntity">
+	
+	SELECT * FROM RESOURCE_STATION
+	<where>
+			<if test="stationType != null and stationType != ''">
+				STATIONTYPE = #{stationType,jdbcType=VARCHAR}
+			</if>
+		</where>
+	</select>
+
+	<insert id="save"
+		parameterType="com.khidi.manager.basicinfo.entity.ResourceStationEntity">
+		insert into RESOURCE_STATION
+		(
+		ID ,
+		CODE ,
+		AREA_ID ,
+		STATIONTYPE ,
+		NAME ,
+		ADDRESS ,
+		RESOURCE_TYPE ,
+		RESOURCE_ID ,
+		STATIONX ,
+		STATIONY ,
+		OWNER ,
+		PHONE ,
+		STATIONBUILD ,
+		STATIONSITUATION ,
+		STATIONSTARTTIME ,
+		STATIONBUILDTIME ,
+		REMARK ,
+		ATTACHMENT,
+		UPRID,
+		AIM_LEVEL
+		)
+		values
+		(
+		#{id,jdbcType=VARCHAR},
+		#{code,jdbcType=VARCHAR},
+		#{areaId,jdbcType=VARCHAR},
+		#{stationType,jdbcType=VARCHAR},
+		#{name,jdbcType=VARCHAR},
+		#{address,jdbcType=VARCHAR},
+		#{resourceType,jdbcType=VARCHAR},
+		#{resourceId,jdbcType=VARCHAR},
+		#{stationX,jdbcType=VARCHAR},
+		#{stationY,jdbcType=VARCHAR},
+		#{owner,jdbcType=VARCHAR},
+		#{phone,jdbcType=VARCHAR},
+		#{stationBuild,jdbcType=VARCHAR},
+		#{stationSituation,jdbcType=VARCHAR},
+		#{stationStarttime,jdbcType=DATE},
+		#{stationBuildtime,jdbcType=DATE},
+		#{remark,jdbcType=VARCHAR},
+		#{attachment,jdbcType=VARCHAR},
+		#{uprId,jdbcType=VARCHAR},
+		#{aimLevel,jdbcType=VARCHAR}
+		)
+	</insert>
+
+	<update id="update"
+		parameterType="com.khidi.manager.basicinfo.entity.ResourceStationEntity">
+		update RESOURCE_STATION
+		<set>
+			<if test="aimLevel != null">
+				AIM_LEVEL = #{aimLevel} ,
+			</if>
+			<if test="code != null">
+				CODE = #{code} ,
+			</if>
+			<if test="areaId != null">
+				AREA_ID = #{areaId} ,
+			</if>
+			<if test="stationType != null">
+				STATIONTYPE = #{stationType} ,
+			</if>
+			<if test="name != null">
+				NAME = #{name} ,
+			</if>
+			<if test="address != null">
+				ADDRESS = #{address} ,
+			</if>
+			<if test="resourceType != null">
+				RESOURCE_TYPE = #{resourceType} ,
+			</if>
+			<if test="resourceId != null">
+				RESOURCE_ID = #{resourceId} ,
+			</if>
+			<if test="stationX != null">
+				STATIONX = #{stationX} ,
+			</if>
+			<if test="stationY != null">
+				STATIONY = #{stationY} ,
+			</if>
+			<if test="owner != null">
+				OWNER = #{owner} ,
+			</if>
+			<if test="phone != null">
+				PHONE = #{phone} ,
+			</if>
+			<if test="stationBuild != null">
+				STATIONBUILD = #{stationBuild} ,
+			</if>
+			<if test="stationSituation != null">
+				STATIONSITUATION = #{stationSituation} ,
+			</if>
+			<if test="stationStarttime != null">
+				STATIONSTARTTIME = #{stationStarttime} ,
+			</if>
+			<if test="stationBuildtime != null">
+				STATIONBUILDTIME = #{stationBuildtime} ,
+			</if>
+			<if test="remark != null">
+				REMARK = #{remark},
+			</if>
+			<if test="attachment != null">
+				ATTACHMENT = #{attachment},
+			</if>
+			<if test="uprId != null">
+				UPRID = #{uprId}
+			</if>
+		</set>
+		where ID = #{id}
+	</update>
+
+	<delete id="delete">
+		delete from RESOURCE_STATION where ID = #{id}
+	</delete>
+</mapper>

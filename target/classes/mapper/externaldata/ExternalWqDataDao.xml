@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.khidi.manager.externaldata.dao.ExternalWqDataDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.khidi.manager.externaldata.entity.ExternalWqDataEntity" id="externalWqDataMap">
+        <result property="id" column="ID"/>
+        <result property="stationId" column="STATION_ID"/>
+        <result property="monitorTime" column="MONITOR_TIME"/>
+        <result property="item" column="ITEM"/>
+        <result property="value" column="VALUE"/>
+        <result property="unit" column="UNIT"/>
+        <result property="createTime" column="CREATE_TIME"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.khidi.manager.externaldata.entity.ExternalWqDataEntity">
+		select * from EXTERNAL_WQ_DATA where ID = #{id}
+	</select>
+
+
+    <select id="queryList" resultType="com.khidi.manager.externaldata.entity.ExternalWqDataEntity">
+        <choose>
+            <when test="limit != null and offset !=null and page!=null">
+                select * FROM (
+                SELECT * FROM
+                (
+                SELECT a.*, ROWNUM RN
+                FROM (select * from EXTERNAL_WQ_DATA
+                <where>
+                                            <if test="id != null and id!=''">AND ID like '%'||to_char(#{id})||'%'
+                        </if>
+                                            <if test="stationId != null and stationId!=''">AND STATION_ID like '%'||to_char(#{stationId})||'%'
+                        </if>
+                                            <if test="monitorTime != null and monitorTime!=''">AND MONITOR_TIME like '%'||to_char(#{monitorTime})||'%'
+                        </if>
+                                            <if test="item != null and item!=''">AND ITEM like '%'||to_char(#{item})||'%'
+                        </if>
+                                            <if test="value != null and value!=''">AND VALUE like '%'||to_char(#{value})||'%'
+                        </if>
+                                            <if test="unit != null and unit!=''">AND UNIT like '%'||to_char(#{unit})||'%'
+                        </if>
+                                            <if test="createTime != null and createTime!=''">AND CREATE_TIME like '%'||to_char(#{createTime})||'%'
+                        </if>
+                                    </where>
+                <choose>
+                    <when test="sidx != null and sidx.trim() != ''">
+                        order by ${sidx} ${order}
+                    </when>
+                    <otherwise>
+                        order by createtime desc
+                    </otherwise>
+                </choose>
+                )a
+                WHERE ROWNUM &lt;= #{limit} * #{page}
+                )
+                WHERE RN > #{offset}
+                )
+            </when>
+            <otherwise>
+                select * from EXTERNAL_WQ_DATA
+            </otherwise>
+        </choose>
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from EXTERNAL_WQ_DATA
+        <where>
+			                <if test="id != null and id!=''">AND  ID like '%'||to_char(#{id})||'%'
+                </if>
+			                <if test="stationId != null and stationId!=''">AND  STATION_ID like '%'||to_char(#{stationId})||'%'
+                </if>
+			                <if test="monitorTime != null and monitorTime!=''">AND  MONITOR_TIME like '%'||to_char(#{monitorTime})||'%'
+                </if>
+			                <if test="item != null and item!=''">AND  ITEM like '%'||to_char(#{item})||'%'
+                </if>
+			                <if test="value != null and value!=''">AND  VALUE like '%'||to_char(#{value})||'%'
+                </if>
+			                <if test="unit != null and unit!=''">AND  UNIT like '%'||to_char(#{unit})||'%'
+                </if>
+			                <if test="createTime != null and createTime!=''">AND  CREATE_TIME like '%'||to_char(#{createTime})||'%'
+                </if>
+			        </where>
+	</select>
+	 
+	<insert id="save" parameterType="com.khidi.manager.externaldata.entity.ExternalWqDataEntity">
+		insert into EXTERNAL_WQ_DATA
+		(
+			ID , 
+			STATION_ID , 
+			MONITOR_TIME , 
+			ITEM , 
+			VALUE , 
+			UNIT
+		)
+		values
+		(
+			#{id,jdbcType = VARCHAR}, 
+			#{stationId,jdbcType = VARCHAR}, 
+			#{monitorTime,jdbcType = VARCHAR}, 
+			#{item,jdbcType = VARCHAR}, 
+			#{value,jdbcType = VARCHAR}, 
+			#{unit,jdbcType = VARCHAR}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.khidi.manager.externaldata.entity.ExternalWqDataEntity">
+		update EXTERNAL_WQ_DATA 
+		<set>
+			<if test="stationId != null">
+				STATION_ID = #{stationId}  , </if>
+			<if test="monitorTime != null">
+				MONITOR_TIME = #{monitorTime}  , </if>
+			<if test="item != null">
+				ITEM = #{item}  , </if>
+			<if test="value != null">
+				VALUE = #{value}  , </if>
+			<if test="unit != null">
+				UNIT = #{unit}  , </if>
+			<if test="createTime != null">
+				CREATE_TIME = #{createTime}  </if>
+		</set>
+		where ID = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from EXTERNAL_WQ_DATA where ID = #{id}
+	</delete>
+</mapper>
